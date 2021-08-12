@@ -31,3 +31,27 @@ class Data {
         void show_data(void); 
 };
 
+class Articles{
+    int id, number_topics, number_authors;
+    std::vector<int> article_authors;
+    std::vector<int> article_topics;
+};
+
+class Sessions{
+    int id, number_session, max_article, min_article;
+};
+
+class Topics{
+    int id;
+    std::vector<int> topic;
+};
+
+class Authors{
+    int id;
+    std::vector<int> articles;
+};
+
+class Timetabling{
+    int time_blocks, rooms, days;
+    std::vector<std::vector<std::vector<int>>> timetabling;
+};

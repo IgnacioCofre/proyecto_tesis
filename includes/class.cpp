@@ -127,7 +127,7 @@ void Data::read_input_file(const char * input_path) {
         std::cerr << "Problem while reading number authors" << std::endl;
         exit(EXIT_FAILURE);
     }
-
+    //autores por articulo
     for(int i = 0; i < number_articles; i++)
     {
         int new_number_article_authors;
@@ -165,5 +165,9 @@ void Data::show_data()
 
         std::cout << std::endl; 
     }
-    
+
+    std::cout << number_type_sessions << std::endl;
+    std::cout << number_days << std::endl;
+    std::cout << number_topics << std::endl;
+    std::cout << number_authors << std::endl;
 }    

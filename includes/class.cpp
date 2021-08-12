@@ -43,7 +43,7 @@ void Data::read_input_file(const char * input_path) {
         std::cerr << "Problem while reading session number" << std::endl;
         exit(EXIT_FAILURE);
     }
-
+    //informacio del tipo de sesiones
     for(int i = 0; i<number_type_sessions; i++)
     {
         int input_per_session = 3;
@@ -54,7 +54,7 @@ void Data::read_input_file(const char * input_path) {
             exit(EXIT_FAILURE);
         } 
     }
-
+    //numero de dias
     if(fscanf(pFile, "%d", &number_days) != 1)
     {
         std::cerr << "Problem while reading number days" << std::endl;
@@ -91,14 +91,14 @@ void Data::read_input_file(const char * input_path) {
         new_data_day.push_back(session_data);
         
     }
-
+    //numero de articulos y numero de topicos
     int aux;
     if(fscanf(pFile, "%d %d", &aux , &number_topics) != 2)
     {
         std::cerr << "Problem while reading number topics" << std::endl;
         exit(EXIT_FAILURE);
     }
-
+    //topicos por articulo
     for(int i = 0; i < number_articles; i++)
     {
         int number_article_topics;
@@ -120,7 +120,35 @@ void Data::read_input_file(const char * input_path) {
         articles_topics.push_back(topics_article);
 
     }
+    //numero de articulos y numero de autores
+    int aux2;
+    if(fscanf(pFile, "%d %d", &aux2 , &number_authors) != 2)
+    {
+        std::cerr << "Problem while reading number authors" << std::endl;
+        exit(EXIT_FAILURE);
+    }
 
+    for(int i = 0; i < number_articles; i++)
+    {
+        int new_number_article_authors;
+        if(fscanf(pFile, "%d",&new_number_article_authors) != 1)
+        {
+            std::cerr << "Problem while reading number of authors per articule" << std::endl;
+            exit(EXIT_FAILURE);
+        } 
+        number_articles_authors.push_back(new_number_article_authors);
+
+        std::vector<int> new_articles_authors(new_number_article_authors);
+        for(int j = 0; j<new_number_article_authors; j++)
+        {   
+            if(fscanf(pFile, "%d",&new_articles_authors[j]) != 1){
+                std::cerr << "Problem while reading author per article" << std::endl;
+                exit(EXIT_FAILURE);
+            }    
+        }
+        articles_authors.push_back(new_articles_authors);
+
+    }
     fclose(pFile);
 }
 

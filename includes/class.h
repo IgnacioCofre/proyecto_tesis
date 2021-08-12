@@ -11,6 +11,7 @@ class Data {
     int number_type_sessions;
     int number_days;
     int number_topics;
+    int number_authors;
     
     std::vector <std::vector<int>> similarity_matrix;
     std::vector <std::vector<int>> session_data;
@@ -21,6 +22,9 @@ class Data {
 
     std::vector <int> number_topics_articles;
     std::vector <std::vector<int>> articles_topics;
+
+    std::vector <int> number_articles_authors;
+    std::vector <std::vector<int>> articles_authors; 
 
     public:
         void read_input_file(const char *);

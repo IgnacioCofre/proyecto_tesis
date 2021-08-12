@@ -13,7 +13,9 @@ class Data {
     int number_topics;
     int number_authors;
     
+    //similarity_matrix[id_article1][id_article2] = number
     std::vector <std::vector<int>> similarity_matrix;
+    //session_data[]
     std::vector <std::vector<int>> session_data;
     std::vector <std::vector<int>> data_days;
     
@@ -54,4 +56,17 @@ class Authors{
 class Timetabling{
     int time_blocks, rooms, days;
     std::vector<std::vector<std::vector<int>>> timetabling;
+};
+
+class Solutions{
+    int number_days;
+
+    //data_day[day] = [number_block, number_sessions]
+    std::vector<std::vector<int>> data_day;
+    //scheduling[Day][Block][Session] = [ids articles]
+    std::vector<std::vector<std::vector<std::vector<int>>>> scheduling;
+
+    public:
+        void read_solution(const char *); 
+        void show_solution(void);
 };

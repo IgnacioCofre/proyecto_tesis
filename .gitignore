@@ -31,5 +31,6 @@
 *.out
 *.app
 
-# Input Folder
+# Input and Output Folder
 input/
+output/

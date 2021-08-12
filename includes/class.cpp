@@ -202,6 +202,8 @@ void Solutions::read_solution(const char * solution_path)
 
         int number_blocks = new_data_day[0];
         int number_sessions = new_data_day[1];
+        data_day.push_back(new_data_day);
+
         std::vector<std::vector<std::vector<int>>> new_day(number_blocks);
         //iteracion sobre las sessiones que se realizan en un dia 
         for(int session = 0; session<number_sessions; session++)

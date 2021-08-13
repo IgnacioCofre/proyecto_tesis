@@ -6,6 +6,25 @@
 #include <cstdlib>
 #include "function.h"
 
+class Authors{
+    public:
+        int number_articles;
+        int number_authors;
+        //number_articles_authors[id_article] = int number of authors
+        std::vector <int> number_articles_authors;
+        //articles_authors[id_article] = [ids_authors of paper]
+        std::vector <std::vector<int>> article_authors;
+        //authors_articles[id_author] = [ids_articles of the author]
+        std::vector <std::vector<int>> author_articles;
+        //common_author(id_article_1,id_article_2) = {0: no common author; 1: common author}    
+        std::vector<std::vector<int>> common_author; 
+
+        Authors(int, int, std::vector<int>, std::vector <std::vector<int>>);
+        int get_common_author(int, int);
+        void show_data(void);    
+
+};
+
 class Data {
     int number_articles;
     int number_type_sessions;
@@ -25,13 +44,19 @@ class Data {
     std::vector <int> number_topics_articles;
     std::vector <std::vector<int>> articles_topics;
 
+    //number_articles_authors[id_article] = int number of authors
     std::vector <int> number_articles_authors;
-    std::vector <std::vector<int>> articles_authors; 
+    //articles_authors[id_authors] = [ids_authors of paper]
+    std::vector <std::vector<int>> articles_authors;
 
     public:
         void read_input_file(const char *);
         void show_data(void); 
+        Authors create_Authors(void);
+        
 };
+
+
 
 class Articles{
     int id, number_topics, number_authors;
@@ -46,11 +71,6 @@ class Sessions{
 class Topics{
     int id;
     std::vector<int> topic;
-};
-
-class Authors{
-    int id;
-    std::vector<int> articles;
 };
 
 class Timetabling{

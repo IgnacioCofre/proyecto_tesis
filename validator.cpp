@@ -18,6 +18,10 @@ int main() {
     Solutions new_solution;
     new_solution.read_solution(solution_test_file);
 
+    Authors authors = data.create_Authors();
+
+    authors.show_data();
+
     return 0;
     
 }

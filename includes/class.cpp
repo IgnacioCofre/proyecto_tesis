@@ -171,7 +171,13 @@ void Data::show_data()
     std::cout << number_days << std::endl;
     std::cout << number_topics << std::endl;
     std::cout << number_authors << std::endl;
-}    
+}
+
+Authors Data::create_Authors()
+{
+    Authors authors(number_articles,number_authors,number_articles_authors,articles_authors);
+    return authors;
+}
 
 void Solutions::read_solution(const char * solution_path)
 {
@@ -236,4 +242,55 @@ void Solutions::read_solution(const char * solution_path)
     } 
     fclose(pFile);
 
+}
+
+Authors::Authors(int n_articles, int n_authors, std::vector<int> n_articles_authors, std::vector <std::vector<int>> articles_authors)
+{
+    number_articles = n_articles;
+    number_authors = n_authors;
+    number_articles_authors = n_articles_authors;
+    article_authors = articles_authors;
+
+    std::vector <std::vector<int>> aux_author_articles(number_authors);
+
+    for(int article=0; article<number_articles; article++)
+    {   
+        //std::cout << article <<std::endl;
+        for(int j=0; j<number_articles_authors[article]; j++)
+        {
+            //std::cout << article_authors[article][j] << std::endl;
+            aux_author_articles[article_authors[article][j]].push_back(article);
+            
+        }  
+    }
+
+    author_articles = aux_author_articles;
+
+    //std::vector<std::vector<int>> aux_common_author(number_articles);
+    std::vector<std::vector<int>> aux_common_author(number_articles, std::vector<int>(number_articles, 0));
+
+
+    std::cout << "Authors created" << std::endl;
+
+}
+
+void Authors::show_data()
+{
+    std::cout<< "Show data authors" << std::endl;
+    std::cout<< "Number of articles: "<<number_articles << std::endl;
+    std::cout<< "Number of authors:  "<<number_authors << std::endl;
+    
+    std::cout << "id_articles per author:" << std::endl;
+    for(int author=0; author<number_authors; author++)
+    {   
+        //std::cout << author << std::endl;
+        //print id_articles de un autor
+        int number_author_articles = author_articles[author].size();
+        //std::cout << number_author_articles << std::endl;
+        for(int article=0; article<number_author_articles; article++)
+        {
+            std::cout<< author_articles[author][article] << " ";
+        } 
+        std::cout << std::endl;
+    }
 }

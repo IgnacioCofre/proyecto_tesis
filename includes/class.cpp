@@ -268,7 +268,24 @@ Authors::Authors(int n_articles, int n_authors, std::vector<int> n_articles_auth
 
     //std::vector<std::vector<int>> aux_common_author(number_articles);
     std::vector<std::vector<int>> aux_common_author(number_articles, std::vector<int>(number_articles, 0));
+    
+    for(int author=0;author<number_authors;author++)
+    {   
+        int number_articles_author = author_articles[author].size();
+        if(number_articles_author > 1)
+        {
+            for(int i=0; i<number_articles_author; i++)
+            {
+                for(int j=i+1; j<number_articles_author; j++)
+                {
+                    aux_common_author[author_articles[author][i]][author_articles[author][j]] += 1;
+                    aux_common_author[author_articles[author][j]][author_articles[author][i]] += 1;
+                }    
+            }
+        }
+    }
 
+    common_author = aux_common_author;
 
     std::cout << "Authors created" << std::endl;
 
@@ -292,5 +309,15 @@ void Authors::show_data()
             std::cout<< author_articles[author][article] << " ";
         } 
         std::cout << std::endl;
+    }
+
+    std::cout << "Matriz of number of common authors:" << std::endl;
+    for(int i=0; i<number_articles; i++)
+    {
+        for(int j=0; j<number_articles; j++)
+        {
+            std::cout << common_author[i][j] << " ";
+        }
+        std::cout<< std::endl;
     }
 }

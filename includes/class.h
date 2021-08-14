@@ -4,7 +4,7 @@
 #include <vector>
 #include <stdio.h>
 #include <cstdlib>
-#include "function.h"
+#include <string>
 
 class Authors{
     public:
@@ -20,7 +20,7 @@ class Authors{
         std::vector<std::vector<int>> common_author; 
 
         Authors(int, int, std::vector<int>, std::vector <std::vector<int>>);
-        int get_common_author(int, int);
+        int get_number_common_author(int, int);
         void show_data(void);    
 
 };
@@ -52,11 +52,25 @@ class Data {
     public:
         void read_input_file(const char *);
         void show_data(void); 
+        int get_similarity(int, int);
+        int get_number_days(void);
         Authors create_Authors(void);
         
 };
 
+class Solutions{
+    int number_days;
 
+    //data_day[day] = [number_block, number_sessions]
+    std::vector<std::vector<int>> data_day;
+    //scheduling[Day][Block][Session] = [ids articles]
+    std::vector<std::vector<std::vector<std::vector<int>>>> scheduling;
+
+    public:
+        void read_solution(const char *); 
+        std::vector<std::vector<std::vector<std::vector<int>>>> get_scheduling(void);
+        void show_solution(void);
+};
 
 class Articles{
     int id, number_topics, number_authors;
@@ -78,15 +92,12 @@ class Timetabling{
     std::vector<std::vector<std::vector<int>>> timetabling;
 };
 
-class Solutions{
-    int number_days;
-
-    //data_day[day] = [number_block, number_sessions]
-    std::vector<std::vector<int>> data_day;
-    //scheduling[Day][Block][Session] = [ids articles]
-    std::vector<std::vector<std::vector<std::vector<int>>>> scheduling;
+class Validator
+{
+    std::vector<std::string>  comments;
 
     public:
-        void read_solution(const char *); 
-        void show_solution(void);
+        void solution_validation(Data, Authors, Solutions);
+        std::vector<std::string> get_comments(void);    
+
 };

@@ -5,9 +5,6 @@
 
 int main() {
     
-    //int x = add(2, 4);
-    //std::cout << x << std::endl;
-
     const char * input_file = "input/ebl_one_author/ebl_one_author_30_1.txt";
     const char * solution_test_file = "output/output_example.txt";
 
@@ -20,7 +17,9 @@ int main() {
 
     Authors authors = data.create_Authors();
 
-    authors.show_data();
+    //authors.show_data();
+    Validator validator;
+    validator.solution_validation(data, authors, new_solution);
 
     return 0;
     

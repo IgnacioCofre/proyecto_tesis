@@ -1,5 +1,5 @@
 all:
-	g++ -Wall validator.cpp -o main includes/function.cpp includes/class.h
+	g++ -Wall main.cpp -o main src/Solution.cpp src/Authors.cpp src/Data.cpp src/Validator.cpp 
 	./main
 clean:
 	rm -rf *o main

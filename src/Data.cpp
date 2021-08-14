@@ -1,5 +1,4 @@
-#include "class.h"
-
+#include "../includes/class.h"
 
 void Data::read_input_file(const char * input_path)
 {
@@ -105,7 +104,7 @@ void Data::read_input_file(const char * input_path)
         int number_article_topics;
         if(fscanf(pFile, "%d",&number_article_topics) != 1)
         {
-            std::cerr << "Problem while reading number of topics per articule" << std::endl;
+            std::cerr << "Problem while reading number of topics per article" << std::endl;
             exit(EXIT_FAILURE);
         } 
         number_topics_articles.push_back(number_article_topics);
@@ -134,7 +133,7 @@ void Data::read_input_file(const char * input_path)
         int new_number_article_authors;
         if(fscanf(pFile, "%d",&new_number_article_authors) != 1)
         {
-            std::cerr << "Problem while reading number of authors per articule" << std::endl;
+            std::cerr << "Problem while reading number of authors per article" << std::endl;
             exit(EXIT_FAILURE);
         } 
         number_articles_authors.push_back(new_number_article_authors);
@@ -151,6 +150,17 @@ void Data::read_input_file(const char * input_path)
 
     }
     fclose(pFile);
+}
+
+int Data::get_similarity(int id_article_1, int id_article_2)
+{
+    if((id_article_1 <number_articles) & (id_article_2<number_articles))
+    {
+        return similarity_matrix[id_article_1][id_article_2];
+    }
+
+    std::cerr << "Problem while reading number of article" << std::endl;
+    exit(EXIT_FAILURE);
 }
 
 void Data::show_data()
@@ -173,151 +183,7 @@ void Data::show_data()
     std::cout << number_authors << std::endl;
 }
 
-Authors Data::create_Authors()
+int Data::get_number_days()
 {
-    Authors authors(number_articles,number_authors,number_articles_authors,articles_authors);
-    return authors;
-}
-
-void Solutions::read_solution(const char * solution_path)
-{
-    FILE * pFile;
-    pFile = fopen (solution_path,"r");
-
-    //lectura del archivo
-    if(!pFile)
-    {
-	    std::cerr << "Problem while reading solution" << std::endl;
-	    exit(EXIT_FAILURE);
-    }
-    //numero de dias
-    if(fscanf(pFile, "%d", &number_days) != 1)
-    {
-        std::cerr << "Problem while reading number of days" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    //iteracion sobre los dias de la calendarizacion
-    for(int day = 0; day < number_days; day++)
-    {
-        std::vector<int> new_data_day(2);
-        if(fscanf(pFile, "%d %d", &new_data_day[0], &new_data_day[1]) != 2)
-        {
-            std::cerr << "Problem while reading number of blocks and number of sessions" << std::endl;
-            exit(EXIT_FAILURE);
-        }
-
-        int number_blocks = new_data_day[0];
-        int number_sessions = new_data_day[1];
-        data_day.push_back(new_data_day);
-
-        std::vector<std::vector<std::vector<int>>> new_day(number_blocks);
-        //iteracion sobre las sessiones que se realizan en un dia 
-        for(int session = 0; session<number_sessions; session++)
-        {
-            int block_session;
-            int number_articles_per_sessison;
-            if(fscanf(pFile, "%d %d", &block_session, &number_articles_per_sessison) != 2)
-            {
-                std::cerr << "Problem while reading article of blocks" << std::endl;
-                exit(EXIT_FAILURE);
-            }
-
-            //std::cout << block_session << std::endl;
-            //std::cout << number_articles_per_sessison << std::endl;
-            std::vector<int> articles_in_session(number_articles_per_sessison);
-            //iteracion sobre los articulos que se asignaron en una session 
-            for(int i = 0; i<number_articles_per_sessison; i++)
-            {
-                if(fscanf(pFile, "%d", &articles_in_session[i]) != 1)
-                {
-                    std::cerr << "Problem while reading article id" << std::endl;
-                    exit(EXIT_FAILURE);
-                }
-
-            }
-            new_day[block_session-1].push_back(articles_in_session);
-
-        }
-        scheduling.push_back(new_day);
-    } 
-    fclose(pFile);
-
-}
-
-Authors::Authors(int n_articles, int n_authors, std::vector<int> n_articles_authors, std::vector <std::vector<int>> articles_authors)
-{
-    number_articles = n_articles;
-    number_authors = n_authors;
-    number_articles_authors = n_articles_authors;
-    article_authors = articles_authors;
-
-    std::vector <std::vector<int>> aux_author_articles(number_authors);
-
-    for(int article=0; article<number_articles; article++)
-    {   
-        //std::cout << article <<std::endl;
-        for(int j=0; j<number_articles_authors[article]; j++)
-        {
-            //std::cout << article_authors[article][j] << std::endl;
-            aux_author_articles[article_authors[article][j]].push_back(article);
-            
-        }  
-    }
-
-    author_articles = aux_author_articles;
-
-    //std::vector<std::vector<int>> aux_common_author(number_articles);
-    std::vector<std::vector<int>> aux_common_author(number_articles, std::vector<int>(number_articles, 0));
-    
-    for(int author=0;author<number_authors;author++)
-    {   
-        int number_articles_author = author_articles[author].size();
-        if(number_articles_author > 1)
-        {
-            for(int i=0; i<number_articles_author; i++)
-            {
-                for(int j=i+1; j<number_articles_author; j++)
-                {
-                    aux_common_author[author_articles[author][i]][author_articles[author][j]] += 1;
-                    aux_common_author[author_articles[author][j]][author_articles[author][i]] += 1;
-                }    
-            }
-        }
-    }
-
-    common_author = aux_common_author;
-
-    std::cout << "Authors created" << std::endl;
-
-}
-
-void Authors::show_data()
-{
-    std::cout<< "Show data authors" << std::endl;
-    std::cout<< "Number of articles: "<<number_articles << std::endl;
-    std::cout<< "Number of authors:  "<<number_authors << std::endl;
-    
-    std::cout << "id_articles per author:" << std::endl;
-    for(int author=0; author<number_authors; author++)
-    {   
-        //std::cout << author << std::endl;
-        //print id_articles de un autor
-        int number_author_articles = author_articles[author].size();
-        //std::cout << number_author_articles << std::endl;
-        for(int article=0; article<number_author_articles; article++)
-        {
-            std::cout<< author_articles[author][article] << " ";
-        } 
-        std::cout << std::endl;
-    }
-
-    std::cout << "Matriz of number of common authors:" << std::endl;
-    for(int i=0; i<number_articles; i++)
-    {
-        for(int j=0; j<number_articles; j++)
-        {
-            std::cout << common_author[i][j] << " ";
-        }
-        std::cout<< std::endl;
-    }
+    return number_days;
 }

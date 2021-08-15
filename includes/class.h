@@ -21,7 +21,9 @@ class Authors{
 
         Authors(int, int, std::vector<int>, std::vector <std::vector<int>>);
         int get_number_common_author(int, int);
-        void show_data(void);    
+        void show_data(void);   
+        std::vector<int> get_author_articles(int); 
+        int get_number_authors(void);
 
 };
 
@@ -54,21 +56,27 @@ class Data {
         void show_data(void); 
         int get_similarity(int, int);
         int get_number_days(void);
+        int get_number_articles(void);
         Authors create_Authors(void);
         
 };
 
 class Solutions{
     int number_days;
+    int number_articles;
 
     //data_day[day] = [number_block, number_sessions]
     std::vector<std::vector<int>> data_day;
     //scheduling[Day][Block][Session] = [ids articles]
     std::vector<std::vector<std::vector<std::vector<int>>>> scheduling;
+    //article_asignation[id_aticle] = [day,block,session] of asignation 
+    std::vector<std::vector<int>> article_asignation; 
 
     public:
         void read_solution(const char *); 
         std::vector<std::vector<std::vector<std::vector<int>>>> get_scheduling(void);
+        int get_number_articles(void);
+        std::vector<int> get_article_asignation(int);
         void show_solution(void);
 };
 
@@ -97,7 +105,9 @@ class Validator
     std::vector<std::string>  comments;
 
     public:
+        //Verifica que no hayan articulos de un mismo autor en sesiones paralelas
         void solution_validation(Data, Authors, Solutions);
-        std::vector<std::string> get_comments(void);    
-
+        
+        std::vector<std::string> get_comments(void);
+        void show_comments(void);    
 };

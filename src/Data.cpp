@@ -187,3 +187,8 @@ int Data::get_number_days()
 {
     return number_days;
 }
+
+int Data::get_number_articles()
+{
+    return number_articles;
+}

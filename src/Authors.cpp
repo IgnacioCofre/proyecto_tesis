@@ -99,3 +99,19 @@ void Authors::show_data()
         std::cout<< std::endl;
     }
 }
+
+std::vector<int> Authors::get_author_articles(int id_author)
+{
+    if(id_author < number_authors)
+    {
+        return author_articles[id_author];
+    }
+    
+    std::cerr << "id_author out off range" << std::endl;
+    exit(EXIT_FAILURE);
+}
+
+int Authors::get_number_authors()
+{
+    return number_authors;
+}

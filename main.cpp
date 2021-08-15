@@ -14,12 +14,15 @@ int main() {
 
     Solutions new_solution;
     new_solution.read_solution(solution_test_file);
+    //new_solution.show_solution();
 
     Authors authors = data.create_Authors();
-
     //authors.show_data();
+    
     Validator validator;
+    std::cout << "Validating solution" << std::endl;
     validator.solution_validation(data, authors, new_solution);
+    validator.show_comments();
 
     return 0;
     

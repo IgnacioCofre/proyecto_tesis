@@ -12,12 +12,16 @@ void Solutions::read_solution(const char * solution_path)
 	    exit(EXIT_FAILURE);
     }
     //numero de dias
-    if(fscanf(pFile, "%d", &number_days) != 1)
+    if(fscanf(pFile, "%d %d", &number_days, &number_articles) != 2)
     {
-        std::cerr << "Problem while reading number of days" << std::endl;
+        std::cerr << "Problem while reading number of days and articles" << std::endl;
         exit(EXIT_FAILURE);
     }
+    //vector de vectores que guarda la asignacion de cada articulo en la calendarizacion
+    std::vector<std::vector<int>> new_article_asignation(number_articles,std::vector<int>(3,-1));
+
     //iteracion sobre los dias de la calendarizacion
+    
     for(int day = 0; day < number_days; day++)
     {
         std::vector<int> new_data_day(2);
@@ -54,13 +58,28 @@ void Solutions::read_solution(const char * solution_path)
                     std::cerr << "Problem while reading article id" << std::endl;
                     exit(EXIT_FAILURE);
                 }
+                //std::cout << day << " " << block_session-1 << " " << session <<std::endl;
+                else
+                {
+                    if(new_article_asignation[articles_in_session[i]][0] == -1)
+                    {
+                        new_article_asignation[articles_in_session[i]] = {day, block_session-1, session};
+                    }
 
+                    else
+                    {
+                        std::cerr << "Problem of output, same article apears in two diferent sessions: " << articles_in_session[i] <<std::endl;
+                        exit(EXIT_FAILURE);
+                    }
+                }
             }
             new_day[block_session-1].push_back(articles_in_session);
 
         }
         scheduling.push_back(new_day);
-    } 
+    }
+
+    article_asignation = new_article_asignation; 
     fclose(pFile);
 
 }
@@ -68,4 +87,29 @@ void Solutions::read_solution(const char * solution_path)
 std::vector<std::vector<std::vector<std::vector<int>>>> Solutions::get_scheduling()
 {
     return scheduling;
+}
+
+std::vector<int> Solutions::get_article_asignation(int id_article)
+{
+    /*
+    std::cout<< "Article asignation" <<std::endl;
+    std::cout<< article_asignation[id_article][0] <<std::endl;
+    std::cout<< article_asignation[id_article][1] <<std::endl;
+    std::cout<< article_asignation[id_article][2] <<std::endl;
+    */
+    return article_asignation[id_article];
+}
+
+int Solutions::get_number_articles()
+{
+    return number_articles;
+}
+
+void Solutions::show_solution()
+{
+    std::cout << "Asignacion of articles [Day,Block,Session]" << std::endl;
+    for(int i=0; i<number_articles; i++)
+    {
+        std::cout << article_asignation[i][0] << "," << article_asignation[i][1] << ","<< article_asignation[i][2] <<std::endl;
+    }
 }

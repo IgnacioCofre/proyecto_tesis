@@ -52,8 +52,11 @@ void Data::read_input_file(const char * input_path)
         {
             std::cerr << "Problem while reading session tipe data" << std::endl;
             exit(EXIT_FAILURE);
-        } 
+        }
+        
+
     }
+
     //numero de dias
     if(fscanf(pFile, "%d", &number_days) != 1)
     {
@@ -63,34 +66,40 @@ void Data::read_input_file(const char * input_path)
 
     for(int day = 0; day<number_days; day++)
     {
-        std::vector<int> new_data_log(2);    
-        //&new_data_log[0] : numero de bloques del dia
-        //&new_data_log[1] : numero de sesiones del dia
-        if(fscanf(pFile, "%d %d", &new_data_log[0], &new_data_log[1]) != 2)
+        int number_blocks;
+        int number_sessions;
+        
+        if(fscanf(pFile, "%d %d", &number_blocks, &number_sessions) != 2)
         {
             std::cerr << "Problem while reading session tipe data" << std::endl;
             exit(EXIT_FAILURE);
         }
+
+        std::vector<int> new_data_log = {number_blocks,number_sessions};
         data_days.push_back(new_data_log);
 
-        std::vector<std::vector<std::vector<int>>> new_data_day;
-        for(int session = 0; session < new_data_log[1]; session++)
+        std::vector<std::vector<int>> new_data_day(number_blocks);
+        for(int session = 0; session < number_sessions; session++)
         {
-            std::vector<int> new_session(2);
-            //&new_data_day_block[0] : bloque en que se realiza la sesion
-            //&new_data_day_block[1] : tamaño maximo de dicha sesion
-            if(fscanf(pFile, "%d %d", &new_session[0], &new_session[1]) != 2)
+            int block;
+            int max_number_articles;
+
+            if(fscanf(pFile, "%d %d", &block, &max_number_articles) != 2)
             {
                 std::cerr << "Problem while reading data block" << std::endl;
                 exit(EXIT_FAILURE);
             } 
 
-            session_data.push_back(new_session);
+            new_data_day[block-1].push_back(max_number_articles);
+
+            //std::cout<<"si pasa esto 2"<<std::endl;
         }
 
-        new_data_day.push_back(session_data);
-        
+        max_assign_per_session.push_back(new_data_day);
     }
+
+    
+    
     //numero de articulos y numero de topicos
     int aux;
     if(fscanf(pFile, "%d %d", &aux , &number_topics) != 2)
@@ -181,6 +190,22 @@ void Data::show_data()
     std::cout << number_days << std::endl;
     std::cout << number_topics << std::endl;
     std::cout << number_authors << std::endl;
+
+    std::cout<< "max_assign_per_session"<<std::endl;
+    int number_days = max_assign_per_session.size();
+    for(int day=0; day<number_days; day++)
+    {
+        int number_blocks = max_assign_per_session[day].size();
+        for(int block=0; block<number_blocks; block++)
+        {
+            int number_sessions = max_assign_per_session[day][block].size();
+            for(int session=0; session<number_sessions; session++)
+            {   
+                int max_session = max_assign_per_session[day][block][session];
+                std::cout<<day<<","<<block<<","<<session<<","<<max_session<<std::endl;
+            }
+        }
+    }
 }
 
 int Data::get_number_days()

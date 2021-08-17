@@ -18,11 +18,18 @@ int main() {
 
     Authors authors = data.create_Authors();
     //authors.show_data();
-    
+
+    Sessions sessions = data.create_Sessions();
+    //sessions.show_data();
+
     Validator validator;
     std::cout << "Validating solution" << std::endl;
-    validator.solution_validation(data, authors, new_solution);
+    
+    validator.articles_in_diferent_sessions(data, authors, new_solution);
+    validator.article_assignment(data,new_solution);
+    validator.capacity_session(sessions,new_solution);
     validator.show_comments();
+    
 
     return 0;
     

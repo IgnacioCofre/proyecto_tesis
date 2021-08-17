@@ -1,8 +1,9 @@
 #include "../includes/class.h"
 
-void Validator::solution_validation(Data data, Authors authors, Solutions solution)
+void Validator::articles_in_diferent_sessions(Data data, Authors authors, Solutions solution)
 {
     std::cout << "Validating authors and articles on diferent sessions" << std::endl;
+    comments.push_back("Validating authors and articles on diferent sessions");
     std::vector<std::vector<std::vector<std::vector<int>>>> scheduling = solution.get_scheduling();
     
     
@@ -104,6 +105,66 @@ void Validator::solution_validation(Data data, Authors authors, Solutions soluti
     }
 }
 
+void Validator::article_assignment(Data data, Solutions solution)
+{
+    std::cout << "Validating articles are only assing to one session" << std::endl;
+    comments.push_back("Validating articles are only assing to one session");
+
+    int number_articles = data.get_number_articles();
+    for(int id_article = 0; id_article<number_articles; id_article++)
+    {
+        std::vector<int> article_assing = solution.get_article_asignation(id_article);
+        if(article_assing[0] == -1)
+        {
+            //std::cout<< "Article is not assing: "<< id_article<< std::endl;
+            comments.push_back("Article is not assing: "+std::to_string(id_article));
+        } 
+    }
+}
+
+void Validator::capacity_session(Sessions sessions,Solutions solution)
+{
+    std::cout << "Validating articles capacity of session" << std::endl;
+    comments.push_back("Validating articles capacity of session");
+
+    std::vector<std::vector<std::vector<std::vector<int>>>> scheduling = solution.get_scheduling();
+    
+    int number_days = scheduling.size();
+    //std::cout<<number_days<<std::endl;
+    for(int day=0; day<number_days; day++)
+    {
+        int number_blocks = scheduling[day].size();
+        //std::cout<<number_blocks<<std::endl;
+        for(int block=0; block<number_blocks; block++)
+        {
+            int number_sessions =  scheduling[day][block].size();
+            //std::cout<<number_sessions<<std::endl;
+
+            for(int session=0; session<number_sessions; session++)
+            {   
+                int max_size_session = sessions.max_article_session(day,block,session);
+                //std::cout<<max_size_session<<std::endl;
+                if(max_size_session != -1)
+                {   
+                    int size_session = scheduling[day][block][session].size();
+                    if(size_session>max_size_session)
+                    {
+                        //std::cout<< "Session out of max articles: "+std::to_string(day)+","+std::to_string(block)+","+std::to_string(session)<< std::endl;
+                        comments.push_back("Session out of max articles: "
+                        +std::to_string(day)+","+std::to_string(block)+","+std::to_string(session));
+                    }
+                }
+                else
+                {
+                    //std::cout<< "Session can't be assined: "+std::to_string(day)+","+std::to_string(block)+","+std::to_string(session)<< std::endl;
+                    comments.push_back("Session can be assined: "
+                    +std::to_string(day)+","+std::to_string(block)+","+std::to_string(session));
+                }
+            }
+        }
+    }
+}
+
 std::vector<std::string> Validator::get_comments()
 {
     return comments;
@@ -111,7 +172,7 @@ std::vector<std::string> Validator::get_comments()
 
 void Validator::show_comments()
 {
-    std::cout <<"Coments validator:" <<std::endl;
+    std::cout <<"Comments validator:" <<std::endl;
     int n_lines = comments.size();
 
     for(int line=0; line<n_lines; line++)

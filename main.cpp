@@ -10,26 +10,40 @@ int main() {
 
     Data data;
     data.read_input_file(input_file);
-    //data.show_data();
-
+    
     Solutions new_solution;
     new_solution.read_solution(solution_test_file);
-    //new_solution.show_solution();
-
+    
     Authors authors = data.create_Authors();
-    //authors.show_data();
-
     Sessions sessions = data.create_Sessions();
-    //sessions.show_data();
+    Articles articles =data.create_Articles();
+    Topics topics = data.create_Topics();
+    
 
     Validator validator;
     std::cout << "Validating solution" << std::endl;
     
-    validator.articles_in_diferent_sessions(data, authors, new_solution);
-    validator.article_assignment(data,new_solution);
-    validator.capacity_session(sessions,new_solution);
-    validator.show_comments();
-    
+    bool show_data_clases = false;
+    if(show_data_clases)
+    {
+        data.show_data();
+        
+        authors.show_data();
+        sessions.show_data();
+        articles.show_data();
+        topics.show_data();
+
+        new_solution.show_solution();
+    }
+
+    bool validation_process = false;
+    if(validation_process)
+    {
+        validator.articles_in_diferent_sessions(data, authors, new_solution);
+        validator.article_assignment(data,new_solution);
+        validator.capacity_session(sessions,new_solution);
+        validator.show_comments();
+    }
 
     return 0;
     

@@ -47,6 +47,32 @@ class Sessions{
         void show_data(void);
 };
 
+class Articles{
+    int number_articles;
+    std::vector<std::vector<int>> similarity_matrix;
+
+    public:
+        Articles(int, std::vector<std::vector<int>>);
+        int get_number_articles(void);
+        int get_similarity(int,int);
+        void show_data(void);
+};
+
+class Topics{
+    int number_topics;
+    std::vector <int> number_topics_articles;
+    std::vector <std::vector<int>> articles_topics;
+
+    //number_articles_by_topic[id_topic] = number of articles with the topic
+    std::vector <int> number_articles_by_topic;
+
+    public:
+        Topics(int, std::vector <int>, std::vector <std::vector<int>>);
+        int get_number_articles_by_topic(int);
+        void show_data();
+
+};
+
 class Data {
     int number_articles;
     int number_type_sessions;
@@ -66,7 +92,10 @@ class Data {
     std::vector <std::vector<std::vector<int>>> data_days_timeblock;
     std::vector <std::vector<int>> data_timeblock;
 
+    //number_topics_articles[id_article] = number topics
     std::vector <int> number_topics_articles;
+
+    //articles_topics[id_article] = [ids_topics]
     std::vector <std::vector<int>> articles_topics;
 
     //max_assign_per_session[day,block,session] = max_number_articles
@@ -86,6 +115,8 @@ class Data {
 
         Authors create_Authors(void);
         Sessions create_Sessions(void);
+        Articles create_Articles(void);
+        Topics create_Topics(void);
 };
 
 class Solutions{
@@ -107,17 +138,6 @@ class Solutions{
         void show_solution(void);
 };
 
-class Articles{
-    int id, number_topics, number_authors;
-    std::vector<int> article_authors;
-    std::vector<int> article_topics;
-};
-
-class Topics{
-    int id;
-    std::vector<int> topic;
-};
-
 class Timetabling{
     int time_blocks, rooms, days;
     std::vector<std::vector<std::vector<int>>> timetabling;
@@ -136,6 +156,12 @@ class Validator
 
         //Verifica que se cumpla la capacidad de articulos por sesion
         void capacity_session(Sessions,Solutions);
+
+        //Verifica la cantidad maxima de articulos por dia que pueden ser asignados que hagan referencia a un mismo topico
+        void capacity_topics(Topics,Solutions);
+
+        //Entrega la calidad de la solucion
+        int quality_solution(Articles,Solutions);
 
         std::vector<std::string> get_comments(void);
         void show_comments(void);    

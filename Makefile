@@ -1,5 +1,5 @@
 all:
-	g++ -Wall main.cpp -o main src/Solution.cpp src/Authors.cpp src/Sessions.cpp src/Data.cpp src/Validator.cpp 
+	g++ -Wall main.cpp -o main src/Solution.cpp src/Authors.cpp src/Sessions.cpp src/Articles.cpp src/Topics.cpp src/Data.cpp src/Validator.cpp 
 	./main
 clean:
 	rm -rf *o main

@@ -165,6 +165,16 @@ void Validator::capacity_session(Sessions sessions,Solutions solution)
     }
 }
 
+void Validator::capacity_topics(Topics topics,Solutions solutions)
+{
+
+}
+
+int Validator::quality_solution(Articles,Solutions)
+{
+    return 0;
+}
+
 std::vector<std::string> Validator::get_comments()
 {
     return comments;

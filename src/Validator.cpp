@@ -167,12 +167,78 @@ void Validator::capacity_session(Sessions sessions,Solutions solution)
 
 void Validator::capacity_topics(Topics topics,Solutions solutions)
 {
+    int number_days = solutions.get_number_days();
+    
+    if(number_days > 1)
+    {
+        int number_topics = topics.get_number_topics();
+        std::vector<std::vector<std::vector<std::vector<int>>>> scheduling = solutions.get_scheduling();
 
+        //counter_topics_per_day[day][id_topic] = number of articles with topic id_topic
+        std::vector<std::vector<int>> counter_topics_per_day(number_days,std::vector<int>(number_topics));
+
+        for(int day=0; day<number_days; day++)
+        {
+            int number_blocks = scheduling[day].size();
+            for(int block=0; block<number_blocks; block++)
+            {
+                int number_sessions = scheduling[day][block].size();
+                for(int session=0; session<number_sessions; session++)
+                {
+                    int number_articles = scheduling[day][block][session].size();
+                    for(int article=0; article<number_articles; article++)
+                    {
+                        int id_article = scheduling[day][block][session][article];
+                        std::vector<int> topics_in_article = topics.get_article_topics(id_article);
+                        int number_topics_in_article = topics_in_article.size();
+                        for(int topic=0; topic<number_topics_in_article; topic++)
+                        {
+                            int id_topic = topics_in_article[topic];
+                            counter_topics_per_day[day][id_topic] += 1;
+                        }
+                        
+                    }
+                }
+                    
+            }
+        }
+        /* Mostrar cantidad de aticulos por dia que incluyan cierto topico
+        for(int day=0; day<number_days; day++)
+        {
+            for(int topic=0; topic<number_topics; topic++)
+            {
+                std::cout << day <<","<<topic<<","<<counter_topics_per_day[day][topic]<<std::endl;
+            }
+        }
+        */
+        for(int id_topic=0; id_topic<number_topics; id_topic++)
+        {
+            int number_articles_with_topic = topics.get_number_articles_by_topic(id_topic);
+            if(number_articles_with_topic>20)
+            {
+                for(int day=0; day<number_days; day++)
+                {   
+                    //Caso en que no se cumpla el limite de articulos de cierto topico
+                    if(counter_topics_per_day[day][id_topic]>(number_articles_with_topic/2))
+                    {
+                        std::cout << day <<","<<id_topic<<","<<counter_topics_per_day[day][id_topic]<<std::endl;
+                        comments.push_back("Day out of max topics [day,id_topic,number_articles]: ["
+                        +std::to_string(day)+","
+                        +std::to_string(id_topic)+","
+                        +std::to_string(counter_topics_per_day[day][id_topic]));
+                        
+                    }
+                    
+                }
+            }
+        }
+    }   
+    
 }
 
-int Validator::quality_solution(Articles,Solutions)
+void Validator::quality_solution(Articles articles,Solutions solutions)
 {
-    return 0;
+    
 }
 
 std::vector<std::string> Validator::get_comments()
@@ -183,10 +249,20 @@ std::vector<std::string> Validator::get_comments()
 void Validator::show_comments()
 {
     std::cout <<"Comments validator:" <<std::endl;
+    
     int n_lines = comments.size();
-
-    for(int line=0; line<n_lines; line++)
+    if(n_lines>0)
     {
-        std::cout<< comments[line] <<std::endl;
+        for(int line=0; line<n_lines; line++)
+        {
+            std::cout<< comments[line] <<std::endl;
+        }   
     }
+    else
+    {
+        std::cout <<"No comments" <<std::endl;
+    }
+    
 }
+    
+    

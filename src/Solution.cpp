@@ -105,6 +105,11 @@ int Solutions::get_number_articles()
     return number_articles;
 }
 
+int Solutions::get_number_days()
+{
+    return number_days;
+}
+
 void Solutions::show_solution()
 {
     std::cout << "Asignacion of articles [Day,Block,Session]" << std::endl;

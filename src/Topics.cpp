@@ -20,8 +20,11 @@ Topics::Topics(int n_topics, std::vector <int> n_topics_articles, std::vector <s
         int n_topics = articles_topics[id_article].size();
         for(int topic=0; topic<n_topics; topic++)
         {
-            aux_number_articles_by_topic[articles_topics[id_article][topic]] +=1;
+            int id_topic = articles_topics[id_article][topic];
+            aux_number_articles_by_topic[id_topic] +=1;
+            //std::cout<<id_topic<<",";
         }
+        //std::cout<<std::endl;
     }
 
     number_articles_by_topic = aux_number_articles_by_topic;
@@ -39,20 +42,31 @@ int Topics::get_number_articles_by_topic(int id_topic)
     return number_articles_by_topic[id_topic];
 }
 
+int Topics::get_number_topics()
+{
+    return number_topics;
+}
+
+ std::vector<int> Topics::get_article_topics(int id_article)
+ {
+    int number_articles = articles_topics.size();
+    if(id_article<number_articles)
+    {
+        return articles_topics[id_article];
+    }
+    else
+    {
+        std::cout << "id article not found: " << id_article << std::endl;
+        std::vector<int> aux = {0};
+        return aux;
+    }
+    
+ }
+
 void Topics::show_data()
 {
     std::cout<< "Show data topics" << std::endl;
     std::cout<< "Topics by article" << std::endl;
-    
-    int number_articles = articles_topics.size();
-    for(int id_article=0; id_article<number_articles; id_article++)
-    {
-        int n_topics = articles_topics[id_article].size();
-        for(int topic=0; topic<n_topics; topic++)
-        {
-            number_articles_by_topic[articles_topics[id_article][topic]] +=1;
-        }
-    }
 
     std::cout<< "Number articles by topic [Id_topic,number_articles]" << std::endl;
     for(int topic=0; topic<number_topics; topic++)

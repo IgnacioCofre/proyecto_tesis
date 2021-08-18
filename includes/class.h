@@ -61,6 +61,8 @@ class Articles{
 class Topics{
     int number_topics;
     std::vector <int> number_topics_articles;
+    
+    //articles_topics[id_article] = [ids topics]
     std::vector <std::vector<int>> articles_topics;
 
     //number_articles_by_topic[id_topic] = number of articles with the topic
@@ -69,6 +71,8 @@ class Topics{
     public:
         Topics(int, std::vector <int>, std::vector <std::vector<int>>);
         int get_number_articles_by_topic(int);
+        std::vector<int> get_article_topics(int);
+        int get_number_topics(void);
         void show_data();
 
 };
@@ -134,17 +138,12 @@ class Solutions{
         void read_solution(const char *); 
         std::vector<std::vector<std::vector<std::vector<int>>>> get_scheduling(void);
         int get_number_articles(void);
+        int get_number_days(void);
         std::vector<int> get_article_asignation(int);
         void show_solution(void);
 };
 
-class Timetabling{
-    int time_blocks, rooms, days;
-    std::vector<std::vector<std::vector<int>>> timetabling;
-};
-
-class Validator
-{
+class Validator{
     std::vector<std::string>  comments;
 
     public:
@@ -161,7 +160,7 @@ class Validator
         void capacity_topics(Topics,Solutions);
 
         //Entrega la calidad de la solucion
-        int quality_solution(Articles,Solutions);
+        void quality_solution(Articles,Solutions);
 
         std::vector<std::string> get_comments(void);
         void show_comments(void);    

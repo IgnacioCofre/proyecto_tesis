@@ -167,6 +167,8 @@ void Validator::capacity_session(Sessions sessions,Solutions solution)
 
 void Validator::capacity_topics(Topics topics,Solutions solutions)
 {
+    std::cout << "Validating capacity of topics per day" << std::endl;
+    comments.push_back("Validating capacity of topics per day");
     int number_days = solutions.get_number_days();
     
     if(number_days > 1)
@@ -238,7 +240,65 @@ void Validator::capacity_topics(Topics topics,Solutions solutions)
 
 void Validator::quality_solution(Articles articles,Solutions solutions)
 {
-    
+    std::cout << "Calculating the benefit of the solution" << std::endl;
+    //comments.push_back("Calculating the quality of the solution");
+    int total_quality = 0;
+    std::vector<std::vector<int>> benefit_per_session;
+    std::vector<std::vector<std::vector<std::vector<int>>>> scheduling = solutions.get_scheduling();
+    int number_days = scheduling.size();
+
+    for(int day=0; day<number_days; day++)
+    {
+        int number_blocks = scheduling[day].size();
+        for(int block=0; block<number_blocks; block++)
+        {
+            int number_sessions = scheduling[day][block].size();
+            for(int session=0; session<number_sessions; session++)
+            {
+                int benefit_session = 0;
+                int number_articles = scheduling[day][block][session].size();
+                for(int article_1=0; article_1<number_articles; article_1++)
+                {
+                    for(int article_2=article_1+1; article_2<number_articles; article_2++)
+                    {
+                        int id_article_1 = scheduling[day][block][session][article_1];
+                        int id_article_2 = scheduling[day][block][session][article_2];
+
+                        int benefit_articles = articles.get_similarity(id_article_1,id_article_2);
+                        if(benefit_articles == -1)
+                        {
+                            comments.push_back("Error id articles: "
+                            +std::to_string(id_article_1)+","
+                            +std::to_string(id_article_2));    
+                        }
+
+                        total_quality += benefit_articles;
+                        benefit_session += benefit_articles;
+            
+                    }   
+
+                    
+                }
+
+                benefit_per_session.push_back({day,block,session,benefit_session});
+            }
+        }
+    }
+    int number_total_sessions = benefit_per_session.size();
+    std::cout<<"Benefit per session [Day,Block,Session]:benefit"<<std::endl;
+    for(int i=0;i<number_total_sessions;i++)
+    {
+        std::cout<<
+        "["<<
+        benefit_per_session[i][0]<<","<<
+        benefit_per_session[i][1]<<","<<
+        benefit_per_session[i][2]<<
+        "]:"<<
+        benefit_per_session[i][3]<<std::endl;
+    }
+
+    std::cout<<"Total benefit solution: "<<total_quality<<std::endl;
+
 }
 
 std::vector<std::string> Validator::get_comments()

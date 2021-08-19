@@ -20,6 +20,8 @@ int main() {
     Topics topics = data.create_Topics();
     
     bool show_data_clases = false;
+    bool validation_process = true;
+
     if(show_data_clases)
     {
         data.show_data();
@@ -32,7 +34,6 @@ int main() {
         new_solution.show_solution();
     }
 
-    bool validation_process = true;
     if(validation_process)
     {
         Validator validator;
@@ -42,10 +43,10 @@ int main() {
         validator.article_assignment(data,new_solution);
         validator.capacity_session(sessions,new_solution);
         validator.capacity_topics(topics,new_solution);
-        validator.quality_solution(articles,new_solution);
         validator.show_comments();
+
+        validator.quality_solution(articles,new_solution);
     }
 
     return 0;
-    
 }

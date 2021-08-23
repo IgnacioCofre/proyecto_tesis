@@ -55,6 +55,7 @@ class Articles{
         Articles(int, std::vector<std::vector<int>>);
         int get_number_articles(void);
         int get_similarity(int,int);
+        std::vector<std::vector<int>> get_similarity_matrix();
         void show_data(void);
 };
 

@@ -29,6 +29,11 @@ int Articles::get_similarity(int id_article_1, int id_article_2)
     return similarity_matrix[id_article_1][id_article_2];
 }
 
+std::vector<std::vector<int>> Articles::get_similarity_matrix()
+{
+    return similarity_matrix;
+}
+
 void Articles::show_data()
 {
     std::cout <<"Show data articles" << std::endl;

@@ -34,6 +34,11 @@ std::vector<int> Sessions::session_type(int id_type)
     return session_types[id_type];
 }
 
+std::vector<std::vector<std::vector<int>>> Sessions::get_max_article_session()
+{
+    return max_assign_per_session;
+}
+
 void Sessions::show_data(){
    std::cout<< "max_assign_per_session"<<std::endl;
    int number_days = max_assign_per_session.size();

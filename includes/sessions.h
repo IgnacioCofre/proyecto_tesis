@@ -15,7 +15,7 @@ class Sessions{
     //session_types[type] = [number_max_articles, number_sessions, number_min_articles]
     std::vector <std::vector<int>> session_types;
     
-    //max_assign_per_session[day,block,session] = max_number_articles
+    //max_assign_per_session[day][block][session] = max_number_articles
     std::vector<std::vector<std::vector<int>>> max_assign_per_session;
 
     //data_days[index] = [number_block, number_sessions]
@@ -26,6 +26,7 @@ class Sessions{
         Sessions(int, std::vector <std::vector<int>>, std::vector<std::vector<std::vector<int>>>);
         int max_article_session(int, int, int);
         std::vector<int> session_type(int);
+        std::vector<std::vector<std::vector<int>>> get_max_article_session(void);
         void show_data(void);
 };
 

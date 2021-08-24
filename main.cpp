@@ -55,8 +55,10 @@ int main() {
         validator.quality_solution(articles,new_solution);
     }
 
+    srand(time(0));
+
     /*Parametros de las hormigas*/
-    int number_ants = 1;
+    int number_ants = 2;
     float max_pheromone = 1;
     float min_pheromone = 0.2;
     int number_articles = articles.get_number_articles();
@@ -64,41 +66,44 @@ int main() {
     float beta = 0.5;
     float Lk_constant = 1;
 
-    /*Parametros generales*/
+    /*Parametros de muestra de datos*/
     bool show_solution_construction = false;
-    srand(time(0));
-    
+    bool show_solution_benefit = true;
+
     //Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,Lk_constant)
     Ants ants = Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,Lk_constant,articles.get_similarity_matrix());
     
-    std::vector<int>available_articles(number_articles); 
-    std::vector<int>solution;
-    for(int iter=0; iter<number_articles; iter++)
+    std::vector<int>available_articles; 
+    //std::vector<int>solution;
+
+    for(int id_ant=0; id_ant<number_ants;id_ant++)
     {
-        available_articles[iter] = iter;
-    }
-    
-    for(int ant=0; ant<number_ants;ant++)
-    {
+        std::cout<<"Ant: "<<id_ant<<std::endl;
+
+        for(int iter=0; iter<number_articles; iter++)
+        {
+            available_articles.push_back(iter);
+        }
+
         int initial_article = 0;
-        int article_id_1 = available_articles[initial_article];
-        solution.push_back(article_id_1);
+        int id_inital_article = available_articles[initial_article];
+        //solution.push_back(id_inital_article);
+        ants.save_solution(id_ant,id_inital_article);
         available_articles.erase(available_articles.begin()+initial_article);
 
         while(available_articles.size()>0)
         {
-            int next_article = ants.get_next_article(article_id_1,available_articles);
+            int next_article = ants.get_next_article(id_inital_article,available_articles);
+            int id_next_article = available_articles[next_article];
             
-            int next_id_article = available_articles[next_article];
-            
-            
-            solution.push_back(next_id_article);
+            //solution.push_back(id_next_article);
+            ants.save_solution(id_ant,id_next_article);
             available_articles.erase(available_articles.begin()+next_article);
             
             if(show_solution_construction)
             {
-                std::cout << articles.get_similarity(article_id_1,next_id_article) <<std::endl;
-                for (const int& i : solution) {
+                std::cout << articles.get_similarity(id_inital_article,id_next_article) <<std::endl;
+                for (const int& i : ants.get_solution_ant(id_ant)) {
                     std::cout << i << ",";
                 }
                 std::cout << std::endl;
@@ -109,15 +114,20 @@ int main() {
                 std::cout << std::endl;
             }
 
-            article_id_1 = next_id_article;
-
+            id_inital_article = id_next_article;
         }
 
-        std::cout <<"Solution: "<<std::endl;
-        for (const int& i : solution) {
-            std::cout << i << ",";
+        if(show_solution_benefit)
+        {
+            std::cout <<"Solution: ";
+            for (const int& i : ants.get_solution_ant(id_ant)) {
+                std::cout << i << ",";
+            }
+            std::cout << std::endl;
+
+            int solution_benefit = ants.solution_quality(id_ant, sessions.get_max_article_session());
+            std::cout <<"Solution benefit: "<<solution_benefit<<std::endl;
         }
-        std::cout << std::endl;
     }
 
     return 0;

@@ -21,15 +21,41 @@ class Ants
 
     std::vector<std::vector<int>> similarity_matrix;
 
+    //solution_ant[id_ant] = [ids_articles]
+    std::vector<std::vector<int>> solution_ant;
+
     public:
         //Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,Lk_constant,similarity_matrix)
         Ants(int,float,float,int, float, float, float,std::vector<std::vector<int>>); 
         int get_number_ants(void);
 
-        //get_next_article(i,list_j,similarity_matrix)
+        /*
+        get_next_article(id_article,list_id_articles)
+        Retorna el id del siguiente articulo seleccionado para ser parte de la solucion
+        */
         int get_next_article(int, std::vector<int>); 
 
+        /*
+        save_solution(id_ant,id_article)
+        Guarda la solucion que se va contrullendo en solution_ant[id_ant]
+        */
+        int save_solution(int,int);
+
+        /*
+        get_solution_ant(id_ant)
+        Retorna la lista de solucion en forma de una lista de ids de articulos
+        */
+        std::vector<int> get_solution_ant(int);
+
+        void  reset_ants(void);
+
         float get_test(int, int, int);
+
+        /*
+        solution_quality(id_ant,max_assign_per_session)
+        calcula el beneficio total de la solucion creada por la hormiga id_ant
+        */
+        int solution_quality(int,std::vector<std::vector<std::vector<int>>>);
 };
 
 #endif

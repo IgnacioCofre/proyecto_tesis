@@ -1,8 +1,14 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "includes/class.h"
+
 #include "includes/ants.h"
+#include "includes/data.h"
+#include "includes/articles.h"
+#include "includes/authors.h"
+#include "includes/sessions.h"
+#include "includes/solutions.h"
+#include "includes/validator.h"
 
 int main() {
     
@@ -59,7 +65,7 @@ int main() {
     float Lk_constant = 1;
 
     /*Parametros generales*/
-    bool solution_construction = false;
+    bool show_solution_construction = false;
     srand(time(0));
     
     //Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,Lk_constant)
@@ -72,45 +78,48 @@ int main() {
         available_articles[iter] = iter;
     }
     
-    int initial_article = 0;
-    int article_id_1 = available_articles[initial_article];
-    solution.push_back(article_id_1);
-    available_articles.erase(available_articles.begin()+initial_article);
-
-    while(available_articles.size()>0)
+    for(int ant=0; ant<number_ants;ant++)
     {
-        int next_article = ants.get_next_article(article_id_1,available_articles);
-        
-        int next_id_article = available_articles[next_article];
-        
-        
-        solution.push_back(next_id_article);
-        available_articles.erase(available_articles.begin()+next_article);
-        
-        if(solution_construction)
+        int initial_article = 0;
+        int article_id_1 = available_articles[initial_article];
+        solution.push_back(article_id_1);
+        available_articles.erase(available_articles.begin()+initial_article);
+
+        while(available_articles.size()>0)
         {
-            std::cout << articles.get_similarity(article_id_1,next_id_article) <<std::endl;
-            for (const int& i : solution) {
-                std::cout << i << ",";
-            }
-            std::cout << std::endl;
+            int next_article = ants.get_next_article(article_id_1,available_articles);
             
-            for (const int& i : available_articles) {
-                std::cout << i << ",";
+            int next_id_article = available_articles[next_article];
+            
+            
+            solution.push_back(next_id_article);
+            available_articles.erase(available_articles.begin()+next_article);
+            
+            if(show_solution_construction)
+            {
+                std::cout << articles.get_similarity(article_id_1,next_id_article) <<std::endl;
+                for (const int& i : solution) {
+                    std::cout << i << ",";
+                }
+                std::cout << std::endl;
+                
+                for (const int& i : available_articles) {
+                    std::cout << i << ",";
+                }
+                std::cout << std::endl;
             }
-            std::cout << std::endl;
+
+            article_id_1 = next_id_article;
+
         }
 
-        article_id_1 = next_id_article;
-
+        std::cout <<"Solution: "<<std::endl;
+        for (const int& i : solution) {
+            std::cout << i << ",";
+        }
+        std::cout << std::endl;
     }
 
-    std::cout <<"Solution: "<<std::endl;
-    for (const int& i : solution) {
-        std::cout << i << ",";
-    }
-    std::cout << std::endl;
-    
     return 0;
 
 }

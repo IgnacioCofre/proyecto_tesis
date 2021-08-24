@@ -1,4 +1,5 @@
-#include "../includes/class.h"
+#include "../includes/data.h"
+#include "../includes/topics.h"
 
 Topics Data::create_Topics()
 {

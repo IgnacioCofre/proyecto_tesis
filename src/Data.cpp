@@ -1,4 +1,4 @@
-#include "../includes/class.h"
+#include "../includes/data.h"
 
 void Data::read_input_file(const char * input_path)
 {

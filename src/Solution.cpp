@@ -1,4 +1,4 @@
-#include "../includes/class.h"
+#include "../includes/solutions.h"
 
 void Solutions::read_solution(const char * solution_path)
 {

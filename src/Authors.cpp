@@ -1,4 +1,5 @@
-#include "../includes/class.h"
+#include "../includes/authors.h"
+#include "../includes/data.h"
 
 Authors Data::create_Authors()
 {

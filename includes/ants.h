@@ -1,3 +1,6 @@
+#ifndef ANTS_H
+#define ANTS_H
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -29,3 +32,4 @@ class Ants
         float get_test(int, int, int);
 };
 
+#endif

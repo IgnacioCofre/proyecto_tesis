@@ -1,4 +1,4 @@
-#include "../includes/class.h"
+#include "../includes/validator.h"
 
 void Validator::articles_in_diferent_sessions(Data data, Authors authors, Solutions solution)
 {

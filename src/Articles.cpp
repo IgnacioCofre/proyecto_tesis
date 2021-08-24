@@ -1,4 +1,5 @@
-#include "../includes/class.h"
+#include "../includes/data.h"
+#include "../includes/articles.h"
 
 Articles Data::create_Articles()
 {

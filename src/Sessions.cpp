@@ -1,4 +1,5 @@
-#include "../includes/class.h"
+#include "../includes/sessions.h"
+#include "../includes/data.h"
 
 Sessions Data::create_Sessions()
 {

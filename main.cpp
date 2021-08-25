@@ -125,7 +125,8 @@ int main() {
             }
             std::cout << std::endl;
 
-            int solution_benefit = ants.solution_quality(id_ant, sessions.get_max_article_session());
+            //int solution_benefit = ants.solution_quality_v1(id_ant, sessions.get_max_article_session());
+            int solution_benefit = ants.solution_quality_v2(id_ant, sessions.get_sheduling_by_room());
             std::cout <<"Solution benefit: "<<solution_benefit<<std::endl;
         }
     }

@@ -103,8 +103,8 @@ int Ants::get_next_article(int id_article_1, std::vector<int> list_j)
     return next_i;
 }
 
-int Ants::solution_quality(int id_ant, std::vector<std::vector<std::vector<int>>> max_assign_per_session)
-{
+int Ants::solution_quality_v1(int id_ant, std::vector<std::vector<std::vector<int>>> max_assign_per_session)
+{   
     std::vector<int> solution = solution_ant[id_ant];
     int iter_solution = 0;
     int total_quality = 0;
@@ -141,6 +141,44 @@ int Ants::solution_quality(int id_ant, std::vector<std::vector<std::vector<int>>
             }
         }
     }
+    return total_quality;
+}
 
+int Ants::solution_quality_v2(int id_ant, std::vector<std::vector<int>> max_assign_per_session)
+{
+
+    std::vector<int> solution = solution_ant[id_ant];
+    int iter_solution = 0;
+    int total_quality = 0;
+    std::vector<std::vector<int>> benefit_per_session;
+    int number_sessions = max_assign_per_session.size();
+
+    for(int session=0; session<number_sessions; session++)
+    {
+        int benefit_session = 0;
+        int number_articles = max_assign_per_session[session][3];
+
+        for(int iter_1=iter_solution; iter_1<number_articles + iter_solution; iter_1++)
+        {
+            for(int iter_2=iter_1+1; iter_2<number_articles + iter_solution; iter_2++)
+            {
+                int id_article_1 = solution[iter_1];
+                int id_article_2 = solution[iter_2];
+
+                int benefit_articles = similarity_matrix[id_article_1][id_article_2];
+        
+                total_quality += benefit_articles;
+                benefit_session += benefit_articles;           
+            }   
+        }
+
+        int day = max_assign_per_session[session][0];
+        int block = max_assign_per_session[session][1];
+        int room = max_assign_per_session[session][2];
+
+        iter_solution += number_articles;
+        benefit_per_session.push_back({day,block,room,benefit_session});
+    }
+    
     return total_quality;
 }

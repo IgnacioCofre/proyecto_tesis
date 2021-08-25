@@ -18,6 +18,9 @@ class Sessions{
     //max_assign_per_session[day][block][session] = max_number_articles
     std::vector<std::vector<std::vector<int>>> max_assign_per_session;
 
+    //sheduling_by_room[id_session] = [Day,Block,Room,Max_articles]
+    std::vector<std::vector<int>>   sheduling_by_room;
+
     //data_days[index] = [number_block, number_sessions]
     //std::vector <std::vector<int>> data_days;
 
@@ -27,6 +30,7 @@ class Sessions{
         int max_article_session(int, int, int);
         std::vector<int> session_type(int);
         std::vector<std::vector<std::vector<int>>> get_max_article_session(void);
+        std::vector<std::vector<int>> get_sheduling_by_room(void);
         void show_data(void);
 };
 

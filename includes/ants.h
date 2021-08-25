@@ -55,7 +55,14 @@ class Ants
         solution_quality(id_ant,max_assign_per_session)
         calcula el beneficio total de la solucion creada por la hormiga id_ant
         */
-        int solution_quality(int,std::vector<std::vector<std::vector<int>>>);
+        int solution_quality_v1(int,std::vector<std::vector<std::vector<int>>>);
+
+        /*
+        solution_quality(id_ant,max_assign_per_session)
+        calcula el beneficio total de la solucion creada por la hormiga id_ant
+        V2 se cambia el orden de instanciacion
+        */
+        int solution_quality_v2(int,std::vector<std::vector<int>>);
 };
 
 #endif

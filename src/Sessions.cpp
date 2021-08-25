@@ -14,6 +14,43 @@ Sessions::Sessions(int n_days, std::vector <std::vector<int>> s_data,std::vector
     session_types = s_data;
     max_assign_per_session = max_assign;
 
+    int room =0;
+    int block = 0;
+    bool rooms_left = true;
+    bool blocks_left = true;
+    std::vector<std::vector<int>> new_sheduling;
+
+    while(rooms_left)
+    {
+        rooms_left=false;
+        blocks_left = true;
+        block = 0;
+
+        while(blocks_left)
+        {
+            blocks_left = false;
+            for(int day= 0; day<number_days; day++)
+            {
+                if(block<(int) max_assign_per_session[day].size())
+                {
+                    blocks_left = true;
+                    if(room<(int) max_assign_per_session[day][block].size())
+                    {
+                        rooms_left = true;
+                        new_sheduling.push_back({day,block,room,max_assign_per_session[day][block][room]});
+
+                    }
+                }
+            }
+
+            block+=1;    
+        }
+
+        room+=1;
+    }
+    
+    sheduling_by_room = new_sheduling;
+    
     std::cout << "Sessions created" << std::endl;
 }
 
@@ -39,11 +76,16 @@ std::vector<std::vector<std::vector<int>>> Sessions::get_max_article_session()
     return max_assign_per_session;
 }
 
+std::vector<std::vector<int>> Sessions::get_sheduling_by_room()
+{
+    return sheduling_by_room;
+}
+
 void Sessions::show_data(){
-   std::cout<< "max_assign_per_session"<<std::endl;
-   int number_days = max_assign_per_session.size();
-   for(int day=0; day<number_days; day++)
-   {
+    std::cout<< "max_assign_per_session"<<std::endl;
+    int number_days = max_assign_per_session.size();
+    for(int day=0; day<number_days; day++)
+    {
         int number_blocks = max_assign_per_session[day].size();
         for(int block=0; block<number_blocks; block++)
         {
@@ -53,5 +95,18 @@ void Sessions::show_data(){
                 std::cout<<day<<","<<number_blocks<<","<<number_sessions<<std::endl;
             }
         }
-   }
+    }
+
+    std::cout<< "sheduling order by room [Day,Block,Room,Max_articles]"<<std::endl;
+    int number_sessions = sheduling_by_room.size();
+    for(int i=0; i<number_sessions; i++)
+    {
+        std::cout<<"["
+        <<sheduling_by_room[i][0]<<","
+        <<sheduling_by_room[i][1]<<","
+        <<sheduling_by_room[i][2]<<","
+        <<sheduling_by_room[i][3]
+        <<"]"<<std::endl;
+    }
+
 }

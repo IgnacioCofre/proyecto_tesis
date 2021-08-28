@@ -17,7 +17,8 @@ class Ants
     float alpha, beta;
     float Lk_constant;
     std::vector<std::vector<float>> pheromone_matrix;
-    std::vector<std::vector<std::vector<float>>> ants_pheromone_matrix;
+    //ant_solution_scheduling[id_ant][day][block][room] = [id articles in session]
+    std::vector<std::vector<std::vector<std::vector<std::vector<int>>>>> ant_solution_scheduling;
 
     std::vector<std::vector<int>> similarity_matrix;
 
@@ -36,20 +37,21 @@ class Ants
         int get_next_article(int, std::vector<int>); 
 
         /*
-        save_solution(id_ant,id_article)
-        Guarda la solucion que se va contrullendo en solution_ant[id_ant]
+        save_solution(id_ant,max_assign_per_session,[id_articles])
+        Crea y guarda la solucion que se va contrullendo la solucion en ant_solution_scheduling[id_ant]
+        en base al formato de max_assign_per_session
         */
-        int save_solution(int,int);
+        void save_solution(int,std::vector<std::vector<std::vector<int>>>, std::vector<int>);
 
         /*
         get_solution_ant(id_ant)
-        Retorna la lista de solucion en forma de una lista de ids de articulos
+        Retorna la calendarizacion resultante contruida por la hormiga id_ant
         */
-        std::vector<int> get_solution_ant(int);
+        std::vector<std::vector<std::vector<std::vector<int>>>> get_solution_ant(int);
 
         void  reset_ants(void);
 
-        float get_test(int, int, int);
+        float get_test(int, int);
 
         /*
         solution_quality(id_ant,max_assign_per_session)

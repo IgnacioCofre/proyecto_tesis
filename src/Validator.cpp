@@ -122,12 +122,12 @@ void Validator::article_assignment(Data data, Solutions solution)
     }
 }
 
-void Validator::capacity_session(Sessions sessions,Solutions solution)
+void Validator::capacity_session(Sessions sessions,std::vector<std::vector<std::vector<std::vector<int>>>> scheduling)
 {
     std::cout << "Validating articles capacity of session" << std::endl;
     comments.push_back("Validating articles capacity of session");
 
-    std::vector<std::vector<std::vector<std::vector<int>>>> scheduling = solution.get_scheduling();
+    //std::vector<std::vector<std::vector<std::vector<int>>>> scheduling = solution.get_scheduling();
     
     int number_days = scheduling.size();
     //std::cout<<number_days<<std::endl;
@@ -165,16 +165,16 @@ void Validator::capacity_session(Sessions sessions,Solutions solution)
     }
 }
 
-void Validator::capacity_topics(Topics topics,Solutions solutions)
+void Validator::capacity_topics(Topics topics,std::vector<std::vector<std::vector<std::vector<int>>>> scheduling)
 {
     std::cout << "Validating capacity of topics per day" << std::endl;
     comments.push_back("Validating capacity of topics per day");
-    int number_days = solutions.get_number_days();
+    int number_days = scheduling.size();
     
     if(number_days > 1)
     {
         int number_topics = topics.get_number_topics();
-        std::vector<std::vector<std::vector<std::vector<int>>>> scheduling = solutions.get_scheduling();
+        //std::vector<std::vector<std::vector<std::vector<int>>>> scheduling = solutions.get_scheduling();
 
         //counter_topics_per_day[day][id_topic] = number of articles with topic id_topic
         std::vector<std::vector<int>> counter_topics_per_day(number_days,std::vector<int>(number_topics));
@@ -238,13 +238,14 @@ void Validator::capacity_topics(Topics topics,Solutions solutions)
     
 }
 
-void Validator::quality_solution(Articles articles,Solutions solutions)
+int Validator::quality_solution(Articles articles,std::vector<std::vector<std::vector<std::vector<int>>>> scheduling)
 {
-    std::cout << "Calculating the benefit of the solution" << std::endl;
-    //comments.push_back("Calculating the quality of the solution");
+    //std::cout << "Calculating the benefit of the solution" << std::endl;
+    
+    bool show_coments = false;
     int total_quality = 0;
     std::vector<std::vector<int>> benefit_per_session;
-    std::vector<std::vector<std::vector<std::vector<int>>>> scheduling = solutions.get_scheduling();
+    //std::vector<std::vector<std::vector<std::vector<int>>>> scheduling = solutions.get_scheduling();
     int number_days = scheduling.size();
 
     for(int day=0; day<number_days; day++)
@@ -284,21 +285,26 @@ void Validator::quality_solution(Articles articles,Solutions solutions)
             }
         }
     }
-    int number_total_sessions = benefit_per_session.size();
-    std::cout<<"Benefit per session [Day,Block,Session]:benefit"<<std::endl;
-    for(int i=0;i<number_total_sessions;i++)
+
+    if(show_coments)
     {
-        std::cout<<
-        "["<<
-        benefit_per_session[i][0]<<","<<
-        benefit_per_session[i][1]<<","<<
-        benefit_per_session[i][2]<<
-        "]:"<<
-        benefit_per_session[i][3]<<std::endl;
+        int number_total_sessions = benefit_per_session.size();
+        std::cout<<"Benefit per session [Day,Block,Session]:benefit"<<std::endl;
+        for(int i=0;i<number_total_sessions;i++)
+        {
+            std::cout<<
+            "["<<
+            benefit_per_session[i][0]<<","<<
+            benefit_per_session[i][1]<<","<<
+            benefit_per_session[i][2]<<
+            "]:"<<
+            benefit_per_session[i][3]<<std::endl;
+        }
+
+        std::cout<<"Total benefit solution: "<<total_quality<<std::endl;
     }
 
-    std::cout<<"Total benefit solution: "<<total_quality<<std::endl;
-
+    return total_quality;
 }
 
 std::vector<std::string> Validator::get_comments()

@@ -22,13 +22,13 @@ class Validator{
         void article_assignment(Data, Solutions);
 
         //Verifica que se cumpla la capacidad de articulos por sesion
-        void capacity_session(Sessions,Solutions);
+        void capacity_session(Sessions,std::vector<std::vector<std::vector<std::vector<int>>>>);
 
         //Verifica la cantidad maxima de articulos por dia que pueden ser asignados que hagan referencia a un mismo topico
-        void capacity_topics(Topics,Solutions);
+        void capacity_topics(Topics,std::vector<std::vector<std::vector<std::vector<int>>>>);
 
         //Entrega la calidad de la solucion
-        void quality_solution(Articles,Solutions);
+        int quality_solution(Articles,std::vector<std::vector<std::vector<std::vector<int>>>>);
 
         std::vector<std::string> get_comments(void);
         void show_comments(void);    

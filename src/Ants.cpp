@@ -12,18 +12,15 @@ Ants::Ants(int n_ants,float mx_pheromone,float mn_pheromone,int n_articles, floa
     Lk_constant = lk_c;
     similarity_matrix = s_matrix;
 
-    /*
-    Matriz de  feromonas se inicializa con el valor maximo de la
-    feromona
-    */
+    /*Matriz de  feromonas se inicializa con el valor maximo de la feromona*/
     std::vector<std::vector<float>> aux_matrix(n_articles,std::vector<float>(n_articles,max_pheromone));
     pheromone_matrix = aux_matrix;
 
-    std::vector<std::vector<int>> aux_ant_solution(number_ants); 
-    solution_ant = aux_ant_solution;
+    //std::vector<std::vector<int>> aux_ant_solution(number_ants); 
+    //solution_ant = aux_ant_solution;
 
-    std::vector<std::vector<std::vector<std::vector<std::vector<int>>>>> aux_ant_solution_scheduling(number_ants);
-    ant_solution_scheduling = aux_ant_solution_scheduling;
+    //std::vector<std::vector<std::vector<std::vector<std::vector<int>>>>> aux_ant_solution_scheduling(number_ants);
+    //ant_solution_scheduling = aux_ant_solution_scheduling;
 
     std::cout<<"Ants created: "<<number_ants<<std::endl;
 }
@@ -38,7 +35,7 @@ float Ants::get_test(int id_article_1, int id_article_2)
     return pheromone_matrix[id_article_1][id_article_2];
 }
 
-std::vector<std::vector<std::vector<std::vector<int>>>> Ants::get_solution_ant(int id_ant)
+/*std::vector<std::vector<std::vector<std::vector<int>>>> Ants::get_solution_ant(int id_ant)
 {
     if(id_ant>number_ants)
     {
@@ -47,7 +44,7 @@ std::vector<std::vector<std::vector<std::vector<int>>>> Ants::get_solution_ant(i
     return ant_solution_scheduling[id_ant];
 
 }
-
+*/
 int Ants::get_next_article(int id_article_1, std::vector<int> list_j)
 {   
     int number_j = list_j.size();
@@ -65,24 +62,11 @@ int Ants::get_next_article(int id_article_1, std::vector<int> list_j)
         eta_ij = b_ij*10+1
         */
         int b_ij = similarity_matrix[id_article_1][id_article_2];
-        float eta_ij = b_ij*10 + 1;
+        float eta_ij = b_ij*10.0 + 1.0;
         
         float numerador = pow(tau_ij,alpha)*pow(eta_ij,beta);
         p_ij[j] = numerador;
         sum_p_ij += numerador;
-    }
-
-    /* 
-    En caso de que todos los arcos de un articulo i a todos los articulos j tengan ponderacion 0
-    se elije el siguiente articulo en la solucion de forma aleatoria
-
-    ***Este caso ya no deberia ocurrir***
-    */
-    if(sum_p_ij == 0)
-    {
-        int next_j = (int) std::rand() % number_j;
-        std::cout <<"Especial case: "<< next_j <<std::endl;
-        return next_j; 
     }
 
     float new_random = (float) rand()/RAND_MAX;
@@ -90,16 +74,17 @@ int Ants::get_next_article(int id_article_1, std::vector<int> list_j)
     float acumulated = (p_ij[0]/sum_p_ij);
     int next_i = 0;
     
-    while(new_random - acumulated > 0)
+    while((new_random - acumulated > 0) & (next_i<number_j-1))
     {
         next_i++;
         acumulated += (p_ij[next_i]/sum_p_ij);
-        
     }
-    
+
+    std::vector<float>().swap(p_ij);
     return next_i;
 }
 
+/*
 int Ants::solution_quality_v1(int id_ant, std::vector<std::vector<std::vector<int>>> max_assign_per_session)
 {   
     std::vector<int> solution = solution_ant[id_ant];
@@ -178,8 +163,8 @@ int Ants::solution_quality_v2(int id_ant, std::vector<std::vector<int>> max_assi
     
     return total_quality;
 }
-
-void Ants::save_solution(int id_ant,std::vector<std::vector<std::vector<int>>> max_assign_per_session,std::vector<int> list_articles)
+*/
+std::vector<std::vector<std::vector<std::vector<int>>>> Ants::save_solution(int id_ant,std::vector<std::vector<std::vector<int>>> max_assign_per_session,std::vector<int> list_articles)
 {   
     bool show_solution = false;
     int number_days = max_assign_per_session.size();
@@ -197,8 +182,11 @@ void Ants::save_solution(int id_ant,std::vector<std::vector<std::vector<int>>> m
             int number_rooms = max_assign_per_session[day][block].size();
             std::vector<std::vector<int>> rooms_block(number_rooms);
             blocks_day.push_back(rooms_block);
+            std::vector<std::vector<int>>().swap(rooms_block);
         }
         scheduling.push_back(blocks_day);
+        std::vector<std::vector<std::vector<int>>>().swap(blocks_day);
+
     }
 
     int current_article = 0;
@@ -308,6 +296,29 @@ void Ants::save_solution(int id_ant,std::vector<std::vector<std::vector<int>>> m
         room+=1;
         //std::cout<<"Room: "<<room<<std::endl;
     }
+    
+    std::vector<int>().swap(days);
+    std::vector<std::vector<int>>().swap(block_days);
+    
+    return scheduling;
 
-    ant_solution_scheduling[id_ant] = scheduling;
+    //std::vector<std::vector<std::vector<std::vector<int>>>>().swap(scheduling);
+    
 }
+
+/*
+void  Ants::reset_ants()
+{
+    std::vector<std::vector<int>>().swap(solution_ant);
+    std::vector<std::vector<int>> aux_ant_solution(number_ants); 
+    
+    solution_ant = aux_ant_solution;
+    std::vector<std::vector<int>>().swap(aux_ant_solution);
+
+    std::vector<std::vector<std::vector<std::vector<std::vector<int>>>>>().swap(ant_solution_scheduling);
+    std::vector<std::vector<std::vector<std::vector<std::vector<int>>>>> aux_ant_solution_scheduling(number_ants);
+    
+    ant_solution_scheduling = aux_ant_solution_scheduling;
+    std::vector<std::vector<std::vector<std::vector<std::vector<int>>>>>().swap(aux_ant_solution_scheduling);
+}
+*/

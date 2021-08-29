@@ -245,7 +245,6 @@ int Validator::quality_solution(Articles articles,std::vector<std::vector<std::v
     bool show_coments = false;
     int total_quality = 0;
     std::vector<std::vector<int>> benefit_per_session;
-    //std::vector<std::vector<std::vector<std::vector<int>>>> scheduling = solutions.get_scheduling();
     int number_days = scheduling.size();
 
     for(int day=0; day<number_days; day++)
@@ -270,7 +269,8 @@ int Validator::quality_solution(Articles articles,std::vector<std::vector<std::v
                         {
                             comments.push_back("Error id articles: "
                             +std::to_string(id_article_1)+","
-                            +std::to_string(id_article_2));    
+                            +std::to_string(id_article_2));
+                            std::cout<<"Error"<<std::endl;    
                         }
 
                         total_quality += benefit_articles;
@@ -304,6 +304,8 @@ int Validator::quality_solution(Articles articles,std::vector<std::vector<std::v
         std::cout<<"Total benefit solution: "<<total_quality<<std::endl;
     }
 
+    //benefit_per_session.clear();
+    std::vector<std::vector<int>>().swap(benefit_per_session);
     return total_quality;
 }
 

@@ -1,7 +1,7 @@
 #include "../includes/ants.h"
 
 //Ants(number_ants,max_pheromone,min_pheromone,number_articles)
-Ants::Ants(int n_ants,float mx_pheromone,float mn_pheromone,int n_articles, float alp, float b, float lk_c,std::vector<std::vector<int>> s_matrix)
+Ants::Ants(int n_ants,float mx_pheromone,float mn_pheromone,int n_articles, float alp, float b, float lk_c,std::vector<std::vector<int>> s_matrix, float vapor)
 {
     number_ants = n_ants;
     max_pheromone = mx_pheromone;
@@ -11,6 +11,7 @@ Ants::Ants(int n_ants,float mx_pheromone,float mn_pheromone,int n_articles, floa
     number_articles = n_articles;
     Lk_constant = lk_c;
     similarity_matrix = s_matrix;
+    vapor_factor = vapor;
 
     /*Matriz de  feromonas se inicializa con el valor maximo de la feromona*/
     std::vector<std::vector<float>> aux_matrix(n_articles,std::vector<float>(n_articles,max_pheromone));
@@ -35,16 +36,6 @@ float Ants::get_test(int id_article_1, int id_article_2)
     return pheromone_matrix[id_article_1][id_article_2];
 }
 
-/*std::vector<std::vector<std::vector<std::vector<int>>>> Ants::get_solution_ant(int id_ant)
-{
-    if(id_ant>number_ants)
-    {
-        std::cout <<"Ivalid Id Ant: "<<id_ant<<std::endl;
-    }
-    return ant_solution_scheduling[id_ant];
-
-}
-*/
 int Ants::get_next_article(int id_article_1, std::vector<int> list_j)
 {   
     int number_j = list_j.size();
@@ -83,6 +74,198 @@ int Ants::get_next_article(int id_article_1, std::vector<int> list_j)
     std::vector<float>().swap(p_ij);
     return next_i;
 }
+
+std::vector<std::vector<std::vector<std::vector<int>>>> Ants::save_solution(int id_ant,std::vector<std::vector<std::vector<int>>> max_assign_per_session,std::vector<int> list_articles)
+{   
+    bool show_solution = false;
+    int number_days = max_assign_per_session.size();
+    std::vector<std::vector<std::vector<std::vector<int>>>> scheduling;
+    std::vector<int> days;
+    std::vector<std::vector<int>> block_days(number_days);
+
+    //creacion de la solucion
+    for(int day=0; day<number_days; day++)
+    {
+        int number_blocks = max_assign_per_session[day].size();
+        std::vector<std::vector<std::vector<int>>> blocks_day;
+        for(int block=0; block<number_blocks; block++)
+        {
+            int number_rooms = max_assign_per_session[day][block].size();
+            std::vector<std::vector<int>> rooms_block(number_rooms);
+            blocks_day.push_back(rooms_block);
+            std::vector<std::vector<int>>().swap(rooms_block);
+        }
+        scheduling.push_back(blocks_day);
+        std::vector<std::vector<std::vector<int>>>().swap(blocks_day);
+
+    }
+
+    int current_article = 0;
+    bool roms_left = true;
+    int room = 0;
+    
+    if(show_solution)
+    {
+        std::cout<<"Solution"<<std::endl;
+        std::cout<<"[day,block,room]:[Articles]"<<std::endl; 
+    }
+    
+    while(roms_left)
+    {
+        roms_left = false;
+        for (int day=0; day<number_days; day++)
+        {
+            int number_blocks = max_assign_per_session[day].size();
+            for(int block=0; block<number_blocks; block++)
+            {
+                int number_rooms = max_assign_per_session[day][block].size();
+                if(number_rooms>room)
+                {
+                    roms_left = true;
+                    block_days[day].push_back(block);
+                }
+            } 
+        }
+
+        if(roms_left)
+        {   
+            for(int day=0; day<number_days; day++)
+            {
+                if(block_days[day].size()>0)
+                {
+                    days.push_back(day);
+                    //std::cout<<day<<std::endl;
+                }
+            }
+
+            int aux_number_days = days.size();
+            for(int i=0; i<aux_number_days-1; i++)
+            {  
+                int j = i + (rand()%(aux_number_days-i));
+                std::swap(days[i],days[j]);
+            }
+
+            auto it = days.begin();  
+            while(days.size()>0)
+            {
+                int day = *it;
+                //std::cout<<"day: "<<*it<<std::endl;
+                //std::cout<<"number blocks left: "<<block_days[day].size()<<std::endl;
+                if(block_days[day].size()>0)
+                {
+                    int block = block_days[day][0];
+                    
+                    int number_articles = max_assign_per_session[day][block][room];
+                    //std::cout<<number_articles<<std::endl;
+                    if(show_solution){std::cout<<day<<","<<block<<","<<room<<" : ";}
+                    for(int article=current_article; article<number_articles + current_article; article++)
+                    { 
+                        int aux_article = list_articles[article];
+                        scheduling[day][block][room].push_back(aux_article);
+                        if(show_solution){std::cout<<aux_article<<",";}
+                    }
+                    if(show_solution){std::cout<<std::endl;}
+
+                    current_article+= number_articles;
+                    block_days[day].erase(block_days[day].begin());
+
+                    if(block_days[day].size() == 0)
+                    {
+                        it = days.erase(it);
+                    }
+                    else
+                    {
+                        ++it;
+                    } 
+
+                    if(it == days.end()){it = days.begin();}
+                }
+            }
+        }
+        room+=1;
+        //std::cout<<"Room: "<<room<<std::endl;
+    }
+    
+    std::vector<int>().swap(days);
+    std::vector<std::vector<int>>().swap(block_days);
+    
+    return scheduling;
+
+    //std::vector<std::vector<std::vector<std::vector<int>>>>().swap(scheduling);
+    
+}
+
+void Ants::pheromone_update(std::vector<std::vector<std::vector<std::vector<int>>>> scheduling, float best_solution_quality)
+{
+    std::vector<std::vector<float>> pheromone_copy = pheromone_matrix;
+
+    /*Evaporizacion general de la matriz de feromonas*/
+    for(int i=0; i<number_articles; i++)
+    {
+        for(int j=i+1; j<number_articles; j++)
+        {    
+            float new_pheromona = (float)(1.0-vapor_factor)*pheromone_copy[i][j];
+            
+            pheromone_matrix[i][j] = new_pheromona;
+            pheromone_matrix[j][i] = new_pheromona;            
+        }
+    } 
+
+    /*Aumento de feromona para articulos de una misma sesion*/
+    int number_days = scheduling.size();
+
+    for(int day=0; day<number_days; day++)
+    {
+        int number_blocks = scheduling[day].size();
+        for(int block=0; block<number_blocks; block++)
+        {
+            int number_sessions = scheduling[day][block].size();
+            for(int session=0; session<number_sessions; session++)
+            {
+                int articles_in_session = scheduling[day][block][session].size();
+                for(int i=0; i<articles_in_session; i++)
+                {
+                    for(int j=i+1; j<articles_in_session; j++)
+                    {
+                        pheromone_matrix[i][j] += best_solution_quality;
+                        pheromone_matrix[j][i] += best_solution_quality;
+                    }   
+                }
+            }
+        }
+    }
+
+    for(int i=0; i<number_articles; i++)
+    {
+        for(int j=i+1; j<number_articles; j++)
+        {    
+            if(pheromone_matrix[i][j]<min_pheromone)
+            {
+                pheromone_matrix[i][j] = min_pheromone;
+                pheromone_matrix[j][i] = min_pheromone;
+            }
+            if(pheromone_matrix[i][j]>max_pheromone)
+            {
+                pheromone_matrix[i][j] = max_pheromone;
+                pheromone_matrix[j][i] = max_pheromone;
+            }       
+        }
+    } 
+
+    std::vector<std::vector<float>>().swap(pheromone_copy);
+}
+
+/*
+std::vector<std::vector<std::vector<std::vector<int>>>> Ants::get_solution_ant(int id_ant)
+{
+    if(id_ant>number_ants)
+    {
+        std::cout <<"Ivalid Id Ant: "<<id_ant<<std::endl;
+    }
+    return ant_solution_scheduling[id_ant];
+
+}
+*/
 
 /*
 int Ants::solution_quality_v1(int id_ant, std::vector<std::vector<std::vector<int>>> max_assign_per_session)
@@ -164,147 +347,6 @@ int Ants::solution_quality_v2(int id_ant, std::vector<std::vector<int>> max_assi
     return total_quality;
 }
 */
-std::vector<std::vector<std::vector<std::vector<int>>>> Ants::save_solution(int id_ant,std::vector<std::vector<std::vector<int>>> max_assign_per_session,std::vector<int> list_articles)
-{   
-    bool show_solution = false;
-    int number_days = max_assign_per_session.size();
-    std::vector<std::vector<std::vector<std::vector<int>>>> scheduling;
-    std::vector<int> days;
-    std::vector<std::vector<int>> block_days(number_days);
-
-    //creacion de la solucion
-    for(int day=0; day<number_days; day++)
-    {
-        int number_blocks = max_assign_per_session[day].size();
-        std::vector<std::vector<std::vector<int>>> blocks_day;
-        for(int block=0; block<number_blocks; block++)
-        {
-            int number_rooms = max_assign_per_session[day][block].size();
-            std::vector<std::vector<int>> rooms_block(number_rooms);
-            blocks_day.push_back(rooms_block);
-            std::vector<std::vector<int>>().swap(rooms_block);
-        }
-        scheduling.push_back(blocks_day);
-        std::vector<std::vector<std::vector<int>>>().swap(blocks_day);
-
-    }
-
-    int current_article = 0;
-    bool roms_left = true;
-    int room = 0;
-    
-    if(show_solution)
-    {
-        std::cout<<"Solution"<<std::endl;
-        std::cout<<"[day,block,room]:[Articles]"<<std::endl; 
-    }
-    
-    while(roms_left)
-    {
-        roms_left = false;
-        for (int day=0; day<number_days; day++)
-        {
-            int number_blocks = max_assign_per_session[day].size();
-            for(int block=0; block<number_blocks; block++)
-            {
-                int number_rooms = max_assign_per_session[day][block].size();
-                if(number_rooms>room)
-                {
-                    roms_left = true;
-                    block_days[day].push_back(block);
-                }
-            } 
-        }
-
-        if(roms_left)
-        {
-            for(int day=0; day<number_days; day++)
-            {
-                if(block_days[day].size()>0)
-                {
-                    days.push_back(day);
-                    //std::cout<<day<<std::endl;
-                }
-            }
-            
-            /*Aleatorizacion del orden de dias
-            Por alguna razon no funciona
-            */
-            /*
-            std::cout<<"lista days"<<std::endl;
-            for (int i = 0; i < days.size(); i++)
-            {
-                std::cout<<days[i]<<",";
-            }
-            std::cout<<std::endl;
-            */
-            /*
-            int aux_number_days = days.size();
-            for (int i = 0; i <aux_number_days-1 ; i++)
-            {
-                int j = i + rand() % (aux_number_days-1);
-                int aux = days[i];
-                days[i] = days[j];
-                days[j] = aux;
-            }
-            
-            std::cout<<"lista re ordenada"<<std::endl;
-            for (int i = 0; i < aux_number_days; i++)
-            {
-                std::cout<<days[i]<<",";
-            }
-            std::cout<<std::endl;
-            */
-
-            auto it = days.begin();  
-            while(days.size()>0)
-            {
-                int day = *it;
-                //std::cout<<"day: "<<*it<<std::endl;
-                //std::cout<<"number blocks left: "<<block_days[day].size()<<std::endl;
-                if(block_days[day].size()>0)
-                {
-                    int block = block_days[day][0];
-                    
-                    int number_articles = max_assign_per_session[day][block][room];
-                    //std::cout<<number_articles<<std::endl;
-                    if(show_solution){std::cout<<day<<","<<block<<","<<room<<" : ";}
-                    for(int article=current_article; article<number_articles + current_article; article++)
-                    { 
-                        int aux_article = list_articles[article];
-                        scheduling[day][block][room].push_back(aux_article);
-                        if(show_solution){std::cout<<aux_article<<",";}
-                    }
-                    if(show_solution){std::cout<<std::endl;}
-
-                    current_article+= number_articles;
-                    block_days[day].erase(block_days[day].begin());
-
-                    if(block_days[day].size() == 0)
-                    {
-                        it = days.erase(it);
-                    }
-                    else
-                    {
-                        ++it;
-                    } 
-
-                    if(it == days.end()){it = days.begin();}
-                }
-            }
-        }
-        room+=1;
-        //std::cout<<"Room: "<<room<<std::endl;
-    }
-    
-    std::vector<int>().swap(days);
-    std::vector<std::vector<int>>().swap(block_days);
-    
-    return scheduling;
-
-    //std::vector<std::vector<std::vector<std::vector<int>>>>().swap(scheduling);
-    
-}
 
 /*
 void  Ants::reset_ants()

@@ -16,8 +16,8 @@
 
 int main() {
     
-    //const char * input_file = "input/ebl/ebl_200_5.txt";
-    const char * input_file = "input/ebl_one_author/ebl_one_author_30_1.txt";
+    const char * input_file = "input/ebl/ebl_200_5.txt";
+    //const char * input_file = "input/ebl_one_author/ebl_one_author_30_1.txt";
     const char * solution_test_file = "output/output_example.txt";
 
     Data data;
@@ -63,27 +63,28 @@ int main() {
     }
 
     /*Parametros de las hormigas*/
-    int number_anthill = 10;
-    int number_ants = 10;
+    int number_anthill = 100;
+    int number_ants = 30;
     float max_pheromone = 10.0;
     float min_pheromone = 0.1;
     int number_articles = articles.get_number_articles();
     float alpha = 0.5;
     float beta = 0.5;
     float Lk_constant = 1.0;
+    float vapor_factor = 0.11;
 
     /*Parametros de muestra de datos por pantalla*/
     bool show_solution_construction = false;
     bool show_solution_benefit = false;
     bool show_ant_information = false;
-    bool show_solution_improvement = false;
     bool show_best_ant = false;
+    bool show_solution_improvement = true;
     
     //Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,Lk_constant, similarity_matrix)
-    Ants ants = Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,Lk_constant,articles.get_similarity_matrix());
+    Ants ants = Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,Lk_constant,articles.get_similarity_matrix(),vapor_factor);
     
     /*Algoritmo de hormigas*/
-    //int very_best_solution_quality = 0;
+    int very_best_solution_quality = 0;
     std::vector<std::vector<std::vector<std::vector<int>>>> very_best_solution;
     bool random_first_article = true;
 
@@ -151,12 +152,12 @@ int main() {
                 id_inital_article = id_next_article;
             }
 
-            std::vector<std::vector<std::vector<std::vector<int>>>> sheduling = ants.save_solution(id_ant,sessions.get_max_article_session(),solution_articles);
+            std::vector<std::vector<std::vector<std::vector<int>>>> scheduling = ants.save_solution(id_ant,sessions.get_max_article_session(),solution_articles);
             
             std::vector<int>().swap(solution_articles);
             std::vector<int>().swap(available_articles);
 
-            int solution_benefit = validator.quality_solution(articles,sheduling);
+            int solution_benefit = validator.quality_solution(articles,scheduling);
             
             if(show_solution_benefit)
             {
@@ -167,7 +168,7 @@ int main() {
             {
                 
                 best_solution_quality = solution_benefit;
-                best_solution = sheduling;
+                best_solution = scheduling;
 
                 if(show_best_ant)
                 {
@@ -175,17 +176,25 @@ int main() {
                 }
             }
 
-            std::vector<std::vector<std::vector<std::vector<int>>>>().swap(sheduling);
+            std::vector<std::vector<std::vector<std::vector<int>>>>().swap(scheduling);
+        }
+
+        /*actualizacion de la feromona*/
+        ants.pheromone_update(best_solution,best_solution_quality);
+        
+        if(best_solution_quality>very_best_solution_quality)
+        {
+            very_best_solution_quality = best_solution_quality;
+            very_best_solution = best_solution;
+
+            if(show_solution_improvement)
+            {
+                std::cout<<"New best solution: "<<very_best_solution_quality<<std::endl;
+            }
         }
 
         std::vector<std::vector<std::vector<std::vector<int>>>>().swap(best_solution);
-
-        /*actualizacion de la feromona*/
-        if(show_solution_improvement)
-        {
-            std::cout<<"New best solution"<<std::endl;
-        }
-
     }
+    
     return 0;
 }

@@ -15,7 +15,7 @@ class Ants
     //alpha: importancia empírica
     //beta: importancia heuristica
     float alpha, beta;
-    float Lk_constant;
+    float Lk_constant, vapor_factor;
     std::vector<std::vector<float>> pheromone_matrix;
     //ant_solution_scheduling[id_ant][day][block][room] = [id articles in session]
     //std::vector<std::vector<std::vector<std::vector<std::vector<int>>>>> ant_solution_scheduling;
@@ -26,8 +26,8 @@ class Ants
     //std::vector<std::vector<int>> solution_ant;
 
     public:
-        //Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,Lk_constant,similarity_matrix)
-        Ants(int,float,float,int, float, float, float,std::vector<std::vector<int>>); 
+        //Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,Lk_constant,similarity_matrix,vapor_factor)
+        Ants(int,float,float,int, float, float, float,std::vector<std::vector<int>>, float); 
         int get_number_ants(void);
 
         /*
@@ -52,6 +52,12 @@ class Ants
         //void  reset_ants(void);
 
         float get_test(int, int);
+
+        /*
+        pheromone_update(scheduling, solution_benefit)
+        Acutaliza el valor de los arcos en la matriz de feromonas
+        */
+        void pheromone_update(std::vector<std::vector<std::vector<std::vector<int>>>>, float);
 
         /*
         solution_quality(id_ant,max_assign_per_session)

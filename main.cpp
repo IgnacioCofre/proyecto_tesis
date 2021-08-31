@@ -53,7 +53,7 @@ int main() {
         
         std::cout << "Validating solution" << std::endl;
         
-        validator.articles_in_diferent_sessions(data, authors, new_solution);
+        validator.articles_in_diferent_sessions(data, authors, new_solution.get_scheduling());
         validator.article_assignment(data,new_solution);
         validator.capacity_session(sessions,new_solution.get_scheduling());
         validator.capacity_topics(topics,new_solution.get_scheduling());
@@ -63,8 +63,8 @@ int main() {
     }
 
     /*Parametros de las hormigas*/
-    int number_anthill = 100;
-    int number_ants = 30;
+    int number_anthill = 10;
+    int number_ants = 10;
     float max_pheromone = 10.0;
     float min_pheromone = 0.1;
     int number_articles = articles.get_number_articles();
@@ -159,9 +159,14 @@ int main() {
 
             int solution_benefit = validator.quality_solution(articles,scheduling);
             
+            /*Numero de restricciones no cumplidas de la solucion*/    
+            int n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,scheduling); 
+            //int n_max_article_day = validator.capacity_topics(topics,new_solution.get_scheduling());
+
             if(show_solution_benefit)
             {
-                std::cout <<"Solution benefit: "<<solution_benefit<<std::endl;
+                std::cout<<"Solution benefit:           "<<solution_benefit<<std::endl;
+                std::cout<<"Number articles problems:   "<<n_articles_parelel_session<<std::endl;
             }
 
             if(solution_benefit>best_solution_quality)

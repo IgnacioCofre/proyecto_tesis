@@ -1,21 +1,92 @@
 #include "../includes/validator.h"
 
-void Validator::articles_in_diferent_sessions(Data data, Authors authors, Solutions solution)
+int Validator::articles_in_diferent_sessions(Data data, Authors authors, std::vector<std::vector<std::vector<std::vector<int>>>> scheduling)
 {
-    std::cout << "Validating authors and articles on diferent sessions" << std::endl;
-    comments.push_back("Validating authors and articles on diferent sessions");
-    std::vector<std::vector<std::vector<std::vector<int>>>> scheduling = solution.get_scheduling();
-    
+    //std::cout << "Validating authors and articles on diferent sessions" << std::endl;
+    //comments.push_back("Validating authors and articles on diferent sessions");
+    //std::vector<std::vector<std::vector<std::vector<int>>>> scheduling = solution.get_scheduling();
+
+    bool show_conflict = false;
     
     int number_days =  data.get_number_days();
     int number_articles = data.get_number_articles();
     int number_authors = authors.get_number_authors();
-    //std::cout << authors.get_number_common_author(19,1) << std::endl;
+    std::vector<std::vector<int>> article_asignation(number_articles,{-1,-1,-1});
+
+    int number_problems = 0;
     
     //Se verifica que no hayan articulos de un mismo autor en sesiones paralelas
-    int comparison_method = 1; 
+    //int comparison_method = 1; 
     
+    for(int day=0; day<number_days; day++)
+    {
+        int number_blocks = scheduling[day].size();
+        for(int block=0; block<number_blocks; block++)
+        {
+            int number_sessions = scheduling[day][block].size();
+            for(int session=0; session<number_sessions; session++)
+            {
+                int n_articles_session_1 = scheduling[day][block][session].size();
+                for(int iter_article =0; iter_article<n_articles_session_1; iter_article++)
+                {
+                    int id_article = scheduling[day][block][session][iter_article];
+                    article_asignation[id_article] = {day,block,session};
+                }
+            }       
+        }
+    }
+
+    /*
+    Se revisan que los articulos de cada autor no se encuentren en sesiones 
+    paralelas
+    */
+    for(int author= 0; author< number_authors; author++)
+    {
+        std::vector<int> list_articles = authors.get_author_articles(author);
+        int n_articles = list_articles.size();
+
+        if(n_articles>1)
+        {
+            for(int i=0; i<n_articles; i++)
+            {   
+                int id_article_1 = list_articles[i];
+                int day_article_1 = article_asignation[id_article_1][0];
+                int block_article_1 = article_asignation[id_article_1][1];
+                int sesison_article_1 = article_asignation[id_article_1][2];    
+
+                for(int j=i+1; j<n_articles; j++)
+                {
+                    int id_article_2 = list_articles[j];
+                    int day_article_2 = article_asignation[id_article_2][0];
+                    int block_article_2 = article_asignation[id_article_2][1];
+                    int sesison_article_2 = article_asignation[id_article_2][2];   
+
+                    //se verifica primero que los dias y el bloque de dos articulos de un mismo autor sean iguales
+                    if((day_article_1 == day_article_2) & (block_article_1 == block_article_2))
+                    {   
+                        //si las sesiones son diferentes no se cumplen con las restricciones
+                        if(sesison_article_1 != sesison_article_2)
+                        {
+                            //std::cout << "Problem articles: " << id_article_1 << " " << id_article_2 << std::endl;
+                            number_problems += 1;
+                            if(show_conflict)
+                            {
+                                //comments.push_back("Problem articles: "+std::to_string(id_article_1)+" "+std::to_string(id_article_2)); 
+                                std::cout<<"Problem articles: "<<id_article_1<<" "<<id_article_2<<std::endl;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        std::vector<int>().swap(list_articles);
+    }
+
+    std::vector<std::vector<int>>().swap(article_asignation);
+    return number_problems;
     /* Esto es muy costoso de hacer pero funciona*/
+    /*
     if(comparison_method == 0)
     {
         for(int day=0; day<number_days; day++)
@@ -53,56 +124,7 @@ void Validator::articles_in_diferent_sessions(Data data, Authors authors, Soluti
             }
         }
     }
-    
-    /* Esto es un poco mas optimo*/
-    else
-    {
-        if(solution.get_number_articles() != number_articles)
-        {
-            comments.push_back("Error: not all articles are assing to a session");
-        }
-        else
-        {
-            for(int author= 0; author< number_authors; author++)
-            {
-                std::vector<int> list_articles = authors.get_author_articles(author);
-                int n_articles = list_articles.size();
-
-                //std::cout<<"Author: "<<author<<std::endl;
-                //std::cout<<list_articles[0]<<std::endl;
-
-                if(n_articles>1)
-                {
-                    //std::cout<<"Author con mas de un articulo: "<<author<<std::endl;
-                    //std::cout<<n_articles<<std::endl;
-                    
-                    for(int i=0; i<n_articles; i++)
-                    {   
-                        int id_article_1 = list_articles[i];
-                        //std::cout<<id_article_1<<std::endl;
-                        std::vector<int> article1_assing = solution.get_article_asignation(id_article_1);
-
-                        for(int j=i+1; j<n_articles; j++)
-                        {
-                            int id_article_2 = list_articles[j];
-                            std::vector<int> article2_assing = solution.get_article_asignation(id_article_2);
-
-                            //se verifica primero que los dias y el bloque de dos articulos de un mismo autor sean iguales
-                            if((article1_assing[0] == article2_assing[0]) & (article1_assing[1] == article2_assing[1]))
-                            {   
-                                //si las sesiones son diferentes no se cumplen con las restricciones
-                                if(article1_assing[2] != article2_assing[2])
-                                {
-                                    //std::cout << "Problem articles: " << id_article_1 << " " << id_article_2 << std::endl;
-                                    comments.push_back("Problem articles: "+std::to_string(id_article_1)+" "+std::to_string(id_article_2)); 
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    */
 }
 
 void Validator::article_assignment(Data data, Solutions solution)
@@ -165,12 +187,13 @@ void Validator::capacity_session(Sessions sessions,std::vector<std::vector<std::
     }
 }
 
-void Validator::capacity_topics(Topics topics,std::vector<std::vector<std::vector<std::vector<int>>>> scheduling)
+int Validator::capacity_topics(Topics topics,std::vector<std::vector<std::vector<std::vector<int>>>> scheduling)
 {
-    std::cout << "Validating capacity of topics per day" << std::endl;
-    comments.push_back("Validating capacity of topics per day");
+    //std::cout << "Validating capacity of topics per day" << std::endl;
+    //comments.push_back("Validating capacity of topics per day");
     int number_days = scheduling.size();
-    
+    int number_problems = 0;
+
     if(number_days > 1)
     {
         int number_topics = topics.get_number_topics();
@@ -234,8 +257,9 @@ void Validator::capacity_topics(Topics topics,std::vector<std::vector<std::vecto
                 }
             }
         }
-    }   
-    
+    }
+
+    return number_problems;   
 }
 
 int Validator::quality_solution(Articles articles,std::vector<std::vector<std::vector<std::vector<int>>>> scheduling)

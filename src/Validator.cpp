@@ -189,10 +189,17 @@ void Validator::capacity_session(Sessions sessions,std::vector<std::vector<std::
 
 int Validator::capacity_topics(Topics topics,std::vector<std::vector<std::vector<std::vector<int>>>> scheduling)
 {
-    //std::cout << "Validating capacity of topics per day" << std::endl;
-    //comments.push_back("Validating capacity of topics per day");
+    
+    bool show_problems = false;
     int number_days = scheduling.size();
     int number_problems = 0;
+
+    //std::cout << "Validating capacity of topics per day" << std::endl;
+    //comments.push_back("Validating capacity of topics per day");
+    if(show_problems)
+    {
+        std::cout<<"Day out of max topics [day,id_topic,number_articles]"<<std::endl;
+    }
 
     if(number_days > 1)
     {
@@ -223,8 +230,7 @@ int Validator::capacity_topics(Topics topics,std::vector<std::vector<std::vector
                         }
                         
                     }
-                }
-                    
+                }  
             }
         }
         /* Mostrar cantidad de aticulos por dia que incluyan cierto topico
@@ -246,12 +252,19 @@ int Validator::capacity_topics(Topics topics,std::vector<std::vector<std::vector
                     //Caso en que no se cumpla el limite de articulos de cierto topico
                     if(counter_topics_per_day[day][id_topic]>(number_articles_with_topic/2))
                     {
+                        number_problems +=1;
+                        if(show_problems)
+                        {
+                            std::cout<<"["<<day<<"," <<id_topic<<","<<counter_topics_per_day[day][id_topic]<<"]"<<std::endl;
+                        }
+
+                        /*
                         std::cout << day <<","<<id_topic<<","<<counter_topics_per_day[day][id_topic]<<std::endl;
                         comments.push_back("Day out of max topics [day,id_topic,number_articles]: ["
                         +std::to_string(day)+","
                         +std::to_string(id_topic)+","
                         +std::to_string(counter_topics_per_day[day][id_topic]));
-                        
+                        */
                     }
                     
                 }

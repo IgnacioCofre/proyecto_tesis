@@ -63,8 +63,8 @@ int main() {
     }
 
     /*Parametros de las hormigas*/
-    int number_anthill = 10;
-    int number_ants = 10;
+    int number_anthill = 100;
+    int number_ants = 100;
     float max_pheromone = 10.0;
     float min_pheromone = 0.1;
     int number_articles = articles.get_number_articles();
@@ -161,12 +161,13 @@ int main() {
             
             /*Numero de restricciones no cumplidas de la solucion*/    
             int n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,scheduling); 
-            //int n_max_article_day = validator.capacity_topics(topics,new_solution.get_scheduling());
+            int n_max_article_day = validator.capacity_topics(topics,scheduling);
 
             if(show_solution_benefit)
             {
                 std::cout<<"Solution benefit:           "<<solution_benefit<<std::endl;
                 std::cout<<"Number articles problems:   "<<n_articles_parelel_session<<std::endl;
+                std::cout<<"Number topics problems:     "<<n_max_article_day<<std::endl;
             }
 
             if(solution_benefit>best_solution_quality)
@@ -200,6 +201,15 @@ int main() {
 
         std::vector<std::vector<std::vector<std::vector<int>>>>().swap(best_solution);
     }
+
+    std::cout<<"\nInformation very best solution"<<std::endl;
+    int n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,very_best_solution); 
+    int n_max_article_day = validator.capacity_topics(topics,very_best_solution);
     
+    
+    std::cout<<"Solution benefit:           "<<very_best_solution_quality<<std::endl;
+    std::cout<<"Number articles problems:   "<<n_articles_parelel_session<<std::endl;
+    std::cout<<"Number topics problems:     "<<n_max_article_day<<std::endl;
+
     return 0;
 }

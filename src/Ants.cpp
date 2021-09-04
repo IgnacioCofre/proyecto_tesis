@@ -38,11 +38,11 @@ float Ants::get_test(int id_article_1, int id_article_2)
 
 int Ants::get_next_article(int id_article_1, std::vector<int> list_j)
 {   
-    int number_j = list_j.size();
-    std::vector<float> p_ij(number_j,0);
+    int size_list_j = list_j.size();
+    std::vector<float> p_ij(size_list_j,0);
     float sum_p_ij = 0;
     
-    for(int j=0; j<number_j; j++)
+    for(int j=0; j<size_list_j; j++)
     {
         int id_article_2 = list_j[j];
         float tau_ij = pheromone_matrix[id_article_1][id_article_2];
@@ -65,7 +65,8 @@ int Ants::get_next_article(int id_article_1, std::vector<int> list_j)
     float acumulated = (p_ij[0]/sum_p_ij);
     int next_i = 0;
     
-    while((new_random - acumulated > 0) & (next_i<number_j-1))
+    //while((new_random > acumulated) && (next_i<size_list_j-1))
+    while((new_random > acumulated))
     {
         next_i++;
         acumulated += (p_ij[next_i]/sum_p_ij);

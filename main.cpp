@@ -165,9 +165,9 @@ int main() {
 
             if(show_solution_benefit)
             {
-                std::cout<<"Solution benefit:           "<<solution_benefit<<std::endl;
-                std::cout<<"Number articles problems:   "<<n_articles_parelel_session<<std::endl;
-                std::cout<<"Number topics problems:     "<<n_max_article_day<<std::endl;
+                std::cout<<"Solution benefit:               "<<solution_benefit<<std::endl;
+                std::cout<<"Number pair articles problems:  "<<n_articles_parelel_session<<std::endl;
+                std::cout<<"Number topics problems:         "<<n_max_article_day<<std::endl;
             }
 
             if(solution_benefit>best_solution_quality)
@@ -207,9 +207,9 @@ int main() {
     int n_max_article_day = validator.capacity_topics(topics,very_best_solution);
     
     
-    std::cout<<"Solution benefit:           "<<very_best_solution_quality<<std::endl;
-    std::cout<<"Number articles problems:   "<<n_articles_parelel_session<<std::endl;
-    std::cout<<"Number topics problems:     "<<n_max_article_day<<std::endl;
+    std::cout<<"Solution benefit:               "<<very_best_solution_quality<<std::endl;
+    std::cout<<"Number pair articles problems:  "<<n_articles_parelel_session<<std::endl;
+    std::cout<<"Number topics problems:         "<<n_max_article_day<<std::endl;
 
     return 0;
 }

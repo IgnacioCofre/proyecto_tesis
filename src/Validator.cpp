@@ -193,6 +193,7 @@ int Validator::capacity_topics(Topics topics,std::vector<std::vector<std::vector
     bool show_problems = false;
     int number_days = scheduling.size();
     int number_problems = 0;
+    int number_articles_over_max_capacity = 0;
 
     //std::cout << "Validating capacity of topics per day" << std::endl;
     //comments.push_back("Validating capacity of topics per day");
@@ -250,8 +251,14 @@ int Validator::capacity_topics(Topics topics,std::vector<std::vector<std::vector
                 for(int day=0; day<number_days; day++)
                 {   
                     //Caso en que no se cumpla el limite de articulos de cierto topico
-                    if(counter_topics_per_day[day][id_topic]>(number_articles_with_topic/2))
+                    int max_topic_per_day = ceil(number_articles_with_topic/2.0);
+                    if(counter_topics_per_day[day][id_topic]>max_topic_per_day)
                     {
+                        /*
+                        se suman la cantidad de articulos que
+                        se pasan del maximo permitido por dia
+                        */
+                        number_articles_over_max_capacity += (counter_topics_per_day[day][id_topic]-max_topic_per_day);
                         number_problems +=1;
                         if(show_problems)
                         {
@@ -272,10 +279,10 @@ int Validator::capacity_topics(Topics topics,std::vector<std::vector<std::vector
         }
     }
 
-    return number_problems;   
+    return number_articles_over_max_capacity;   
 }
 
-int Validator::quality_solution(Articles articles,std::vector<std::vector<std::vector<std::vector<int>>>> scheduling)
+int Validator::solution_benefit(Articles articles,std::vector<std::vector<std::vector<std::vector<int>>>> scheduling)
 {
     //std::cout << "Calculating the benefit of the solution" << std::endl;
     

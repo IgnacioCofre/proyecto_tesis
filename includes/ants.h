@@ -15,7 +15,7 @@ class Ants
     //alpha: importancia empírica
     //beta: importancia heuristica
     float alpha, beta;
-    float Lk_constant, vapor_factor;
+    float c_factor, vapor_factor, gamma_factor, epsilon_factor ;
     std::vector<std::vector<float>> pheromone_matrix;
     //ant_solution_scheduling[id_ant][day][block][room] = [id articles in session]
     //std::vector<std::vector<std::vector<std::vector<std::vector<int>>>>> ant_solution_scheduling;
@@ -26,8 +26,8 @@ class Ants
     //std::vector<std::vector<int>> solution_ant;
 
     public:
-        //Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,Lk_constant,similarity_matrix,vapor_factor)
-        Ants(int,float,float,int, float, float, float,std::vector<std::vector<int>>, float); 
+        //Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,articles.get_similarity_matrix(),vapor_factor, c_factor,gamma_factor,epsilon_factor)
+        Ants(int,float,float,int, float, float,std::vector<std::vector<int>>, float, float, float, float); 
         int get_number_ants(void);
 
         /*
@@ -54,10 +54,17 @@ class Ants
         float get_test(int, int);
 
         /*
-        pheromone_update(scheduling, solution_benefit)
+        pheromone_update(scheduling, solution_quality)
         Acutaliza el valor de los arcos en la matriz de feromonas
         */
         void pheromone_update(std::vector<std::vector<std::vector<std::vector<int>>>>, float);
+
+        /*
+        Calucla la calidad final de la solucion
+        solution_quality = c*(solution_benefit - gamma*autor_problems - epsilon*topics_problems)
+        */
+        float calculate_quality_solution(int solution_benefit, int autor_problems, int topcis_problems);
+
 
         /*
         solution_quality(id_ant,max_assign_per_session)
@@ -71,6 +78,8 @@ class Ants
         V2 se cambia el orden de instanciacion
         */
         //int solution_quality_v2(int,std::vector<std::vector<int>>);
+
+        
 };
 
 #endif

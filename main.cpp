@@ -59,32 +59,41 @@ int main() {
         validator.capacity_topics(topics,new_solution.get_scheduling());
         validator.show_comments();
 
-        validator.quality_solution(articles,new_solution.get_scheduling());    
+        validator.solution_benefit(articles,new_solution.get_scheduling());    
     }
 
+    /*Parametros generales*/
+    int number_articles = articles.get_number_articles();
+    
     /*Parametros de las hormigas*/
-    int number_anthill = 100;
+    int number_anthill = 200;
     int number_ants = 100;
+
+    /*Parametro de creacion de soluciones*/
+    float alpha = 0.6;
+    float beta = 0.5;
+    
+    /*Parametros de la actualizacion de feromona*/
     float max_pheromone = 10.0;
     float min_pheromone = 0.1;
-    int number_articles = articles.get_number_articles();
-    float alpha = 0.5;
-    float beta = 0.5;
-    float Lk_constant = 1.0;
-    float vapor_factor = 0.11;
+
+    float vapor = 0.15;
+    float c = 0.01;
+    float gamma = 7.0;
+    float epsilon = 10.0;
 
     /*Parametros de muestra de datos por pantalla*/
     bool show_solution_construction = false;
-    bool show_solution_benefit = false;
+    bool show_solution_quality = false;
     bool show_ant_information = false;
-    bool show_best_ant = false;
+    bool show_best_ant = true;
     bool show_solution_improvement = true;
     
     //Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,Lk_constant, similarity_matrix)
-    Ants ants = Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,Lk_constant,articles.get_similarity_matrix(),vapor_factor);
+    Ants ants = Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,articles.get_similarity_matrix(),vapor,c,gamma,epsilon);
     
     /*Algoritmo de hormigas*/
-    int very_best_solution_quality = 0;
+    float very_best_solution_quality = 0;
     std::vector<std::vector<std::vector<std::vector<int>>>> very_best_solution;
     bool random_first_article = true;
 
@@ -99,7 +108,7 @@ int main() {
         std::cout<<"Conjunto de hormigas: "<<anthill<<std::endl;
         
         std::vector<std::vector<std::vector<std::vector<int>>>> best_solution;
-        int best_solution_quality = 0;
+        float best_solution_quality = -1;
 
         std::vector<int> available_articles; 
         std::vector<int> solution_articles;    
@@ -157,37 +166,40 @@ int main() {
             std::vector<int>().swap(solution_articles);
             std::vector<int>().swap(available_articles);
 
-            int solution_benefit = validator.quality_solution(articles,scheduling);
-            
-            /*Numero de restricciones no cumplidas de la solucion*/    
+                
+            int solution_benefit = validator.solution_benefit(articles,scheduling);
+            /*Numero de restricciones no cumplidas de la solucion*/
             int n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,scheduling); 
             int n_max_article_day = validator.capacity_topics(topics,scheduling);
+            float solution_quality = ants.calculate_quality_solution(solution_benefit,n_articles_parelel_session,n_max_article_day);
 
-            if(show_solution_benefit)
+            if(show_solution_quality)
             {
                 std::cout<<"Solution benefit:               "<<solution_benefit<<std::endl;
-                std::cout<<"Number pair articles problems:  "<<n_articles_parelel_session<<std::endl;
-                std::cout<<"Number topics problems:         "<<n_max_article_day<<std::endl;
+                std::cout<<"Pair articles same session:     "<<n_articles_parelel_session<<std::endl;
+                std::cout<<"Articles over max topic:        "<<n_max_article_day<<std::endl;
+                std::cout<<"Solution quality:               "<<solution_quality<<std::endl;
             }
 
-            if(solution_benefit>best_solution_quality)
+            if(solution_quality>best_solution_quality)
             {
-                
-                best_solution_quality = solution_benefit;
+                best_solution_quality = solution_quality;
                 best_solution = scheduling;
-
-                if(show_best_ant)
-                {
-                    std::cout<<"Solution: "<<best_solution_quality<<std::endl;
-                }
             }
 
             std::vector<std::vector<std::vector<std::vector<int>>>>().swap(scheduling);
         }
 
         /*actualizacion de la feromona*/
+        if(show_best_ant){
+            std::cout<<"Best Ant"<<std::endl; 
+            std::cout<<"Solution benefit:               "<<validator.solution_benefit(articles,best_solution)<<std::endl;
+            std::cout<<"Pair articles same session:     "<<validator.articles_in_diferent_sessions(data,authors,best_solution)<<std::endl;
+            std::cout<<"Articles over max topic:        "<<validator.capacity_topics(topics,best_solution)<<std::endl;
+            std::cout<<"Solution quality:               "<<best_solution_quality<<std::endl;
+        }
         ants.pheromone_update(best_solution,best_solution_quality);
-        
+
         if(best_solution_quality>very_best_solution_quality)
         {
             very_best_solution_quality = best_solution_quality;
@@ -203,13 +215,15 @@ int main() {
     }
 
     std::cout<<"\nInformation very best solution"<<std::endl;
+    int very_best_solution_benefit = validator.solution_benefit(articles,very_best_solution);
     int n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,very_best_solution); 
     int n_max_article_day = validator.capacity_topics(topics,very_best_solution);
     
     
-    std::cout<<"Solution benefit:               "<<very_best_solution_quality<<std::endl;
-    std::cout<<"Number pair articles problems:  "<<n_articles_parelel_session<<std::endl;
-    std::cout<<"Number topics problems:         "<<n_max_article_day<<std::endl;
+    std::cout<<"Solution benefit:               "<<very_best_solution_benefit<<std::endl;
+    std::cout<<"Pair articles same session:     "<<n_articles_parelel_session<<std::endl;
+    std::cout<<"Articles over max topic:        "<<n_max_article_day<<std::endl;
+    std::cout<<"Solution quality:               "<<very_best_solution_quality<<std::endl;
 
     return 0;
 }

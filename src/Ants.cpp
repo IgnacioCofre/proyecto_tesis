@@ -1,7 +1,7 @@
 #include "../includes/ants.h"
 
-//Ants(number_ants,max_pheromone,min_pheromone,number_articles)
-Ants::Ants(int n_ants,float mx_pheromone,float mn_pheromone,int n_articles, float alp, float b, float lk_c,std::vector<std::vector<int>> s_matrix, float vapor)
+//Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,articles.get_similarity_matrix(),vapor_factor, c_factor,gamma_fator,epsilon_fator)
+Ants::Ants(int n_ants,float mx_pheromone,float mn_pheromone,int n_articles, float alp, float b,std::vector<std::vector<int>> s_matrix, float vapor, float c, float gamma, float epsilon)
 {
     number_ants = n_ants;
     max_pheromone = mx_pheromone;
@@ -9,9 +9,11 @@ Ants::Ants(int n_ants,float mx_pheromone,float mn_pheromone,int n_articles, floa
     alpha = alp;
     beta = b;
     number_articles = n_articles;
-    Lk_constant = lk_c;
+    c_factor = c;
     similarity_matrix = s_matrix;
     vapor_factor = vapor;
+    gamma_factor = gamma;
+    epsilon_factor = epsilon;
 
     /*Matriz de  feromonas se inicializa con el valor maximo de la feromona*/
     std::vector<std::vector<float>> aux_matrix(n_articles,std::vector<float>(n_articles,max_pheromone));
@@ -65,8 +67,7 @@ int Ants::get_next_article(int id_article_1, std::vector<int> list_j)
     float acumulated = (p_ij[0]/sum_p_ij);
     int next_i = 0;
     
-    //while((new_random > acumulated) && (next_i<size_list_j-1))
-    while((new_random > acumulated))
+    while((new_random > acumulated) && (next_i<size_list_j-1))
     {
         next_i++;
         acumulated += (p_ij[next_i]/sum_p_ij);
@@ -79,6 +80,7 @@ int Ants::get_next_article(int id_article_1, std::vector<int> list_j)
 std::vector<std::vector<std::vector<std::vector<int>>>> Ants::save_solution(int id_ant,std::vector<std::vector<std::vector<int>>> max_assign_per_session,std::vector<int> list_articles)
 {   
     bool show_solution = false;
+    bool random_days = true;
     int number_days = max_assign_per_session.size();
     std::vector<std::vector<std::vector<std::vector<int>>>> scheduling;
     std::vector<int> days;
@@ -138,12 +140,15 @@ std::vector<std::vector<std::vector<std::vector<int>>>> Ants::save_solution(int 
                     //std::cout<<day<<std::endl;
                 }
             }
-
-            int aux_number_days = days.size();
-            for(int i=0; i<aux_number_days-1; i++)
-            {  
-                int j = i + (rand()%(aux_number_days-i));
-                std::swap(days[i],days[j]);
+            
+            if(random_days)
+            {
+                int aux_number_days = days.size();
+                for(int i=0; i<aux_number_days-1; i++)
+                {  
+                    int j = i + (rand()%(aux_number_days-i));
+                    std::swap(days[i],days[j]);
+                }
             }
 
             auto it = days.begin();  
@@ -198,14 +203,12 @@ std::vector<std::vector<std::vector<std::vector<int>>>> Ants::save_solution(int 
 
 void Ants::pheromone_update(std::vector<std::vector<std::vector<std::vector<int>>>> scheduling, float best_solution_quality)
 {
-    std::vector<std::vector<float>> pheromone_copy = pheromone_matrix;
-
     /*Evaporizacion general de la matriz de feromonas*/
     for(int i=0; i<number_articles; i++)
     {
         for(int j=i+1; j<number_articles; j++)
         {    
-            float new_pheromona = (float)(1.0-vapor_factor)*pheromone_copy[i][j];
+            float new_pheromona = (float)(1.0-vapor_factor)*pheromone_matrix[i][j];
             
             pheromone_matrix[i][j] = new_pheromona;
             pheromone_matrix[j][i] = new_pheromona;            
@@ -228,8 +231,9 @@ void Ants::pheromone_update(std::vector<std::vector<std::vector<std::vector<int>
                 {
                     for(int j=i+1; j<articles_in_session; j++)
                     {
-                        pheromone_matrix[i][j] += best_solution_quality;
-                        pheromone_matrix[j][i] += best_solution_quality;
+                        float solution_pheromona = (float)(c_factor*best_solution_quality);
+                        pheromone_matrix[i][j] += solution_pheromona;
+                        pheromone_matrix[j][i] += solution_pheromona;
                     }   
                 }
             }
@@ -252,8 +256,18 @@ void Ants::pheromone_update(std::vector<std::vector<std::vector<std::vector<int>
             }       
         }
     } 
+}
 
-    std::vector<std::vector<float>>().swap(pheromone_copy);
+float Ants::calculate_quality_solution(int solution_benefit, int autor_problems, int topcis_problems)
+{
+    float solution_quality = (float)(solution_benefit - (gamma_factor*autor_problems) - (epsilon_factor*topcis_problems));
+    
+    if(solution_quality < 0)
+    {
+        return 0;
+    }
+
+    return solution_quality;
 }
 
 /*

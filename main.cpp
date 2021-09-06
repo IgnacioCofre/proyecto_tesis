@@ -64,7 +64,7 @@ int main() {
     int number_articles = articles.get_number_articles();
     
     /*Parametros de las hormigas*/
-    int number_anthill = 100;
+    int number_anthill = 300;
     int number_ants = 30;
     int e = 5;
 
@@ -75,7 +75,7 @@ int main() {
     /*Parametros de la actualizacion de feromona*/
     float vapor = 0.15;
     float c = 0.01;
-    float gamma = 0.5;
+    float gamma = 1.0;
     float epsilon = 5.0;
 
     float max_pheromone = 10.0;
@@ -166,7 +166,6 @@ int main() {
             std::vector<int>().swap(solution_articles);
             std::vector<int>().swap(available_articles);
 
-                
             int solution_benefit = validator.solution_benefit(articles,scheduling);
             /*Numero de restricciones no cumplidas de la solucion*/
             int n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,scheduling); 
@@ -192,7 +191,6 @@ int main() {
             std::vector<std::vector<std::vector<std::vector<int>>>>().swap(scheduling);
         }
 
-        /*actualizacion de la feromona*/
         if(show_best_ant){
             std::cout<<"Best Ant"<<std::endl; 
             std::cout<<"Solution benefit:               "<<validator.solution_benefit(articles,best_solution)<<std::endl;
@@ -201,7 +199,7 @@ int main() {
             std::cout<<"Solution quality:               "<<best_solution_quality<<std::endl;
         }
 
-        //ants.pheromone_update(best_solution,best_solution_quality);
+        /*actualizacion de la feromona*/
         ants.pheromone_update_list();
         ants.reset_ants();
 
@@ -226,66 +224,11 @@ int main() {
         int n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,very_best_solution); 
         int n_max_article_day = validator.capacity_topics(topics,very_best_solution);
         
-        
         std::cout<<"Solution benefit:               "<<very_best_solution_benefit<<std::endl;
         std::cout<<"Pair articles paralel session:  "<<n_articles_parelel_session<<std::endl;
         std::cout<<"Articles over max topic:        "<<n_max_article_day<<std::endl;
         std::cout<<"Solution quality:               "<<very_best_solution_quality<<std::endl;
     }
 
-    /*
-    std::vector<int> vec = { 10, 20, 30, 40 };
-    std::vector<int> vec_random = {1,4,2,6,4,7,5,8,9,1,3};
-    std::vector<int> vec_order;
-    //int e = 3;
-    //int max_list = 0;
-    //int min_list = 0;
-    for(int it = 0; it < 10; it++)
-    {   
-        int size = vec_order.size();
-        int new_number = vec_random[it];
-        if(size==0){
-            vec_order.push_back(new_number);
-        }
-        else
-        {
-            if(new_number>vec_order[0]){
-                vec_order.insert(vec_order.begin(),new_number);
-            }
-            else if(new_number<vec_order[size-1]){
-                vec_order.push_back(new_number);
-            }
-            else{
-                int left = 0;
-                int right = size -1; 
-                while (left <= right) {
-                    int middle = left + (right - left) / 2;
-                    
-                    if (vec_order[middle] > new_number){
-                        left = middle+1;
-                    }    
-                    else if(vec_order[middle]< new_number){
-                        right = middle-1;
-                    }
-                    else{
-                        right = middle-1;
-                        left = middle;
-                    }    
-                }
-                std::cout<<left<<std::endl;
-                if(vec_order[left+1] != new_number && vec_order[left] != new_number){
-                vec_order.insert(vec_order.begin()+left,new_number);
-                }
-            }
-        }
-
-        for (auto it_order = vec_order.begin(); it_order != vec_order.end(); ++it_order)
-        {
-            std::cout << *it_order << " ";
-        }
-        std::cout<<std::endl;
-
-    }
-    */
     return 0;
 }

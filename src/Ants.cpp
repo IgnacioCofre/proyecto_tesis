@@ -1,7 +1,7 @@
 #include "../includes/ants.h"
 
 //Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,articles.get_similarity_matrix(),vapor_factor, c_factor,gamma_fator,epsilon_fator)
-Ants::Ants(int n_ants,float mx_pheromone,float mn_pheromone,int n_articles, float alp, float b,std::vector<std::vector<int>> s_matrix, float vapor, float c, float gamma, float epsilon)
+Ants::Ants(int n_ants,float mx_pheromone,float mn_pheromone,int n_articles, float alp, float b,std::vector<std::vector<int>> s_matrix, float vapor, float c, float gamma, float epsilon, int e_max)
 {
     number_ants = n_ants;
     max_pheromone = mx_pheromone;
@@ -14,6 +14,7 @@ Ants::Ants(int n_ants,float mx_pheromone,float mn_pheromone,int n_articles, floa
     vapor_factor = vapor;
     gamma_factor = gamma;
     epsilon_factor = epsilon;
+    e = e_max;
 
     /*Matriz de  feromonas se inicializa con el valor maximo de la feromona*/
     std::vector<std::vector<float>> aux_matrix(n_articles,std::vector<float>(n_articles,max_pheromone));
@@ -77,7 +78,7 @@ int Ants::get_next_article(int id_article_1, std::vector<int> list_j)
     return next_i;
 }
 
-std::vector<std::vector<std::vector<std::vector<int>>>> Ants::save_solution(int id_ant,std::vector<std::vector<std::vector<int>>> max_assign_per_session,std::vector<int> list_articles)
+std::vector<std::vector<std::vector<std::vector<int>>>> Ants::create_solution(int id_ant,std::vector<std::vector<std::vector<int>>> max_assign_per_session,std::vector<int> list_articles)
 {   
     bool show_solution = false;
     bool random_days = true;
@@ -217,6 +218,7 @@ void Ants::pheromone_update(std::vector<std::vector<std::vector<std::vector<int>
 
     /*Aumento de feromona para articulos de una misma sesion*/
     int number_days = scheduling.size();
+    float solution_pheromona = (float)(c_factor*best_solution_quality);
 
     for(int day=0; day<number_days; day++)
     {
@@ -229,11 +231,12 @@ void Ants::pheromone_update(std::vector<std::vector<std::vector<std::vector<int>
                 int articles_in_session = scheduling[day][block][session].size();
                 for(int i=0; i<articles_in_session; i++)
                 {
+                    int art_1 = scheduling[day][block][session][i];
                     for(int j=i+1; j<articles_in_session; j++)
                     {
-                        float solution_pheromona = (float)(c_factor*best_solution_quality);
-                        pheromone_matrix[i][j] += solution_pheromona;
-                        pheromone_matrix[j][i] += solution_pheromona;
+                        int art_2 = scheduling[day][block][session][j];
+                        pheromone_matrix[art_1][art_2] += solution_pheromona;
+                        pheromone_matrix[art_2][art_1] += solution_pheromona;
                     }   
                 }
             }
@@ -268,6 +271,157 @@ float Ants::calculate_quality_solution(int solution_benefit, int autor_problems,
     }
 
     return solution_quality;
+}
+
+void Ants::save_solution(std::vector<std::vector<std::vector<std::vector<int>>>> scheduling, float solution_quality)
+{
+
+    bool show_top_e = false;
+    int size_solution_list = solution_ant.size();
+
+    if(size_solution_list==0){
+        solution_ant.push_back(solution_quality);
+        ant_solution_scheduling.push_back(scheduling);
+    }
+    else
+    {
+        if(solution_quality>solution_ant[0])
+        {
+            solution_ant.insert(solution_ant.begin(),solution_quality);
+            ant_solution_scheduling.insert(ant_solution_scheduling.begin(),scheduling);
+        }
+        else if(solution_quality<solution_ant[size_solution_list-1]){
+            solution_ant.push_back(solution_quality);
+            ant_solution_scheduling.push_back(scheduling);
+        }
+        else{
+            int left = 0;
+            int right = size_solution_list -1; 
+            while (left <= right) {
+                int middle = left + (right - left) / 2;
+                
+                if (solution_ant[middle] > solution_quality){
+                    left = middle+1;
+                }    
+                else if(solution_ant[middle]< solution_quality){
+                    right = middle-1;
+                }
+                else{
+                    right = middle-1;
+                    left = middle;
+                }    
+            }
+            
+            //std::cout<<left<<std::endl;
+            
+            if(solution_ant[left+1] != solution_quality && solution_ant[left] != solution_quality){
+                solution_ant.insert(solution_ant.begin()+left,solution_quality);
+                ant_solution_scheduling.insert(ant_solution_scheduling.begin()+left,scheduling);
+            }
+        }
+
+        int new_size_list = solution_ant.size(); 
+        if(new_size_list > e)
+        {
+            //eliminar las peores soluciones
+            solution_ant.pop_back();
+            ant_solution_scheduling.pop_back();
+        }
+    }
+
+    if(show_top_e)
+    {
+        for (auto it_order = solution_ant.begin(); it_order != solution_ant.end(); ++it_order)
+        {
+            std::cout << *it_order << " ";
+        }
+        std::cout<<std::endl;
+    }
+}
+
+void Ants::reset_ants()
+{
+    std::vector<std::vector<std::vector<std::vector<std::vector<int>>>>>().swap(ant_solution_scheduling);
+    std::vector<float>().swap(solution_ant);    
+}
+
+void Ants::pheromone_update_list()
+{
+    bool sum_e_factor = true;
+
+    /*Evaporizacion general de la matriz de feromonas*/
+    for(int i=0; i<number_articles; i++)
+    {
+        for(int j=i+1; j<number_articles; j++)
+        {    
+            float new_pheromona = (float)(1.0-vapor_factor)*pheromone_matrix[i][j];
+            
+            pheromone_matrix[i][j] = new_pheromona;
+            pheromone_matrix[j][i] = new_pheromona;            
+        }
+    }
+    
+    /*Aumento de feromona para articulos de una misma sesion*/
+    int size_solutions_total = ant_solution_scheduling.size();
+
+    std::vector<std::vector<std::vector<std::vector<int>>>> scheduling;
+
+    for(int id_solution=0; id_solution<size_solutions_total; id_solution++)
+    {
+        scheduling = ant_solution_scheduling[id_solution];
+        
+        float solution_pheromona = (float)(c_factor*solution_ant[id_solution]);
+
+        if(sum_e_factor)
+        {
+            solution_pheromona = (solution_pheromona/e);
+        }
+        
+        int number_days = scheduling.size();
+        for(int day=0; day<number_days; day++)
+        {
+            int number_blocks = scheduling[day].size();
+            for(int block=0; block<number_blocks; block++)
+            {
+                int number_sessions = scheduling[day][block].size();
+                for(int session=0; session<number_sessions; session++)
+                {
+                    int articles_in_session = scheduling[day][block][session].size();
+                    //std::cout<<day<<","<<block<<","<<session<<","<<articles_in_session<<std::endl;
+                    for(int i=0; i<articles_in_session; i++)
+                    {
+                        int art_1 = scheduling[day][block][session][i];
+                        for(int j=i+1; j<articles_in_session; j++)
+                        {
+                            int art_2 = scheduling[day][block][session][j];
+                            pheromone_matrix[art_1][art_2] += solution_pheromona;
+                            pheromone_matrix[art_2][art_1] += solution_pheromona;
+                            //std::cout<<art_1<<","<<art_2<<","<<solution_pheromona<<std::endl;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    std::vector<std::vector<std::vector<std::vector<int>>>>().swap(scheduling);
+
+    for(int i=0; i<number_articles; i++)
+    {
+        for(int j=i+1; j<number_articles; j++)
+        {    
+            if(pheromone_matrix[i][j]<min_pheromone)
+            {
+                pheromone_matrix[i][j] = min_pheromone;
+                pheromone_matrix[j][i] = min_pheromone;
+            }
+            if(pheromone_matrix[i][j]>max_pheromone)
+            {
+                pheromone_matrix[i][j] = max_pheromone;
+                pheromone_matrix[j][i] = max_pheromone;
+            }       
+        }
+    }
 }
 
 /*

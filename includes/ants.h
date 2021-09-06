@@ -16,10 +16,12 @@ class Ants
     //beta: importancia heuristica
     float alpha, beta;
     float c_factor, vapor_factor, gamma_factor, epsilon_factor ;
+    int e;
     std::vector<std::vector<float>> pheromone_matrix;
     //ant_solution_scheduling[id_ant][day][block][room] = [id articles in session]
-    //std::vector<std::vector<std::vector<std::vector<std::vector<int>>>>> ant_solution_scheduling;
-
+    std::vector<std::vector<std::vector<std::vector<std::vector<int>>>>> ant_solution_scheduling;
+    std::vector<float> solution_ant;
+    
     std::vector<std::vector<int>> similarity_matrix;
 
     //solution_ant[id_ant] = [ids_articles]
@@ -27,7 +29,7 @@ class Ants
 
     public:
         //Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,articles.get_similarity_matrix(),vapor_factor, c_factor,gamma_factor,epsilon_factor)
-        Ants(int,float,float,int, float, float,std::vector<std::vector<int>>, float, float, float, float); 
+        Ants(int,float,float,int, float, float,std::vector<std::vector<int>>, float, float, float, float,int); 
         int get_number_ants(void);
 
         /*
@@ -37,19 +39,24 @@ class Ants
         int get_next_article(int, std::vector<int>); 
 
         /*
-        save_solution(id_ant,max_assign_per_session,[id_articles])
-        Crea y guarda la solucion que se va contrullendo la solucion en ant_solution_scheduling[id_ant]
+        create_solution(id_ant,max_assign_per_session,[id_articles])
+        Crea la solucion que se va contrullendo la solucion en ant_solution_scheduling[id_ant]
         en base al formato de max_assign_per_session
         */
-        std::vector<std::vector<std::vector<std::vector<int>>>> save_solution(int,std::vector<std::vector<std::vector<int>>>, std::vector<int>);
+        std::vector<std::vector<std::vector<std::vector<int>>>> create_solution(int,std::vector<std::vector<std::vector<int>>>, std::vector<int>);
 
         /*
-        get_solution_ant(id_ant)
-        Retorna la calendarizacion resultante contruida por la hormiga id_ant
+        save_solution(schedule, solution_quality)
+        Guarda las mejores e soluciones en la lista ant_solution_scheduling y solution_ant
         */
         //std::vector<std::vector<std::vector<std::vector<int>>>> get_solution_ant(int);
+        void save_solution(std::vector<std::vector<std::vector<std::vector<int>>>>, float);
 
-        //void  reset_ants(void);
+        /*
+        reset_ants()
+        Se borra el contenido de ant_solution_scheduling y solution_ant
+        */
+        void reset_ants(void);
 
         float get_test(int, int);
 
@@ -65,7 +72,12 @@ class Ants
         */
         float calculate_quality_solution(int solution_benefit, int autor_problems, int topcis_problems);
 
-
+        /*
+        pheromone_update_list()
+        Actualiza el valor de los arcos de la matriz de feromona 
+        a partir de los valores de solution_ant y las calendarizaciones de ant_solution_scheduling
+        */
+        void pheromone_update_list(void); 
         /*
         solution_quality(id_ant,max_assign_per_session)
         calcula el beneficio total de la solucion creada por la hormiga id_ant

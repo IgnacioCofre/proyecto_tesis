@@ -3,9 +3,6 @@
 #include <string>
 #include <random>
 
-#include <thread>
-#include <chrono>
-
 #include "includes/ants.h"
 #include "includes/data.h"
 #include "includes/articles.h"
@@ -16,7 +13,8 @@
 
 int main() {
     
-    const char * input_file = "input/ebl/ebl_200_5.txt";
+    ///const char * input_file = "input/ebl/ebl_200_5.txt";
+    const char * input_file = "input/ebl_modified/ebl_modified_200_5.txt";
     //const char * input_file = "input/ebl_one_author/ebl_one_author_30_1.txt";
     const char * solution_test_file = "output/output_example.txt";
 
@@ -66,21 +64,22 @@ int main() {
     int number_articles = articles.get_number_articles();
     
     /*Parametros de las hormigas*/
-    int number_anthill = 200;
-    int number_ants = 100;
+    int number_anthill = 100;
+    int number_ants = 30;
+    int e = 5;
 
     /*Parametro de creacion de soluciones*/
-    float alpha = 0.6;
-    float beta = 0.5;
+    float alpha = 0.9;
+    float beta = 0.9;
     
     /*Parametros de la actualizacion de feromona*/
-    float max_pheromone = 10.0;
-    float min_pheromone = 0.1;
-
     float vapor = 0.15;
     float c = 0.01;
-    float gamma = 7.0;
-    float epsilon = 10.0;
+    float gamma = 0.5;
+    float epsilon = 5.0;
+
+    float max_pheromone = 10.0;
+    float min_pheromone = 0.1;
 
     /*Parametros de muestra de datos por pantalla*/
     bool show_solution_construction = false;
@@ -88,9 +87,10 @@ int main() {
     bool show_ant_information = false;
     bool show_best_ant = true;
     bool show_solution_improvement = true;
+    bool show_very_best_solution = true;
     
     //Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,Lk_constant, similarity_matrix)
-    Ants ants = Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,articles.get_similarity_matrix(),vapor,c,gamma,epsilon);
+    Ants ants = Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,articles.get_similarity_matrix(),vapor,c,gamma,epsilon,e);
     
     /*Algoritmo de hormigas*/
     float very_best_solution_quality = 0;
@@ -161,7 +161,7 @@ int main() {
                 id_inital_article = id_next_article;
             }
 
-            std::vector<std::vector<std::vector<std::vector<int>>>> scheduling = ants.save_solution(id_ant,sessions.get_max_article_session(),solution_articles);
+            std::vector<std::vector<std::vector<std::vector<int>>>> scheduling = ants.create_solution(id_ant,sessions.get_max_article_session(),solution_articles);
             
             std::vector<int>().swap(solution_articles);
             std::vector<int>().swap(available_articles);
@@ -173,10 +173,12 @@ int main() {
             int n_max_article_day = validator.capacity_topics(topics,scheduling);
             float solution_quality = ants.calculate_quality_solution(solution_benefit,n_articles_parelel_session,n_max_article_day);
 
+            ants.save_solution(scheduling,solution_quality);
+
             if(show_solution_quality)
             {
                 std::cout<<"Solution benefit:               "<<solution_benefit<<std::endl;
-                std::cout<<"Pair articles same session:     "<<n_articles_parelel_session<<std::endl;
+                std::cout<<"Pair articles paralel session:  "<<n_articles_parelel_session<<std::endl;
                 std::cout<<"Articles over max topic:        "<<n_max_article_day<<std::endl;
                 std::cout<<"Solution quality:               "<<solution_quality<<std::endl;
             }
@@ -194,11 +196,14 @@ int main() {
         if(show_best_ant){
             std::cout<<"Best Ant"<<std::endl; 
             std::cout<<"Solution benefit:               "<<validator.solution_benefit(articles,best_solution)<<std::endl;
-            std::cout<<"Pair articles same session:     "<<validator.articles_in_diferent_sessions(data,authors,best_solution)<<std::endl;
+            std::cout<<"Pair articles paralel session:  "<<validator.articles_in_diferent_sessions(data,authors,best_solution)<<std::endl;
             std::cout<<"Articles over max topic:        "<<validator.capacity_topics(topics,best_solution)<<std::endl;
             std::cout<<"Solution quality:               "<<best_solution_quality<<std::endl;
         }
-        ants.pheromone_update(best_solution,best_solution_quality);
+
+        //ants.pheromone_update(best_solution,best_solution_quality);
+        ants.pheromone_update_list();
+        ants.reset_ants();
 
         if(best_solution_quality>very_best_solution_quality)
         {
@@ -214,16 +219,73 @@ int main() {
         std::vector<std::vector<std::vector<std::vector<int>>>>().swap(best_solution);
     }
 
-    std::cout<<"\nInformation very best solution"<<std::endl;
-    int very_best_solution_benefit = validator.solution_benefit(articles,very_best_solution);
-    int n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,very_best_solution); 
-    int n_max_article_day = validator.capacity_topics(topics,very_best_solution);
-    
-    
-    std::cout<<"Solution benefit:               "<<very_best_solution_benefit<<std::endl;
-    std::cout<<"Pair articles same session:     "<<n_articles_parelel_session<<std::endl;
-    std::cout<<"Articles over max topic:        "<<n_max_article_day<<std::endl;
-    std::cout<<"Solution quality:               "<<very_best_solution_quality<<std::endl;
+    if(show_very_best_solution)
+    {
+        std::cout<<"\nInformation very best solution"<<std::endl;
+        int very_best_solution_benefit = validator.solution_benefit(articles,very_best_solution);
+        int n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,very_best_solution); 
+        int n_max_article_day = validator.capacity_topics(topics,very_best_solution);
+        
+        
+        std::cout<<"Solution benefit:               "<<very_best_solution_benefit<<std::endl;
+        std::cout<<"Pair articles paralel session:  "<<n_articles_parelel_session<<std::endl;
+        std::cout<<"Articles over max topic:        "<<n_max_article_day<<std::endl;
+        std::cout<<"Solution quality:               "<<very_best_solution_quality<<std::endl;
+    }
 
+    /*
+    std::vector<int> vec = { 10, 20, 30, 40 };
+    std::vector<int> vec_random = {1,4,2,6,4,7,5,8,9,1,3};
+    std::vector<int> vec_order;
+    //int e = 3;
+    //int max_list = 0;
+    //int min_list = 0;
+    for(int it = 0; it < 10; it++)
+    {   
+        int size = vec_order.size();
+        int new_number = vec_random[it];
+        if(size==0){
+            vec_order.push_back(new_number);
+        }
+        else
+        {
+            if(new_number>vec_order[0]){
+                vec_order.insert(vec_order.begin(),new_number);
+            }
+            else if(new_number<vec_order[size-1]){
+                vec_order.push_back(new_number);
+            }
+            else{
+                int left = 0;
+                int right = size -1; 
+                while (left <= right) {
+                    int middle = left + (right - left) / 2;
+                    
+                    if (vec_order[middle] > new_number){
+                        left = middle+1;
+                    }    
+                    else if(vec_order[middle]< new_number){
+                        right = middle-1;
+                    }
+                    else{
+                        right = middle-1;
+                        left = middle;
+                    }    
+                }
+                std::cout<<left<<std::endl;
+                if(vec_order[left+1] != new_number && vec_order[left] != new_number){
+                vec_order.insert(vec_order.begin()+left,new_number);
+                }
+            }
+        }
+
+        for (auto it_order = vec_order.begin(); it_order != vec_order.end(); ++it_order)
+        {
+            std::cout << *it_order << " ";
+        }
+        std::cout<<std::endl;
+
+    }
+    */
     return 0;
 }

@@ -14,29 +14,24 @@
 int main() {
     
     /*Archivo input*/
-    std::string input_name = "ebl_modified/ebl_modified_200_5";
-    //std::string input_name = "ebl_modified/ebl_modified_200_5.txt";
+    //std::string input_name = "lars/lars_original.txt";
+    //std::string input_name = "ebl/ebl_original.txt";
+    std::string input_name = "ebl_modified/ebl_modified_200_5.txt";
     //std::string input_name = "ebl_one_author/ebl_one_author_30_1.txt";
 
-    /*Registro de soluciones*/
-    std::string result_file_name = "experimet.csv"; 
-    std::string result_improvement = "improvement.csv";
-    bool write_result = true;
-    //bool write_improvement = true;
-
     /*Parametros de las hormigas*/
-    int number_anthill = 10;
-    int number_ants = 10;
+    int number_anthill = 100;
+    int number_ants = 30;
     int e = 5;
 
     /*Parametro de creacion de soluciones*/
-    float alpha = 0.9;
-    float beta = 0.9;
+    float alpha = 1.0;
+    float beta = 0.7;
     
     /*Parametros de la actualizacion de feromona*/
-    float vapor = 0.15;
+    float vapor = 0.20;
     float c = 0.01;
-    float gamma = 1.0;
+    float gamma = 2.0;
     float epsilon = 5.0;
 
     float max_pheromone = 10.0;
@@ -51,7 +46,13 @@ int main() {
     bool show_very_best_solution = true;
     bool random_first_article = true;
 
-    std::string aux_path =  "input/"+ input_name + ".txt";
+    /*Registro de soluciones*/
+    std::string result_file_name = "experimet.csv"; 
+    std::string result_improvement = "improvement.csv";
+    bool write_result = false;
+    bool write_improvement = false;
+
+    std::string aux_path =  "input/"+ input_name;
     const char * input_file = aux_path.c_str();
     const char * solution_test_file = "output/output_example.txt";
 
@@ -96,6 +97,11 @@ int main() {
 
         validator.solution_benefit(articles,new_solution.get_scheduling());    
     }
+
+    std::ofstream improvementFile;
+    std::string aux_improvement_path = "results/" + result_improvement; 
+    const char * result_improvement_path = aux_improvement_path.c_str();
+    improvementFile.open(result_improvement_path,std::ios::out | std::ios::app);
 
     /*Algoritmo de hormigas*/
     int number_articles = articles.get_number_articles();
@@ -199,13 +205,24 @@ int main() {
         }
 
         if(show_best_ant){
+            float aux_benefit = validator.solution_benefit(articles,best_solution);
+            float aux_articles = validator.articles_in_diferent_sessions(data,authors,best_solution);
+            float aux_capacity = validator.capacity_topics(topics,best_solution);    
+
             std::cout<<"Best Ant"<<std::endl; 
-            std::cout<<"Solution benefit:               "<<validator.solution_benefit(articles,best_solution)<<std::endl;
-            std::cout<<"Pair articles paralel session:  "<<validator.articles_in_diferent_sessions(data,authors,best_solution)<<std::endl;
-            std::cout<<"Articles over max topic:        "<<validator.capacity_topics(topics,best_solution)<<std::endl;
+            std::cout<<"Solution benefit:               "<<aux_benefit<<std::endl;
+            std::cout<<"Pair articles paralel session:  "<<aux_articles<<std::endl;
+            std::cout<<"Articles over max topic:        "<<aux_capacity<<std::endl;
             std::cout<<"Solution quality:               "<<best_solution_quality<<std::endl;
 
-
+            if(write_improvement)
+            {
+                improvementFile<<
+                aux_benefit<<","<<
+                aux_articles<<","<<
+                aux_capacity<<","<<
+                best_solution_quality<<std::endl;
+            }
         }
 
         /*actualizacion de la feromona*/
@@ -239,6 +256,8 @@ int main() {
         std::cout<<"Articles over max topic:        "<<n_max_article_day<<std::endl;
         std::cout<<"Solution quality:               "<<very_best_solution_quality<<std::endl;
     }
+
+    improvementFile.close();
 
     /*Registro de resultdos*/
     if(write_result)

@@ -13,9 +13,46 @@
 
 int main() {
     
-    ///const char * input_file = "input/ebl/ebl_200_5.txt";
-    const char * input_file = "input/ebl_modified/ebl_modified_200_5.txt";
-    //const char * input_file = "input/ebl_one_author/ebl_one_author_30_1.txt";
+    /*Archivo input*/
+    std::string input_name = "ebl_modified/ebl_modified_200_5";
+    //std::string input_name = "ebl_modified/ebl_modified_200_5.txt";
+    //std::string input_name = "ebl_one_author/ebl_one_author_30_1.txt";
+
+    /*Registro de soluciones*/
+    std::string result_file_name = "experimet.csv"; 
+    std::string result_improvement = "improvement.csv";
+    bool write_result = true;
+    //bool write_improvement = true;
+
+    /*Parametros de las hormigas*/
+    int number_anthill = 10;
+    int number_ants = 10;
+    int e = 5;
+
+    /*Parametro de creacion de soluciones*/
+    float alpha = 0.9;
+    float beta = 0.9;
+    
+    /*Parametros de la actualizacion de feromona*/
+    float vapor = 0.15;
+    float c = 0.01;
+    float gamma = 1.0;
+    float epsilon = 5.0;
+
+    float max_pheromone = 10.0;
+    float min_pheromone = 0.1;
+
+    /*Parametros de muestra de datos por pantalla*/
+    bool show_solution_construction = false;
+    bool show_solution_quality = false;
+    bool show_ant_information = false;
+    bool show_best_ant = true;
+    bool show_solution_improvement = true;
+    bool show_very_best_solution = true;
+    bool random_first_article = true;
+
+    std::string aux_path =  "input/"+ input_name + ".txt";
+    const char * input_file = aux_path.c_str();
     const char * solution_test_file = "output/output_example.txt";
 
     Data data;
@@ -60,42 +97,12 @@ int main() {
         validator.solution_benefit(articles,new_solution.get_scheduling());    
     }
 
-    /*Parametros generales*/
+    /*Algoritmo de hormigas*/
     int number_articles = articles.get_number_articles();
-    
-    /*Parametros de las hormigas*/
-    int number_anthill = 300;
-    int number_ants = 30;
-    int e = 5;
-
-    /*Parametro de creacion de soluciones*/
-    float alpha = 0.9;
-    float beta = 0.9;
-    
-    /*Parametros de la actualizacion de feromona*/
-    float vapor = 0.15;
-    float c = 0.01;
-    float gamma = 1.0;
-    float epsilon = 5.0;
-
-    float max_pheromone = 10.0;
-    float min_pheromone = 0.1;
-
-    /*Parametros de muestra de datos por pantalla*/
-    bool show_solution_construction = false;
-    bool show_solution_quality = false;
-    bool show_ant_information = false;
-    bool show_best_ant = true;
-    bool show_solution_improvement = true;
-    bool show_very_best_solution = true;
-    
-    //Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,Lk_constant, similarity_matrix)
     Ants ants = Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,articles.get_similarity_matrix(),vapor,c,gamma,epsilon,e);
     
-    /*Algoritmo de hormigas*/
-    float very_best_solution_quality = 0;
     std::vector<std::vector<std::vector<std::vector<int>>>> very_best_solution;
-    bool random_first_article = true;
+    float very_best_solution_quality = 0;
 
     std::random_device rd; // obtain a random number from hardware
     std::mt19937 gen(rd()); // seed the generator
@@ -197,6 +204,8 @@ int main() {
             std::cout<<"Pair articles paralel session:  "<<validator.articles_in_diferent_sessions(data,authors,best_solution)<<std::endl;
             std::cout<<"Articles over max topic:        "<<validator.capacity_topics(topics,best_solution)<<std::endl;
             std::cout<<"Solution quality:               "<<best_solution_quality<<std::endl;
+
+
         }
 
         /*actualizacion de la feromona*/
@@ -217,17 +226,47 @@ int main() {
         std::vector<std::vector<std::vector<std::vector<int>>>>().swap(best_solution);
     }
 
+    /*Datos de la mejor solucion*/
+    int very_best_solution_benefit = validator.solution_benefit(articles,very_best_solution);
+    int n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,very_best_solution); 
+    int n_max_article_day = validator.capacity_topics(topics,very_best_solution);
+
     if(show_very_best_solution)
     {
         std::cout<<"\nInformation very best solution"<<std::endl;
-        int very_best_solution_benefit = validator.solution_benefit(articles,very_best_solution);
-        int n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,very_best_solution); 
-        int n_max_article_day = validator.capacity_topics(topics,very_best_solution);
-        
         std::cout<<"Solution benefit:               "<<very_best_solution_benefit<<std::endl;
         std::cout<<"Pair articles paralel session:  "<<n_articles_parelel_session<<std::endl;
         std::cout<<"Articles over max topic:        "<<n_max_article_day<<std::endl;
         std::cout<<"Solution quality:               "<<very_best_solution_quality<<std::endl;
+    }
+
+    /*Registro de resultdos*/
+    if(write_result)
+    {
+        std::ofstream resultsFile;
+        std::string aux_result_path = "results/" + result_file_name; 
+        const char * result_file_path = aux_result_path.c_str();
+        resultsFile.open(result_file_path,std::ios::out | std::ios::app);
+
+        resultsFile << 
+        input_name <<","<<
+        number_anthill<<","<<
+        number_ants<<","<<
+        e <<","<<
+        alpha <<","<<
+        beta <<","<<
+        max_pheromone<<","<<
+        min_pheromone<<","<<
+        vapor <<","<<
+        c <<","<<
+        gamma <<","<<
+        epsilon <<","<<
+        very_best_solution_benefit<<","<<
+        n_articles_parelel_session<<","<<
+        n_max_article_day<<","<<
+        very_best_solution_quality<<std::endl;
+
+        resultsFile.close();
     }
 
     return 0;

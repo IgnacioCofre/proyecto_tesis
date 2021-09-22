@@ -331,6 +331,7 @@ void Ants::save_solution(std::vector<std::vector<std::vector<std::vector<int>>>>
 
     if(show_top_e)
     {
+        std::cout<<"show best ants"<<std::endl;
         for (auto it_order = solution_ant.begin(); it_order != solution_ant.end(); ++it_order)
         {
             std::cout << *it_order << " ";
@@ -347,7 +348,7 @@ void Ants::reset_ants()
 
 void Ants::pheromone_update_list()
 {
-    bool sum_e_factor = true;
+    bool sum_e_factor = false;
 
     /*Evaporizacion general de la matriz de feromonas*/
     for(int i=0; i<number_articles; i++)
@@ -422,4 +423,35 @@ void Ants::pheromone_update_list()
             }       
         }
     }
+}
+
+int Ants::get_number_best_solutions()
+{
+    return solution_ant.size();
+}
+
+std::vector<std::vector<std::vector<std::vector<int>>>> Ants::get_best_solution(int position_solution)
+{
+    int number_solutions = ant_solution_scheduling.size();
+    if(position_solution < number_solutions) 
+    {
+        return ant_solution_scheduling[position_solution];
+    }
+
+    std::vector<std::vector<std::vector<std::vector<int>>>> empty;
+    std::cout<<"Erorr best solution position: "<<position_solution<<std::endl;
+    return empty;
+}
+
+float Ants::get_best_quality_solution(int position_solution)
+{
+    int number_solutions = solution_ant.size();
+    if(position_solution < number_solutions)
+    {
+        return solution_ant[position_solution];
+    }
+
+    float empty = 0;
+    std::cout<<"Erorr best solution position: "<<position_solution<<std::endl;
+    return empty;
 }

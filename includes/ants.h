@@ -78,6 +78,23 @@ class Ants
         a partir de los valores de solution_ant y las calendarizaciones de ant_solution_scheduling
         */
         void pheromone_update_list(void); 
+
+        /*
+        Retorna la cantidad de soluciones que se han guardado en la lista de mejores 
+        soluciones ant_solution_scheduling
+        */
+        int get_number_best_solutions(void);
+
+        /*
+        Retorna la mejor solucion de ant_solution_scheduling, donde 0 es la mejor solucion
+        */
+        std::vector<std::vector<std::vector<std::vector<int>>>> get_best_solution(int);
+
+        /*
+        Retorna la calidad de la lista de mejores solucion de solution_ant, donde 0 es la mejor solucion
+        */
+        float get_best_quality_solution(int);
+
         /*
         solution_quality(id_ant,max_assign_per_session)
         calcula el beneficio total de la solucion creada por la hormiga id_ant
@@ -90,6 +107,7 @@ class Ants
         V2 se cambia el orden de instanciacion
         */
         //int solution_quality_v2(int,std::vector<std::vector<int>>);
+
 
         
 };

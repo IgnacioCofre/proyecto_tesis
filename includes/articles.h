@@ -7,7 +7,6 @@
 #include <vector>
 #include <stdio.h>
 #include <cstdlib>
-#include <string>
 
 class Articles{
     int number_articles;

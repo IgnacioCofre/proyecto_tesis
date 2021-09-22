@@ -10,38 +10,45 @@
 #include "includes/sessions.h"
 #include "includes/solutions.h"
 #include "includes/validator.h"
+#include "includes/improvement.h"
 
 int main() {
     
     /*Archivo input*/
     //std::string input_name = "lars/lars_original.txt";
     //std::string input_name = "ebl/ebl_original.txt";
-    std::string input_name = "ebl_modified/ebl_modified_200_5.txt";
-    //std::string input_name = "ebl_one_author/ebl_one_author_30_1.txt";
+    std::string input_name = "lars/lars_30_5.txt";
+    //std::string input_name = "ebl/ebl_30_5.txt";
+    //std::string input_name = "ebl_modified/ebl_modified_200_5.txt";
+    //std::string input_name = "ebl/ebl_200_5.txt";
+
 
     /*Parametros de las hormigas*/
-    int number_anthill = 100;
-    int number_ants = 30;
+    int number_anthill = 2;
+    int number_ants = 20;
     int e = 5;
 
     /*Parametro de creacion de soluciones*/
-    float alpha = 1.0;
-    float beta = 0.7;
+    float alpha = 2.0;
+    float beta = 5.0;
     
     /*Parametros de la actualizacion de feromona*/
     float vapor = 0.20;
     float c = 0.01;
-    float gamma = 2.0;
-    float epsilon = 5.0;
+    float gamma = 15.0;
+    float epsilon = 10.0;
 
     float max_pheromone = 10.0;
     float min_pheromone = 0.1;
+
+    /*Parametros de mejora de soluciones*/
+    float limit_iteration = 10;
 
     /*Parametros de muestra de datos por pantalla*/
     bool show_solution_construction = false;
     bool show_solution_quality = false;
     bool show_ant_information = false;
-    bool show_best_ant = true;
+    bool show_best_ant = false;
     bool show_solution_improvement = true;
     bool show_very_best_solution = true;
     bool random_first_article = true;
@@ -224,6 +231,26 @@ int main() {
                 best_solution_quality<<std::endl;
             }
         }
+
+        /*Mejoramiento de la solucion*/
+        int number_best_solutions = ants.get_number_best_solutions();
+        //std::cout<<"total solutions: "<<number_best_solutions<<std::endl;
+        std::vector<std::vector<std::vector<std::vector<int>>>> solution_to_improve;
+        float current_quality_solution;
+        
+        for(int iter_solution = 0; iter_solution<number_best_solutions; iter_solution++)
+        {
+            //std::cout<<"Iteration of improvement: "<<iter_solution<<std::endl;
+            solution_to_improve = ants.get_best_solution(iter_solution);
+            current_quality_solution = ants.get_best_quality_solution(iter_solution);
+            Improvement * improve_method = new Improvement(solution_to_improve,current_quality_solution, gamma, epsilon, articles, topics, authors);
+            //improve_method->show_data();
+            
+            
+            //ants.update_best_solution(solution,quality_solution,iter_solution);
+            delete improve_method;
+        }
+        std::vector<std::vector<std::vector<std::vector<int>>>>().swap(solution_to_improve); 
 
         /*actualizacion de la feromona*/
         ants.pheromone_update_list();

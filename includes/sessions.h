@@ -7,7 +7,6 @@
 #include <vector>
 #include <stdio.h>
 #include <cstdlib>
-#include <string>
 
 class Sessions{
     int number_days;

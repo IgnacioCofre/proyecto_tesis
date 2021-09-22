@@ -7,7 +7,6 @@
 #include <vector>
 #include <stdio.h>
 #include <cstdlib>
-#include <string>
 #include <math.h>
 #include "data.h"
 #include "solutions.h"

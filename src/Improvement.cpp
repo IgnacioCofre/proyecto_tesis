@@ -15,7 +15,7 @@ Improvement::Improvement(std::vector<std::vector<std::vector<std::vector<int>>>>
     /*Ubicacion de los articulos y beneficio total de la solucion*/
     std::vector<std::vector<int>> article_ubication_aux(number_articles,{-1,-1,-1,-1});
     std::vector<std::vector<std::vector<int>>> benefit_session_aux;
-    std::vector<std::vector<int>> aux_authors_conflicts_per_block(number_days);
+    std::vector<int> authors_conflicts_aux(authors.get_number_authors(),0);
     std::vector<std::vector<int>> number_article_per_day_by_topic_aux(number_days,std::vector<int>(number_topics,0));
 
     for(int day=0; day<number_days; day++)
@@ -27,7 +27,7 @@ Improvement::Improvement(std::vector<std::vector<std::vector<std::vector<int>>>>
         {
             int number_sessions = solution_to_improve[day][block].size();
             std::vector<int> sessions_in_block;
-            aux_authors_conflicts_per_block[day].push_back(0);
+            //aux_authors_conflicts_per_block[day].push_back(0);
 
             //std::cout<<"block: "<<block<<std::endl;
             for(int session=0; session<number_sessions; session++)
@@ -58,7 +58,10 @@ Improvement::Improvement(std::vector<std::vector<std::vector<std::vector<int>>>>
                     for(int iter_article_2 = iter_article + 1; iter_article_2 < n_articles_session; iter_article_2++)
                     {
                         int id_article_2 = solution_to_improve[day][block][session][iter_article_2];
-                        benefit_accumulated_in_session += articles.get_similarity(id_article,id_article_2);
+                        int benefit_pair_articles = articles.get_similarity(id_article,id_article_2);
+                        benefit_accumulated_in_session += benefit_pair_articles;
+                        total_benefit+= benefit_pair_articles;
+                        
                     }
                     //std::cout<<"id_article end: "<<id_article<<std::endl;
                 }
@@ -107,7 +110,8 @@ Improvement::Improvement(std::vector<std::vector<std::vector<std::vector<int>>>>
                         //si las sesiones son diferentes no se cumplen con las restricciones
                         if(sesison_article_1 != sesison_article_2)
                         {
-                            aux_authors_conflicts_per_block[day_article_1][block_article_1] += 1;
+                            authors_conflicts_aux[author] += 1;
+                            //number_autor_conflicts+=1;
                         }
                     }
                 }
@@ -117,14 +121,17 @@ Improvement::Improvement(std::vector<std::vector<std::vector<std::vector<int>>>>
         std::vector<int>().swap(list_articles);
     }
 
-    authors_conflicts_per_block = aux_authors_conflicts_per_block;
+    authors_conflicts = authors_conflicts_aux;
 }
 
-void Improvement::swap_articles(int id_article_1, int id_article_2, Articles article)
+void Improvement::swap_articles(int id_article_1, int id_article_2, Articles articles, Topics topics, Authors authors)
 {
+    bool show_changes = true;
+    
     std::vector<std::vector<std::vector<std::vector<int>>>> new_solution = solution_to_improve;
     std::vector<std::vector<std::vector<int>>> new_benefit_session = benefit_session;
     std::vector<std::vector<int>> new_article_ubication = article_ubication;
+    std::vector<int> new_author_conflics = authors_conflicts;
 
     std::vector<int> aux_vect = {-1,-1,-1,-1};
     /*Revisa que los articulos hallan sido previamente instanciados en la solucion por modificar*/
@@ -147,6 +154,7 @@ void Improvement::swap_articles(int id_article_1, int id_article_2, Articles art
         new_article_ubication[id_article_1] = {day_2,block_2,room_2,pos_2};
         new_article_ubication[id_article_2] = {day_1,block_1,room_1,pos_1};
 
+        //calculo del nuevo beneficio generado para la primera sesion
         int new_benefit_1 = 0;
         std::vector<int> articles_in_session_1 = new_solution[day_1][block_1][room_1];
         int number_articles_session_1 = articles_in_session_1.size();
@@ -156,12 +164,13 @@ void Improvement::swap_articles(int id_article_1, int id_article_2, Articles art
             for(int j = i+1; j<number_articles_session_1; j++)
             {   
                 int article_2 = articles_in_session_1[j];
-                new_benefit_1 += article.get_similarity(article_1,article_2);
+                new_benefit_1 += articles.get_similarity(article_1,article_2);
             }    
         }
 
         new_benefit_session[day_1][block_1][room_1] = new_benefit_1;
         
+        //calculo del nuevo beneficio generado para la segunda sesion
         int new_benefit_2 = 0;
         std::vector<int> articles_in_session_2 = new_solution[day_2][block_2][room_2];
         int number_articles_session_2 = articles_in_session_2.size();
@@ -171,14 +180,13 @@ void Improvement::swap_articles(int id_article_1, int id_article_2, Articles art
             for(int j = i+1; j<number_articles_session_1; j++)
             {   
                 int article_2 = articles_in_session_2[j];
-                new_benefit_2 += article.get_similarity(article_1,article_2);
+                new_benefit_2 += articles.get_similarity(article_1,article_2);
             }    
         }
 
         new_benefit_session[day_2][block_2][room_2] = new_benefit_2;
 
         //Calculo del beneficio total despues del intercambio de articulos
-
         int new_total_benefit = 0;
 
         int number_days = new_solution.size();
@@ -195,11 +203,72 @@ void Improvement::swap_articles(int id_article_1, int id_article_2, Articles art
             }
         }
 
+        //Calculo de nuevos conflictos de topes de horario despues del intercambio
+        for(auto id_article : {id_article_1,id_article_2})
+        {
+            std::vector<int> article_authors = authors.get_article_authors(id_article);
+            for(auto author: article_authors)
+            {
+                new_author_conflics[author] = 0;
+                int new_conflics = 0;
+                std::vector<int> author_articles = authors.get_author_articles(author);
+                int number_author_articles = author_articles.size();
+                if(number_author_articles>1)
+                {
+                    for(int i=0; i<number_author_articles; i++)
+                    {   
+                        int id_art_1 = author_articles[i];
+                        int day_article_1 = new_article_ubication[id_art_1][0];
+                        int block_article_1 = new_article_ubication[id_art_1][1];
+                        int sesison_article_1 = new_article_ubication[id_art_1][2];    
+
+                        for(int j=i+1; j<number_author_articles; j++)
+                        {
+                            int id_art_2 = author_articles[j];
+                            int day_article_2 = new_article_ubication[id_art_2][0];
+                            int block_article_2 = new_article_ubication[id_art_2][1];
+                            int sesison_article_2 = new_article_ubication[id_art_2][2];   
+
+                            //se verifica primero que los dias y el bloque de dos articulos de un mismo autor sean iguales
+                            if((day_article_1 == day_article_2) & (block_article_1 == block_article_2))
+                            {   
+                                //si las sesiones son diferentes no se cumplen con las restricciones
+                                if(sesison_article_1 != sesison_article_2)
+                                {
+                                    new_author_conflics[author] += 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        int new_number_author_conflicts = 0;
+        
+        for(auto n_author_conflicts : new_author_conflics)
+        {
+            new_number_author_conflicts+= n_author_conflicts;
+        }
+
+        if(show_changes)
+        {
+            std::cout<<"Beneficio antes del cambio: "<<total_benefit<<std::endl;
+            std::cout<<"N° conflictos tope horario: "<<number_autor_conflicts<<std::endl;
+            
+            std::cout<<"Beneficio despues:          "<<new_total_benefit<<std::endl;
+            std::cout<<"N° conflictos tope horario: "<<new_number_author_conflicts<<std::endl;
+        }
+
     }
     else
     {
         std::cout<<"Error id articles, id_article_1: "<<id_article_1<<" id_article_2: "<<id_article_2<<std::endl;
     }
+
+    std::vector<std::vector<std::vector<std::vector<int>>>>().swap(new_solution);
+    std::vector<std::vector<std::vector<int>>>().swap(new_benefit_session);
+    //std::vector<std::vector<int>>().swap(new_article_ubication);
 }
 
 void Improvement::show_data()
@@ -228,22 +297,19 @@ void Improvement::show_data()
         }
     }
 
-    //authors_conflicts_per_block[day][block] = int number of conflicts tope de horario 
-    std::cout<<"Conflics per block [day,block:number_conflicts]"<<std::endl;
-    number_days = authors_conflicts_per_block.size();
-    for(int day=0; day<number_days; day++)
+    //authors_conflicts[id_author] = int number of conflicts of author 
+    std::cout<<"Conflics per author [id_author:number_conflicts]"<<std::endl;
+    int number_authors = authors_conflicts.size();
+    for(int author=0; author<number_authors; author++)
     {
-        int number_blocks = authors_conflicts_per_block[day].size();
-        for(int block=0; block<number_blocks; block++)
-        {
-            std::cout<<day<<","<<block<<":"<<authors_conflicts_per_block[day][block]<<std::endl;
-        }
+        int number_conflicts = authors_conflicts[author];
+        std::cout<<author<<":"<<number_conflicts<<std::endl;
     }
 
     //number_article_per_day_by_topic[day][id_topic] = int number of article in the day that contains id_topic
     number_days = number_article_per_day_by_topic.size();
     
-    std::cout<<"Number article per day by topic [day,id_topic]"<<std::endl;
+    std::cout<<"Number article per day by topic [day,id_topic:number articles with topic]"<<std::endl;
     for(int day=0; day<number_days; day++)
     {
         int number_topics = number_article_per_day_by_topic[day].size();

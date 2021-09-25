@@ -24,9 +24,9 @@ int main() {
 
 
     /*Parametros de las hormigas*/
-    int number_anthill = 2;
-    int number_ants = 20;
-    int e = 5;
+    int number_anthill = 1;
+    int number_ants = 1;
+    int e = 1;
 
     /*Parametro de creacion de soluciones*/
     float alpha = 2.0;
@@ -244,7 +244,7 @@ int main() {
             solution_to_improve = ants.get_best_solution(iter_solution);
             current_quality_solution = ants.get_best_quality_solution(iter_solution);
             Improvement * improve_method = new Improvement(solution_to_improve,current_quality_solution, gamma, epsilon, articles, topics, authors);
-            //improve_method->show_data();
+            improve_method->show_data();
             
             
             //ants.update_best_solution(solution,quality_solution,iter_solution);

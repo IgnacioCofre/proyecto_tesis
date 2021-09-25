@@ -7,12 +7,12 @@ Authors Data::create_Authors()
     return authors;
 }
 
-Authors::Authors(int n_articles, int n_authors, std::vector<int> n_articles_authors, std::vector <std::vector<int>> articles_authors)
+Authors::Authors(int n_articles, int n_authors, std::vector<int> n_articles_authors, std::vector <std::vector<int>> art_authors)
 {
     number_articles = n_articles;
     number_authors = n_authors;
     number_articles_authors = n_articles_authors;
-    article_authors = articles_authors;
+    article_authors = art_authors;
 
     std::vector <std::vector<int>> aux_author_articles(number_authors);
 
@@ -115,4 +115,15 @@ std::vector<int> Authors::get_author_articles(int id_author)
 int Authors::get_number_authors()
 {
     return number_authors;
+}
+
+std::vector<int> Authors::get_article_authors(int id_article)
+{
+    if(id_article >= number_articles)
+    {
+        std::cout<<"Error id_article: "<<id_article<<" in Authors get_article_authors"<<std::endl;
+        return {-1};
+    }
+
+    return article_authors[id_article];
 }

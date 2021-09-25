@@ -23,9 +23,22 @@ class Authors{
 
         Authors(int, int, std::vector<int>, std::vector <std::vector<int>>);
         int get_number_common_author(int, int);
-        void show_data(void);   
+        void show_data(void); 
+
+        /*
+        get_author_articles(id_author) = [id_articles of authors]
+        Retorna un vector de enteros que corresponden a los id de los articulos del autor id_author
+        a partir de la lista author_articles
+        */  
         std::vector<int> get_author_articles(int); 
         int get_number_authors(void);
+        
+        /*
+        get_atricle_autors(id_article)
+        Retorna un vector de enteros con los id de los autores del articulo id_article
+        a partir de la lista de vectores article_authors
+        */
+        std::vector<int> get_article_authors(int);
 
 };
 

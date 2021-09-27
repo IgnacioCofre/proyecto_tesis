@@ -7,11 +7,12 @@
 #include "articles.h"
 #include "topics.h"
 #include "authors.h"
+#include "random"
 
 class Improvement
 {
     std::vector<std::vector<std::vector<std::vector<int>>>> solution_to_improve;
-    //article_ubication[id_article] = [day,block,room] of article assignation in solution_to_improve
+    //article_ubication[id_article] = [day,block,room,position_in_list] of article assignation in solution_to_improve
     std::vector<std::vector<int>> article_ubication;
 
     //benefit_session[day,block,room] = int benefit of session
@@ -22,6 +23,7 @@ class Improvement
     
     //number_article_per_day_by_topic[day][id_topic] = int number of article in the day that contains id_topic
     std::vector<std::vector<int>> number_article_per_day_by_topic;
+    
     int total_benefit=0;
     int number_autor_conflicts=0, number_topics_conflics=0;
     float current_solution_quality;
@@ -48,6 +50,32 @@ class Improvement
         number_article_per_day_by_topic
         */
         void show_data(void);
+        
+        /*
+        in_diferent_session(id_article_1,id_article_2) = bool 
+        True si los articulos estan en distintas sesiones
+        False si los articulos estan en la misma sesion
+        */
+        bool in_diferent_session(int,int);
+
+        /*
+        select_aricle_in_diferent_session(id_article) = int del proximo id_article a cambiar
+        Retorna el id de un article que no se encuentre en la misma sesion que id_article
+        */
+        int select_article_in_diferent_session(int);
+
+        /*
+        get_quality_parameters() = {total_benefit,number_autor_conflicts,number_topics_conflics} 
+        Retorna los valores necesarios para calcular la calidad de la solucion 
+        */
+        std::vector<int> get_quality_parameters(void);
+
+        /*
+        get_solution_improved() = solution_to_improve
+        Retorna solution solution_to_improve
+        */
+        std::vector<std::vector<std::vector<std::vector<int>>>> get_solution_improved(void);
+
 
 };
 

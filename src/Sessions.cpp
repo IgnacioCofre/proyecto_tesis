@@ -58,7 +58,7 @@ int Sessions::max_article_session(int day, int block, int session)
 {
     try {
         return max_assign_per_session[day][block][session];
-        std::cout << "Out of Range error."<<std::endl;
+        //std::cout << "Out of Range error."<<std::endl;
     }
         catch (const std::out_of_range& oor) {
         std::cerr << "Out of Range error: " << oor.what() << '\n';

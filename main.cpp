@@ -16,17 +16,17 @@ int main() {
     
     /*Archivo input*/
     //std::string input_name = "lars/lars_original.txt";
-    //std::string input_name = "ebl/ebl_original.txt";
-    std::string input_name = "lars/lars_30_5.txt";
+    std::string input_name = "ebl/ebl_original.txt";
+    //std::string input_name = "lars/lars_30_5.txt";
     //std::string input_name = "ebl/ebl_30_5.txt";
     //std::string input_name = "ebl_modified/ebl_modified_200_5.txt";
     //std::string input_name = "ebl/ebl_200_5.txt";
 
 
     /*Parametros de las hormigas*/
-    int number_anthill = 1;
-    int number_ants = 1;
-    int e = 1;
+    int number_anthill = 100;
+    int number_ants = 20;
+    int e = 5;
 
     /*Parametro de creacion de soluciones*/
     float alpha = 2.0;
@@ -42,13 +42,13 @@ int main() {
     float min_pheromone = 0.1;
 
     /*Parametros de mejora de soluciones*/
-    float limit_iteration = 10;
+    float limit_iteration = 20;
 
     /*Parametros de muestra de datos por pantalla*/
     bool show_solution_construction = false;
     bool show_solution_quality = false;
     bool show_ant_information = false;
-    bool show_best_ant = false;
+    bool show_best_ant = true;
     bool show_solution_improvement = true;
     bool show_very_best_solution = true;
     bool random_first_article = true;
@@ -56,8 +56,10 @@ int main() {
     /*Registro de soluciones*/
     std::string result_file_name = "experimet.csv"; 
     std::string result_improvement = "improvement.csv";
+    std::string resutl_convergence = "convergence.csv";
     bool write_result = false;
     bool write_improvement = false;
+    bool write_convergence = true;
 
     std::string aux_path =  "input/"+ input_name;
     const char * input_file = aux_path.c_str();
@@ -202,15 +204,48 @@ int main() {
                 std::cout<<"Solution quality:               "<<solution_quality<<std::endl;
             }
 
-            if(solution_quality>best_solution_quality)
-            {
-                best_solution_quality = solution_quality;
-                best_solution = scheduling;
-            }
-
             std::vector<std::vector<std::vector<std::vector<int>>>>().swap(scheduling);
         }
 
+        /*Mejoramiento de la solucion*/
+        int number_best_solutions = ants.get_number_best_solutions();
+        //std::cout<<"total solutions: "<<number_best_solutions<<std::endl;
+        std::vector<std::vector<std::vector<std::vector<int>>>> solution_to_improve;
+    
+        for(int iter_solution = 0; iter_solution<number_best_solutions; iter_solution++)
+        {
+            //std::cout<<"Iteration of improvement: "<<iter_solution<<std::endl;
+            solution_to_improve = ants.get_best_solution(iter_solution);
+            float current_quality_solution = ants.get_best_quality_solution(iter_solution);
+            Improvement * improve_method = new Improvement(solution_to_improve,current_quality_solution, gamma, epsilon, articles, topics, authors);
+
+            for(int _ = 0; _<limit_iteration; _++)
+            {
+                int random_article_1 = distr(gen);
+                int random_article_2 = improve_method->select_article_in_diferent_session(random_article_1);
+                
+                improve_method->swap_articles(random_article_1,random_article_2,articles,topics,authors);
+
+                //improve_method->show_data();
+                //int benefit_improved = validator.solution_benefit(articles,improve_method->get_solution_improved());
+                //std::cout<<"Best benefit: "<<benefit_improved<<std::endl;
+            }
+
+            ants.update_best_solution(*improve_method,iter_solution);
+
+            delete improve_method;
+        }
+        std::vector<std::vector<std::vector<std::vector<int>>>>().swap(solution_to_improve); 
+
+        int pos_best_solution_in_anthill = 0;
+        if(limit_iteration>0 && number_best_solutions>1)
+        {
+            pos_best_solution_in_anthill = ants.get_best_solution_found();
+        }
+
+        best_solution = ants.get_best_solution(pos_best_solution_in_anthill); 
+        best_solution_quality = ants.get_best_quality_solution(pos_best_solution_in_anthill);
+    
         if(show_best_ant){
             float aux_benefit = validator.solution_benefit(articles,best_solution);
             float aux_articles = validator.articles_in_diferent_sessions(data,authors,best_solution);
@@ -231,31 +266,11 @@ int main() {
                 best_solution_quality<<std::endl;
             }
         }
-
-        /*Mejoramiento de la solucion*/
-        int number_best_solutions = ants.get_number_best_solutions();
-        //std::cout<<"total solutions: "<<number_best_solutions<<std::endl;
-        std::vector<std::vector<std::vector<std::vector<int>>>> solution_to_improve;
-        float current_quality_solution;
-        
-        for(int iter_solution = 0; iter_solution<number_best_solutions; iter_solution++)
-        {
-            //std::cout<<"Iteration of improvement: "<<iter_solution<<std::endl;
-            solution_to_improve = ants.get_best_solution(iter_solution);
-            current_quality_solution = ants.get_best_quality_solution(iter_solution);
-            Improvement * improve_method = new Improvement(solution_to_improve,current_quality_solution, gamma, epsilon, articles, topics, authors);
-            improve_method->show_data();
-            
-            
-            //ants.update_best_solution(solution,quality_solution,iter_solution);
-            delete improve_method;
-        }
-        std::vector<std::vector<std::vector<std::vector<int>>>>().swap(solution_to_improve); 
-
         /*actualizacion de la feromona*/
         ants.pheromone_update_list();
         ants.reset_ants();
 
+        //arreglar esto
         if(best_solution_quality>very_best_solution_quality)
         {
             very_best_solution_quality = best_solution_quality;
@@ -299,6 +314,7 @@ int main() {
         number_anthill<<","<<
         number_ants<<","<<
         e <<","<<
+        limit_iteration<<","<<
         alpha <<","<<
         beta <<","<<
         max_pheromone<<","<<

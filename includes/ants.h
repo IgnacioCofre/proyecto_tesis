@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <ctime>
+#include "improvement.h"
 
 class Ants
 {
@@ -20,6 +21,8 @@ class Ants
     std::vector<std::vector<float>> pheromone_matrix;
     //ant_solution_scheduling[id_ant][day][block][room] = [id articles in session]
     std::vector<std::vector<std::vector<std::vector<std::vector<int>>>>> ant_solution_scheduling;
+
+    //solution_ant[id_ant] = float solution_quality
     std::vector<float> solution_ant;
     
     std::vector<std::vector<int>> similarity_matrix;
@@ -108,7 +111,20 @@ class Ants
         */
         //int solution_quality_v2(int,std::vector<std::vector<int>>);
 
-
+        /*
+        update_best_solution(solution,id_ant)
+        Actualiza la solucion mejorada en el objeto Improvement de acuerdo a la lista de mejores soluciones 
+        ant_solution_scheduling[id_ant] = new_solution
+        solution_ant[id_ant] = new_quality
+        */
+        void update_best_solution(Improvement,int);
+        
+        /*
+        get_best_solution_found() = int posicion de la mejor solucion 
+        Retorna la posicion de la mejor solucion a partir de la calidad encontrada en las soluciones 
+        de solution_ant
+        */
+        int get_best_solution_found(void);
         
 };
 

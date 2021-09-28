@@ -15,17 +15,16 @@
 int main() {
     
     /*Archivo input*/
-    //std::string input_name = "lars/lars_original.txt";
-    std::string input_name = "ebl/ebl_original.txt";
+    std::string input_name = "lars/lars_original.txt";
+    //std::string input_name = "ebl/ebl_original.txt";
     //std::string input_name = "lars/lars_30_5.txt";
     //std::string input_name = "ebl/ebl_30_5.txt";
     //std::string input_name = "ebl_modified/ebl_modified_200_5.txt";
     //std::string input_name = "ebl/ebl_200_5.txt";
 
-
     /*Parametros de las hormigas*/
-    int number_anthill = 100;
-    int number_ants = 20;
+    int number_anthill = 200;
+    int number_ants = 30;
     int e = 5;
 
     /*Parametro de creacion de soluciones*/
@@ -33,7 +32,7 @@ int main() {
     float beta = 5.0;
     
     /*Parametros de la actualizacion de feromona*/
-    float vapor = 0.20;
+    float vapor = 0.25;
     float c = 0.01;
     float gamma = 15.0;
     float epsilon = 10.0;
@@ -57,7 +56,7 @@ int main() {
     std::string result_file_name = "experimet.csv"; 
     std::string result_improvement = "improvement.csv";
     std::string resutl_convergence = "convergence.csv";
-    bool write_result = false;
+    bool write_result = true;
     bool write_improvement = false;
     bool write_convergence = true;
 
@@ -107,10 +106,17 @@ int main() {
         validator.solution_benefit(articles,new_solution.get_scheduling());    
     }
 
+    /*Archivo que guarda la mejor solucion encontrada en cada hormiguero*/
     std::ofstream improvementFile;
     std::string aux_improvement_path = "results/" + result_improvement; 
     const char * result_improvement_path = aux_improvement_path.c_str();
     improvementFile.open(result_improvement_path,std::ios::out | std::ios::app);
+
+    /*Archivo que guarda la mejora que se produce a lo largo de las iteraciones*/
+    std::ofstream convergenceFile;
+    std::string aux_convergence_path = "results/" + resutl_convergence; 
+    const char * result_convergence_path = aux_convergence_path.c_str();
+    convergenceFile.open(result_convergence_path,std::ios::out | std::ios::app);
 
     /*Algoritmo de hormigas*/
     int number_articles = articles.get_number_articles();
@@ -245,42 +251,56 @@ int main() {
 
         best_solution = ants.get_best_solution(pos_best_solution_in_anthill); 
         best_solution_quality = ants.get_best_quality_solution(pos_best_solution_in_anthill);
+        //hay que optimizar esto
+        float aux_benefit = validator.solution_benefit(articles,best_solution);
+        float aux_articles = validator.articles_in_diferent_sessions(data,authors,best_solution);
+        float aux_capacity = validator.capacity_topics(topics,best_solution);
     
         if(show_best_ant){
-            float aux_benefit = validator.solution_benefit(articles,best_solution);
-            float aux_articles = validator.articles_in_diferent_sessions(data,authors,best_solution);
-            float aux_capacity = validator.capacity_topics(topics,best_solution);    
-
             std::cout<<"Best Ant"<<std::endl; 
             std::cout<<"Solution benefit:               "<<aux_benefit<<std::endl;
             std::cout<<"Pair articles paralel session:  "<<aux_articles<<std::endl;
             std::cout<<"Articles over max topic:        "<<aux_capacity<<std::endl;
             std::cout<<"Solution quality:               "<<best_solution_quality<<std::endl;
-
-            if(write_improvement)
-            {
-                improvementFile<<
-                aux_benefit<<","<<
-                aux_articles<<","<<
-                aux_capacity<<","<<
-                best_solution_quality<<std::endl;
-            }
         }
+
         /*actualizacion de la feromona*/
         ants.pheromone_update_list();
         ants.reset_ants();
 
-        //arreglar esto
+        if(write_improvement)
+        {
+            improvementFile<<
+            anthill<<","<<
+            aux_benefit<<","<<
+            aux_articles<<","<<
+            aux_capacity<<","<<
+            best_solution_quality<<std::endl;
+        }
+
         if(best_solution_quality>very_best_solution_quality)
         {
             very_best_solution_quality = best_solution_quality;
             very_best_solution = best_solution;
 
+            if(write_convergence)
+            {
+                convergenceFile<<
+                anthill<<","<<
+                aux_benefit<<","<<
+                aux_articles<<","<<
+                aux_capacity<<","<<
+                best_solution_quality<<std::endl;
+            }
+
             if(show_solution_improvement)
             {
                 std::cout<<"New best solution: "<<very_best_solution_quality<<std::endl;
             }
+
         }
+
+
 
         std::vector<std::vector<std::vector<std::vector<int>>>>().swap(best_solution);
     }
@@ -330,6 +350,8 @@ int main() {
 
         resultsFile.close();
     }
+
+    convergenceFile.close();
 
     return 0;
 }

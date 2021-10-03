@@ -112,12 +112,12 @@ class Ants
         //int solution_quality_v2(int,std::vector<std::vector<int>>);
 
         /*
-        update_best_solution(solution,id_ant)
+        update_best_solution(solution,solution_quality,id_ant)
         Actualiza la solucion mejorada en el objeto Improvement de acuerdo a la lista de mejores soluciones 
         ant_solution_scheduling[id_ant] = new_solution
         solution_ant[id_ant] = new_quality
         */
-        void update_best_solution(Improvement,int);
+        void update_best_solution(Improvement,float,int);
         
         /*
         get_best_solution_found() = int posicion de la mejor solucion 

@@ -24,8 +24,9 @@ class Improvement
     //number_article_per_day_by_topic[day][id_topic] = int number of article in the day that contains id_topic
     std::vector<std::vector<int>> number_article_per_day_by_topic;
     
-    int total_benefit=0;
-    int number_autor_conflicts=0, number_topics_conflics=0;
+    int total_benefit= 0;
+    int number_autor_conflicts = 0;
+    float number_topics_conflics = 0.0;
     float current_solution_quality;
     float gamma, epsilon;
     float limit_iteration;
@@ -40,6 +41,7 @@ class Improvement
         intercambio produce alguna mejora sobre la solucion solution_to_improve
         */
         void swap_articles(int, int,  Articles, Topics, Authors);
+        void swap_articles_V2(int, int, Articles, Topics, Authors);
 
         /*
         show_data()
@@ -68,7 +70,7 @@ class Improvement
         get_quality_parameters() = {total_benefit,number_autor_conflicts,number_topics_conflics} 
         Retorna los valores necesarios para calcular la calidad de la solucion 
         */
-        std::vector<int> get_quality_parameters(void);
+        //std::vector<int> get_quality_parameters(void);
 
         /*
         get_solution_improved() = solution_to_improve
@@ -87,7 +89,13 @@ class Improvement
         Retorna el numero de conflictos por topes de horario de
         la solucion actual
         */
-       int get_number_autor_conflicts(void);
+        int get_number_autor_conflicts(void);
+
+        /*
+        get_number_topics_conflicts
+        */
+        float get_number_topics_conflicts(void);
+
 
 };
 

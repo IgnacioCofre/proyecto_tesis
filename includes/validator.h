@@ -52,10 +52,10 @@ class Validator{
         float capacity_topics_V2(Topics,std::vector<std::vector<std::vector<std::vector<int>>>>);
 
         /*
-        float Validator::quality_solution(benefit,avegare_authors_problems,average_topics_problems, lambda);
+        float Validator::quality_solution(benefit,author_problems, average_topics_problems, base_penalty);
         Retorna la calidad de la solucion basado en los parametros
         */
-        float quality_solution(int,float,float,float);
+        float quality_solution(int,int,float,float);
 };
 
 #endif

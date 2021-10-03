@@ -38,25 +38,29 @@ int main() {
     /*Parametro de creacion de soluciones*/
     float alpha = 2.0;
     float beta = 5.0;
+    bool random_first_article = true;
     
     /*Parametros de la actualizacion de feromona*/
-    float vapor = 0.25;
-    float c = 0.001;
+    float vapor = 0.20;
+    float c = 0.0005;
     float gamma = 15.0;
     float epsilon = 10.0;
-    float lambda = 0.9;
 
     float max_pheromone = 10.0;
     float min_pheromone = 0.1;
+
+    bool set_author_penalty = true;
+    float base_penalty = 50.0;
+    float constant_for_penalty = 5.0;
 
     /*Parametros de muestra de datos por pantalla*/
     bool show_solution_construction = false;
     bool show_solution_quality = false;
     bool show_ant_information = false;
-    bool show_best_ant = true;
+    bool show_best_ant = false;
     bool show_solution_improvement = true;
     bool show_very_best_solution = true;
-    bool random_first_article = true;
+    
 
     /*Registro de soluciones*/
     std::string result_file_name = "experimet.csv"; 
@@ -220,10 +224,18 @@ int main() {
             float solution_quality = ants.calculate_quality_solution(solution_benefit,n_articles_parelel_session,n_max_article_day);
             */
 
-            float n_articles_parelel_session = validator.articles_in_diferent_sessions_V2(data,authors,scheduling); 
+            float n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,scheduling); 
             float n_max_article_day = validator.capacity_topics_V2(topics,scheduling);
-            float solution_quality = validator.quality_solution(solution_benefit,n_articles_parelel_session,n_max_article_day,lambda);
-            //int n_max_article_day_validator = validator.capacity_topics(topics,scheduling);
+            
+
+            if((n_articles_parelel_session>0) && set_author_penalty)
+            {
+                base_penalty = n_articles_parelel_session * constant_for_penalty;
+                std::cout<<"Base penalty autors: "<<base_penalty<<std::endl;
+                set_author_penalty = false;
+            }
+            
+            float solution_quality = validator.quality_solution(solution_benefit,n_articles_parelel_session,n_max_article_day,base_penalty);
 
             ants.save_solution(scheduling,solution_quality);
 
@@ -231,8 +243,7 @@ int main() {
             {
                 std::cout<<"Solution benefit:               "<<solution_benefit<<std::endl;
                 std::cout<<"Pair articles paralel session:  "<<n_articles_parelel_session<<std::endl;
-                std::cout<<"Articles over max topic:        "<<n_max_article_day<<std::endl;
-                //std::cout<<"Articles over max topic:        "<< n_max_article_day_validator<<std::endl;
+                std::cout<<"Average over max topic:         "<<n_max_article_day<<std::endl;
                 std::cout<<"Solution quality:               "<<solution_quality<<std::endl;
             }
 
@@ -246,27 +257,36 @@ int main() {
     
         for(int iter_solution = 0; iter_solution<number_best_solutions; iter_solution++)
         {
-            solution_to_improve = ants.get_best_solution(iter_solution);
+            //solution_to_improve = ants.get_best_solution(iter_solution);
             float current_quality_solution = ants.get_best_quality_solution(iter_solution);
-            Improvement * improve_method = new Improvement(solution_to_improve,current_quality_solution, gamma, epsilon, articles, topics, authors);
+            Improvement * improve_method = new Improvement(ants.get_best_solution(iter_solution),current_quality_solution, gamma, epsilon, articles, topics, authors);
+
+            /*Implementacion de movimiento*/
 
             for(int _ = 0; _<limit_iteration; _++)
             {
                 int random_article_1 = distr(gen);
                 int random_article_2 = improve_method->select_article_in_diferent_session(random_article_1);
                 
-                improve_method->swap_articles(random_article_1,random_article_2,articles,topics,authors);
+                improve_method->swap_articles_V2(random_article_1,random_article_2,articles,topics,authors);
 
-                //improve_method->show_data();
-                //int benefit_improved = validator.solution_benefit(articles,improve_method->get_solution_improved());
-                //std::cout<<"Best benefit: "<<benefit_improved<<std::endl;
+                /*
+                improve_method->show_data();
+                int benefit_improved = validator.solution_benefit(articles,improve_method->get_solution_improved());
+                std::cout<<"Best benefit: "<<benefit_improved<<std::endl;
+                */
             }
 
             //ants.update_best_solution(*improve_method,iter_solution);
-
+            /*
             float n_articles_parelel_session = validator.articles_in_diferent_sessions_V2(data,authors,improve_method->get_solution_improved()); 
             float n_max_article_day = validator.capacity_topics_V2(topics,improve_method->get_solution_improved());
             float solution_quality = validator.quality_solution(improve_method->get_benefit_solution_improved(),n_articles_parelel_session,n_max_article_day,lambda);
+            */
+            
+            float n_articles_parelel_session = improve_method->get_number_autor_conflicts();
+            float n_average_max_article_day = improve_method->get_number_topics_conflicts();
+            float solution_quality = validator.quality_solution(improve_method->get_benefit_solution_improved(),n_articles_parelel_session,n_average_max_article_day,base_penalty);
             ants.update_best_solution_V2(improve_method->get_solution_improved(),solution_quality, iter_solution);
             
             delete improve_method;
@@ -291,16 +311,14 @@ int main() {
 
         float aux_benefit = validator.solution_benefit(articles,best_solution);
         float aux_capacity = validator.capacity_topics_V2(topics,best_solution);
-        float aux_articles = validator.articles_in_diferent_sessions_V2(data,authors,best_solution);
+        float aux_articles = validator.articles_in_diferent_sessions(data,authors,best_solution);
         //int aux_capacity_validator = validator.capacity_topics(topics,best_solution);
         
-
         if(show_best_ant){
             std::cout<<"Best Ant"<<std::endl; 
             std::cout<<"Solution benefit:               "<<aux_benefit<<std::endl;
             std::cout<<"Pair articles paralel session:  "<<aux_articles<<std::endl;
-            std::cout<<"Articles over max topic:        "<<aux_capacity<<std::endl;
-            //std::cout<<"Articles over max topic V:      "<<aux_capacity_validator<<std::endl;
+            std::cout<<"Average over max topic:         "<<aux_capacity<<std::endl;
             std::cout<<"Solution quality:               "<<best_solution_quality<<std::endl;
         }
 
@@ -345,7 +363,7 @@ int main() {
 
     /*Datos de la mejor solucion*/
     float very_best_solution_benefit = validator.solution_benefit(articles,very_best_solution);
-    float n_articles_parelel_session = validator.articles_in_diferent_sessions_V2(data,authors,very_best_solution); 
+    float n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,very_best_solution); 
     float n_max_article_day = validator.capacity_topics_V2(topics,very_best_solution);
 
     if(show_very_best_solution)
@@ -353,7 +371,7 @@ int main() {
         std::cout<<"\nInformation very best solution"<<std::endl;
         std::cout<<"Solution benefit:               "<<very_best_solution_benefit<<std::endl;
         std::cout<<"Pair articles paralel session:  "<<n_articles_parelel_session<<std::endl;
-        std::cout<<"Articles over max topic:        "<<n_max_article_day<<std::endl;
+        std::cout<<"Average over max topic:         "<<n_max_article_day<<std::endl;
         std::cout<<"Solution quality:               "<<very_best_solution_quality<<std::endl;
     }
 

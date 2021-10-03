@@ -543,17 +543,19 @@ float Validator::capacity_topics_V2(Topics topics,std::vector<std::vector<std::v
     return (float) (average_problems_max_topics);   
 }    
 
-float Validator::quality_solution(int benefit, float avegare_authors_problems, float average_topics_problems, float lambda)
+float Validator::quality_solution(int benefit, int author_problems, float average_topics_problems, float base_penalty)
 {
     bool show_parameters = false;
-    float quality = benefit - benefit*(avegare_authors_problems + average_topics_problems);
+
+    float average_authors_problems = (float) (author_problems/base_penalty);
+    float quality = benefit * (float)(1 - average_authors_problems - average_topics_problems);
 
     if(show_parameters)
     {
-        std::cout<<"Benefit:            "<<benefit<<std::endl;
-        std::cout<<"Average autors:     "<<avegare_authors_problems<<std::endl;
-        std::cout<<"Average topics:     "<<average_topics_problems<<std::endl;
-        std::cout<<"Quality solution:   "<<quality<<std::endl;
+        std::cout<<"Benefit solution:       "<<benefit<<std::endl;
+        std::cout<<"N° autors problems:     "<<author_problems<<std::endl;
+        std::cout<<"Average topics:         "<<average_topics_problems<<std::endl;
+        std::cout<<"Quality solution:       "<<quality<<std::endl;
         std::cout<<std::endl;
     }
     return quality; 

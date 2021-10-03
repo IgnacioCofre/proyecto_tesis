@@ -456,11 +456,12 @@ float Ants::get_best_quality_solution(int position_solution)
     return empty;
 }
 
-void Ants::update_best_solution(Improvement improvement,int id_ant)
+void Ants::update_best_solution(Improvement improvement,float new_quality,int id_ant)
 {
     bool show_improvement = false;
-    std::vector<int> quality_parameters = improvement.get_quality_parameters();
-    float new_quality = calculate_quality_solution(quality_parameters[0],quality_parameters[1],quality_parameters[2]);
+    
+    //std::vector<float> quality_parameters = improvement.get_quality_parameters();
+    //float new_quality = calculate_quality_solution(quality_parameters[0],quality_parameters[1],quality_parameters[2]);
     
     if(solution_ant[id_ant] < new_quality)
     {   

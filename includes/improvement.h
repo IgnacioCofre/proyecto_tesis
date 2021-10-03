@@ -76,6 +76,18 @@ class Improvement
         */
         std::vector<std::vector<std::vector<std::vector<int>>>> get_solution_improved(void);
 
+        /*
+        get_benefit_solution_improved()
+        Retorna el beneficio de la solucion mejorada total_benefit
+        */
+        int get_benefit_solution_improved(void);
+
+        /*
+        get_number_autor_conflicts() = number_autor_conflicts
+        Retorna el numero de conflictos por topes de horario de
+        la solucion actual
+        */
+       int get_number_autor_conflicts(void);
 
 };
 

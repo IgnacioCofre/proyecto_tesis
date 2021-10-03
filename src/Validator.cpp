@@ -376,5 +376,185 @@ void Validator::show_comments()
     }
     
 }
+
+float Validator::articles_in_diferent_sessions_V2(Data data, Authors authors, std::vector<std::vector<std::vector<std::vector<int>>>> scheduling)
+{
+    bool show_conflict = false;
     
+    int number_days =  data.get_number_days();
+    int number_articles = data.get_number_articles();
+    int number_authors = authors.get_number_authors();
+    std::vector<std::vector<int>> article_asignation(number_articles,{-1,-1,-1});
+
+    float average_problems  = 0;
     
+    for(int day=0; day<number_days; day++)
+    {
+        int number_blocks = scheduling[day].size();
+        for(int block=0; block<number_blocks; block++)
+        {
+            int number_sessions = scheduling[day][block].size();
+            for(int session=0; session<number_sessions; session++)
+            {
+                int n_articles_session_1 = scheduling[day][block][session].size();
+                for(int iter_article =0; iter_article<n_articles_session_1; iter_article++)
+                {
+                    int id_article = scheduling[day][block][session][iter_article];
+                    article_asignation[id_article] = {day,block,session};
+                }
+            }       
+        }
+    }
+
+    /*
+    Se revisan que los articulos de cada autor no se encuentren en sesiones 
+    paralelas
+    */
+    for(int author= 0; author< number_authors; author++)
+    {
+        int number_problems = 0;
+        std::vector<int> list_articles = authors.get_author_articles(author);
+        int n_articles = list_articles.size();
+
+        if(n_articles>1)
+        {
+            for(int i=0; i<n_articles; i++)
+            {   
+
+                int id_article_1 = list_articles[i];
+                int day_article_1 = article_asignation[id_article_1][0];
+                int block_article_1 = article_asignation[id_article_1][1];
+                int sesison_article_1 = article_asignation[id_article_1][2];    
+
+                bool not_conflict_found = true;
+                int j = 0;
+
+                while(not_conflict_found && (j<n_articles))
+                {
+                    int id_article_2 = list_articles[j];
+                    int day_article_2 = article_asignation[id_article_2][0];
+                    int block_article_2 = article_asignation[id_article_2][1];
+                    int sesison_article_2 = article_asignation[id_article_2][2];
+
+                    //se verifica primero que los dias y el bloque de dos articulos de un mismo autor sean iguales
+                    if((day_article_1 == day_article_2) & (block_article_1 == block_article_2))
+                    {   
+                        //si las sesiones son diferentes no se cumplen con las restricciones
+                        if(sesison_article_1 != sesison_article_2)
+                        {
+                            //std::cout << "Problem articles: " << id_article_1 << " " << id_article_2 << std::endl;
+                            number_problems += 1;
+                            not_conflict_found = false;
+
+                            if(show_conflict)
+                            {
+                                //comments.push_back("Problem articles: "+std::to_string(id_article_1)+" "+std::to_string(id_article_2)); 
+                                std::cout<<"Problem articles: "<<id_article_1<<" "<<id_article_2<<std::endl;
+                            }
+                        }
+                    }
+
+                    j++;  
+                }
+            }
+        }
+        //average_problems+= (float) number_problems/n_articles;
+        average_problems+= (float) number_problems;
+        std::vector<int>().swap(list_articles);
+    }
+    std::vector<std::vector<int>>().swap(article_asignation);
+    //return (float) (average_problems/number_authors);
+    return (float) (average_problems/number_articles);
+}
+    
+float Validator::capacity_topics_V2(Topics topics,std::vector<std::vector<std::vector<std::vector<int>>>> scheduling)
+{
+    bool show_problems = false;
+    int number_days = scheduling.size();
+    int number_topics = topics.get_number_topics();
+    float average_problems_max_topics = 0;
+
+    if(show_problems)
+    {
+        std::cout<<"Day out of max topics [day,id_topic,number_articles]"<<std::endl;
+    }
+
+    if(number_days > 1)
+    {
+        std::vector<std::vector<int>> counter_topics_per_day(number_days,std::vector<int>(number_topics));
+
+        for(int day=0; day<number_days; day++)
+        {
+            int number_blocks = scheduling[day].size();
+            for(int block=0; block<number_blocks; block++)
+            {
+                int number_sessions = scheduling[day][block].size();
+                for(int session=0; session<number_sessions; session++)
+                {
+                    int number_articles = scheduling[day][block][session].size();
+                    for(int article=0; article<number_articles; article++)
+                    {
+                        int id_article = scheduling[day][block][session][article];
+                        std::vector<int> topics_in_article = topics.get_article_topics(id_article);
+                        int number_topics_in_article = topics_in_article.size();
+                        for(int topic=0; topic<number_topics_in_article; topic++)
+                        {
+                            int id_topic = topics_in_article[topic];
+                            counter_topics_per_day[day][id_topic] += 1;
+                        }
+                        
+                    }
+                }  
+            }
+        }
+
+        for(int id_topic=0; id_topic<number_topics; id_topic++)
+        {
+            int number_articles_with_topic = topics.get_number_articles_by_topic(id_topic);
+            if(number_articles_with_topic>20)
+            {
+                for(int day=0; day<number_days; day++)
+                {   
+                    //Caso en que no se cumpla el limite de articulos de cierto topico
+                    if(counter_topics_per_day[day][id_topic]>topics.get_max_per_day(id_topic))
+                    {
+                        /*
+                        se suman la cantidad de articulos que
+                        se pasan del maximo permitido por dia
+                        partido la cantidad de articulos permitido por dia
+                        */
+                        int number_articles_over_max_per_day = counter_topics_per_day[day][id_topic]-topics.get_max_per_day(id_topic);
+                        average_problems_max_topics += (float) number_articles_over_max_per_day/topics.get_max_per_day(id_topic);
+
+                        if(show_problems)
+                        {
+                            std::cout<<"["<<day<<"," <<id_topic<<","<<counter_topics_per_day[day][id_topic]<<"]"<<std::endl;
+                        }
+                    }
+                    
+                }
+            }
+        }
+
+        std::vector<std::vector<int>>().swap(counter_topics_per_day);
+    }
+
+    //return (float) (average_problems_max_topics/number_topics);
+    return (float) (average_problems_max_topics);   
+}    
+
+float Validator::quality_solution(int benefit, float avegare_authors_problems, float average_topics_problems, float lambda)
+{
+    bool show_parameters = false;
+    float quality = benefit - benefit*(avegare_authors_problems + average_topics_problems);
+
+    if(show_parameters)
+    {
+        std::cout<<"Benefit:            "<<benefit<<std::endl;
+        std::cout<<"Average autors:     "<<avegare_authors_problems<<std::endl;
+        std::cout<<"Average topics:     "<<average_topics_problems<<std::endl;
+        std::cout<<"Quality solution:   "<<quality<<std::endl;
+        std::cout<<std::endl;
+    }
+    return quality; 
+}

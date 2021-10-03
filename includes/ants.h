@@ -125,6 +125,13 @@ class Ants
         de solution_ant
         */
         int get_best_solution_found(void);
+
+        /*
+        update_best_solution_v2(schedule,quality,id_ant)
+        Actualiza la solucion de la hormiga id_ant con el schedule solo si la quality es mejor que la anteriormente 
+        guardada en id_ant
+        */    
+        void update_best_solution_V2(std::vector<std::vector<std::vector<std::vector<int>>>>,float,int);
         
 };
 

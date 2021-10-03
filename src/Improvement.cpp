@@ -313,7 +313,9 @@ void Improvement::swap_articles(int id_article_1, int id_article_2, Articles art
         }
 
         /*Si es mejor la solucion se actualiza*/
-        if((total_benefit<new_total_benefit) || (number_autor_conflicts>new_number_author_conflicts))
+        if((new_total_benefit > total_benefit) || (new_number_author_conflicts < number_autor_conflicts))
+        //if((new_total_benefit > total_benefit) && (new_number_author_conflicts <= number_autor_conflicts))
+        //if(number_autor_conflicts>new_number_author_conflicts)
         {
             //std::cout<<"New better solution found"<<std::endl;
             solution_to_improve = new_solution;
@@ -439,4 +441,14 @@ std::vector<int> Improvement::get_quality_parameters()
 std::vector<std::vector<std::vector<std::vector<int>>>> Improvement::get_solution_improved()
 {
     return solution_to_improve;
+}
+
+int Improvement::get_benefit_solution_improved()
+{
+    return total_benefit;
+}
+
+int Improvement::get_number_autor_conflicts()
+{
+    return number_autor_conflicts;
 }

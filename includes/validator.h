@@ -37,6 +37,25 @@ class Validator{
 
         std::vector<std::string> get_comments(void);
         void show_comments(void);    
+
+        /*
+        articles_in_diferent_sessions_V2(Data, Authors, sheduling)
+        Retorna un numero [0,1] que indica la proporcion de problemas de tope de horarios
+        */
+        float articles_in_diferent_sessions_V2(Data, Authors, std::vector<std::vector<std::vector<std::vector<int>>>>);
+
+        /*
+        capacity_topics_V2(topics, scheduling)
+        Retorna un numero [0,1] que indica la proporcion de problemas de maximo de articulos por topico respecto al total de
+        articulos disponibles.
+        */
+        float capacity_topics_V2(Topics,std::vector<std::vector<std::vector<std::vector<int>>>>);
+
+        /*
+        float Validator::quality_solution(benefit,avegare_authors_problems,average_topics_problems, lambda);
+        Retorna la calidad de la solucion basado en los parametros
+        */
+        float quality_solution(int,float,float,float);
 };
 
 #endif

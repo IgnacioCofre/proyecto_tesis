@@ -482,6 +482,7 @@ int Ants::get_best_solution_found()
     int number_solutions = solution_ant.size();
     int position_best_solution = 0;
     float best_quality_found = 0;
+    
     for(int pos=0; pos<number_solutions; pos++)
     {
         if(solution_ant[pos] > best_quality_found)
@@ -493,3 +494,23 @@ int Ants::get_best_solution_found()
 
     return position_best_solution;
 }
+
+void Ants::update_best_solution_V2(std::vector<std::vector<std::vector<std::vector<int>>>> schedule,float new_quality, int id_ant)
+{
+    bool show_improvement = false;
+    
+    if(solution_ant[id_ant] < new_quality)
+    {   
+        if(show_improvement)
+        {
+            std::cout<<std::endl;
+            std::cout<<"new solution improvement"<<std::endl;
+            std::cout<<"Old quality: "<<solution_ant[id_ant]<<std::endl; 
+            std::cout<<"New quality: "<<new_quality<<std::endl; 
+        }
+        
+        ant_solution_scheduling[id_ant] = schedule;
+        solution_ant[id_ant] = new_quality;
+    } 
+}
+

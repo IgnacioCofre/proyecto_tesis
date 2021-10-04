@@ -15,13 +15,13 @@
 int main() {
     
     /*Archivo input*/
-    std::string input_name = "lars/lars_original.txt";
+    //std::string input_name = "lars/lars_original.txt";
     //std::string input_name = "ebl/ebl_original.txt";
     
     //std::string input_name = "lars/lars_30_5.txt";
     //std::string input_name = "ebl/ebl_30_5.txt";
     
-    //std::string input_name = "ebl_modified/ebl_modified_200_5.txt";
+    std::string input_name = "ebl_modified/ebl_modified_200_5.txt";
     //std::string input_name = "ebl/ebl_200_5.txt";
 
     //std::string input_name = "ebl/ebl_40_3.txt";
@@ -262,14 +262,27 @@ int main() {
             Improvement * improve_method = new Improvement(ants.get_best_solution(iter_solution),current_quality_solution, gamma, epsilon, articles, topics, authors);
 
             /*Implementacion de movimiento*/
-
             for(int _ = 0; _<limit_iteration; _++)
-            {
-                int random_article_1 = distr(gen);
-                int random_article_2 = improve_method->select_article_in_diferent_session(random_article_1);
-                
-                improve_method->swap_articles_V2(random_article_1,random_article_2,articles,topics,authors);
+            {   
+                if(improve_method->get_number_autor_conflicts() > 0)
+                {
+                    //selecciono los articulo del autor con mas conflictos 
+                    std::vector<int> articles_author_max_conflicts = improve_method->get_articles_author_conflicts(authors);
+                    int number_articles_author = articles_author_max_conflicts.size();
 
+                    std::uniform_int_distribution<> distr_articles_author(0, number_articles_author - 1);
+                    //int random_article_1 = articles_author_max_conflicts[distr_articles_author(gen)];
+                    int random_article_1 = improve_method->select_article_most_authors_conflicts(authors);
+                    int random_article_2 = improve_method->select_article_in_diferent_block(random_article_1);
+                    improve_method->swap_articles_V2(random_article_1,random_article_2,articles,topics,authors);
+                }
+                else
+                {   
+                    //selecciono un articulo de las sessiones con menos beneficio
+                    int random_article_1 = distr(gen);
+                    int random_article_2 = improve_method->select_article_in_diferent_session(random_article_1);
+                    improve_method->swap_articles_V2(random_article_1,random_article_2,articles,topics,authors);     
+                }    
                 /*
                 improve_method->show_data();
                 int benefit_improved = validator.solution_benefit(articles,improve_method->get_solution_improved());

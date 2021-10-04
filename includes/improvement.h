@@ -93,10 +93,36 @@ class Improvement
 
         /*
         get_number_topics_conflicts
+        retorna la media de problemas de topicos
         */
         float get_number_topics_conflicts(void);
 
+        /*
+        get_articles_autor_conflicts(class Authors) = [id_articles]
+        retorna los articulos del autor con mas problemas con topes de horario
+        */
+        std::vector<int> get_articles_author_conflicts(Authors);
 
+        /*
+        get_articles_worst_session() = [id_articles]
+        Retorna los id de los articulos pertenecientes a la session con menor beneficio 
+        a partir de la lista benefit_session
+        */
+        std::vector<int> get_articles_worst_session(void);
+
+        /*
+        select_article_in_diferent_block(id_article_1) = id_article_2
+        Retorna un id de un articulo que este en un bloque distinto al id_article_2
+        asignado en la solucion
+        */
+        int select_article_in_diferent_block(int);
+
+        /*
+        select_article_most_authors_conflicts(void) = id_article
+        Retorna el id del articulo que causa mayores conflictos de topes de horario
+        del autor con mas conflictos de topes de horario
+        */
+        int select_article_most_authors_conflicts(Authors);
 };
 
 #endif

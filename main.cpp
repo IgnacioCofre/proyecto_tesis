@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <random>
+#include <chrono>
 
 #include "includes/ants.h"
 #include "includes/data.h"
@@ -12,28 +13,30 @@
 #include "includes/validator.h"
 #include "includes/improvement.h"
 
+using namespace std::chrono;
+
 int main() {
     
     /*Archivo input*/
-    //std::string input_name = "lars/lars_original.txt";
+    std::string input_name = "lars/lars_original.txt";
     //std::string input_name = "ebl/ebl_original.txt";
     
     //std::string input_name = "lars/lars_30_5.txt";
     //std::string input_name = "ebl/ebl_30_5.txt";
     
-    std::string input_name = "ebl_modified/ebl_modified_200_5.txt";
+    //std::string input_name = "ebl_modified/ebl_modified_200_5.txt";
     //std::string input_name = "ebl/ebl_200_5.txt";
 
     //std::string input_name = "ebl/ebl_40_3.txt";
     //std::string input_name = "lars/lars_70_1.txt";
 
     /*Parametros de las hormigas*/
-    int number_anthill = 1000;
-    int number_ants = 40;
+    int number_anthill = 200;
+    int number_ants = 50;
     int e = 10;
 
     /*Parametros de mejora de soluciones*/
-    float limit_iteration = 30;
+    float limit_iteration = 50;
 
     /*Parametro de creacion de soluciones*/
     float alpha = 2.0;
@@ -41,8 +44,8 @@ int main() {
     bool random_first_article = true;
     
     /*Parametros de la actualizacion de feromona*/
-    float vapor = 0.20;
-    float c = 0.0005;
+    float vapor = 0.30;
+    float c = 0.0001;
     float gamma = 15.0;
     float epsilon = 10.0;
 
@@ -73,6 +76,9 @@ int main() {
     std::string aux_path =  "input/"+ input_name;
     const char * input_file = aux_path.c_str();
     const char * solution_test_file = "output/output_example.txt";
+
+    /*Inicio de timer*/
+    auto start = high_resolution_clock::now();
 
     Data data;
     data.read_input_file(input_file);
@@ -122,6 +128,7 @@ int main() {
     improvementFile.open(result_improvement_path,std::ios::out | std::ios::app);
     improvementFile<<
     "anthill"<<","<<
+    "time [s]"<<","<<
     "benefit"<<","<<
     "P articles"<<","<<
     "P topics"<<","<<
@@ -134,6 +141,7 @@ int main() {
     convergenceFile.open(result_convergence_path,std::ios::out | std::ios::app);
     convergenceFile<<
     "anthill"<<","<<
+    "time [s]"<<","<<
     "benefit"<<","<<
     "P articles"<<","<<
     "P topics"<<","<<
@@ -283,19 +291,7 @@ int main() {
                     int random_article_2 = improve_method->select_article_in_diferent_session(random_article_1);
                     improve_method->swap_articles_V2(random_article_1,random_article_2,articles,topics,authors);     
                 }    
-                /*
-                improve_method->show_data();
-                int benefit_improved = validator.solution_benefit(articles,improve_method->get_solution_improved());
-                std::cout<<"Best benefit: "<<benefit_improved<<std::endl;
-                */
             }
-
-            //ants.update_best_solution(*improve_method,iter_solution);
-            /*
-            float n_articles_parelel_session = validator.articles_in_diferent_sessions_V2(data,authors,improve_method->get_solution_improved()); 
-            float n_max_article_day = validator.capacity_topics_V2(topics,improve_method->get_solution_improved());
-            float solution_quality = validator.quality_solution(improve_method->get_benefit_solution_improved(),n_articles_parelel_session,n_max_article_day,lambda);
-            */
             
             float n_articles_parelel_session = improve_method->get_number_autor_conflicts();
             float n_average_max_article_day = improve_method->get_number_topics_conflicts();
@@ -341,8 +337,12 @@ int main() {
 
         if(write_improvement)
         {
+            auto stop = high_resolution_clock::now();
+            auto duration = duration_cast<microseconds>(stop - start).count()/1000000.0;
+
             improvementFile<<
             anthill<<","<<
+            duration<<","<<
             aux_benefit<<","<<
             aux_articles<<","<<
             aux_capacity<<","<<
@@ -356,8 +356,12 @@ int main() {
 
             if(write_convergence)
             {
+                auto stop = high_resolution_clock::now();
+                auto duration = duration_cast<microseconds>(stop - start).count()/1000000.0;
+
                 convergenceFile<<
                 anthill<<","<<
+                duration<<","<<
                 aux_benefit<<","<<
                 aux_articles<<","<<
                 aux_capacity<<","<<
@@ -398,6 +402,9 @@ int main() {
         const char * result_file_path = aux_result_path.c_str();
         resultsFile.open(result_file_path,std::ios::out | std::ios::app);
 
+        auto stop = high_resolution_clock::now();
+        auto delta_time = duration_cast<microseconds>(stop - start).count()/1000000.0;
+
         resultsFile << 
         input_name <<","<<
         number_anthill<<","<<
@@ -412,6 +419,7 @@ int main() {
         c <<","<<
         gamma <<","<<
         epsilon <<","<<
+        delta_time <<","<<
         very_best_solution_benefit<<","<<
         n_articles_parelel_session<<","<<
         n_max_article_day<<","<<

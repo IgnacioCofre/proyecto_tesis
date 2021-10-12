@@ -642,7 +642,8 @@ void Improvement::swap_articles_V2(int id_article_1, int id_article_2, Articles 
                 }
 
                 //en caso de que el beneficio sea mejor producto al intercambio
-                if (new_total_benefit > total_benefit)
+                if((new_total_benefit > total_benefit) || (new_number_author_conflicts < number_autor_conflicts))
+                //if (new_total_benefit > total_benefit)
                 {
                     if (show_changes)
                     {
@@ -707,7 +708,7 @@ std::vector<int> Improvement::get_articles_author_conflicts(Authors authors)
     return authors.get_author_articles(author_max_conflicts);
 }
 
-std::vector<int> Improvement::get_articles_worst_session()
+int Improvement::get_article_worst_session()
 {
     std::vector<int> min_session = {0,0,0};
     int min_session_benefit = 1000000;
@@ -731,7 +732,12 @@ std::vector<int> Improvement::get_articles_worst_session()
         }
     }
 
-    return solution_to_improve[min_session[0]][min_session[1]][min_session[2]];
+    int number_articles_worst_session = solution_to_improve[min_session[0]][min_session[1]][min_session[2]].size();
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distr_articles(0, number_articles_worst_session - 1);
+    int id_article_1 = solution_to_improve[min_session[0]][min_session[1]][min_session[2]][distr_articles(gen)];
+
+    return id_article_1;
 }
 
 int Improvement::select_article_in_diferent_block(int id_article)
@@ -810,5 +816,125 @@ int Improvement::select_article_most_authors_conflicts(Authors authors)
         }
     } 
 
+    //std::cout<<"Article most conflicts: "<<author_articles[index_article_max_conflicts]<<std::endl;
+    //std::cout<<"Number conflicts:       "<<n_max_conflicts<<std::endl;
+
     return author_articles[index_article_max_conflicts];
+}
+
+int Improvement::select_article_from_most_authors_conflicts(Authors authors, int k)
+{
+    //se ordenan los autores por cantidad de conflictos
+    bool debug = false;
+    std::vector<int> index_authors(authors.get_number_authors(), 0);
+    
+    for (int i = 0 ; i != authors.get_number_authors() ; i++) {
+        index_authors[i] = i;
+    }
+
+    //se ordenan los autores segun la cantidad de topes de horario
+    std::sort(index_authors.begin(), index_authors.end(),
+        [&](const int& a, const int& b) {
+            return (authors_conflicts[a] > authors_conflicts[b]);
+        }
+    );
+
+    int max_k_authors = authors.get_number_authors();
+    if(k < max_k_authors)
+    {
+        max_k_authors = k;
+    }
+
+    //seleccion del author dentro de los k con mas topes de horario
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distr_authors(0, max_k_authors - 1);
+    int id_author = index_authors[distr_authors(gen)];
+
+    //seleccion del articulo del autor seleccionado
+    int number_articles_author = authors.get_author_articles(id_author).size();
+    std::uniform_int_distribution<> distr_articles(0, number_articles_author - 1);
+    int index_article = distr_articles(gen);
+    int article_id = authors.get_author_articles(id_author)[index_article];
+
+    if(debug)
+    {
+        for (int i = 0 ; i != max_k_authors ; i++) {
+            std::cout << index_authors[i]<<","<<authors_conflicts[index_authors[i]]<< std::endl;
+        }
+
+        std::cout << "id_author: "<<id_author<< std::endl;
+        std::cout << "id_article_1: "<<article_id<< std::endl;
+        std::cout << article_ubication[article_id][0]<<","<<article_ubication[article_id][1]<<std::endl;    
+    }
+
+    return article_id;
+}
+
+int Improvement::select_article_same_day_diferent_block(int id_article)
+{
+    int day = article_ubication[id_article][0];
+    int number_blocks = solution_to_improve[day].size();
+    bool debug = false;
+    std::mt19937 gen(rd());
+
+    if(number_blocks>1){
+        
+        int block = article_ubication[id_article][1];
+
+        std::uniform_int_distribution<> distr_block(0, number_blocks - 1);
+        int new_block = distr_block(gen);
+
+        while(new_block == block)
+        {
+            new_block = distr_block(gen);
+        }
+
+        int number_rooms = solution_to_improve[day][new_block].size();
+        std::uniform_int_distribution<> distr_rooms(0, number_rooms - 1);
+        int new_room = distr_rooms(gen);
+
+        int number_article_session = solution_to_improve[day][new_block][new_room].size();
+        std::uniform_int_distribution<> distr_article(0, number_article_session - 1);
+        int id_article_2 = solution_to_improve[day][new_block][new_room][distr_article(gen)];
+        
+        if(debug)
+        {
+            std::cout << "Case 1:"<< std::endl;
+            std::cout << "id_article_2: "<< id_article_2<< std::endl;
+            std::cout << article_ubication[id_article_2][0]<<","<<article_ubication[id_article_2][1]<<std::endl;
+        }
+
+        return id_article_2;
+    }
+    else
+    {
+        int number_days = solution_to_improve.size();
+        std::uniform_int_distribution<> distr_day(0, number_days - 1);
+        int new_day = distr_day(gen); 
+        
+        while(new_day == day)
+        {
+            new_day = distr_day(gen);
+        }
+
+        std::uniform_int_distribution<> distr_block(0, solution_to_improve[new_day].size() - 1);
+        int new_block = distr_block(gen);
+
+        int number_rooms = solution_to_improve[new_day][new_block].size();
+        std::uniform_int_distribution<> distr_rooms(0, number_rooms - 1);
+        int new_room = distr_rooms(gen);
+
+        int number_article_session = solution_to_improve[new_day][new_block][new_room].size();
+        std::uniform_int_distribution<> distr_article(0, number_article_session - 1);
+        int id_article_2 = solution_to_improve[new_day][new_block][new_room][distr_article(gen)];
+
+        if(debug)
+        {
+            std::cout << "Case 2:"<< std::endl;
+            std::cout << "id_article_2: "<< id_article_2<< std::endl;
+            std::cout << article_ubication[id_article_2][0]<<","<<article_ubication[id_article_2][1]<<std::endl;
+        }
+
+        return id_article_2;
+    }
 }

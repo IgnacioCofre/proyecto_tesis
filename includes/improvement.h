@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include "articles.h"
 #include "topics.h"
 #include "authors.h"
@@ -30,6 +31,8 @@ class Improvement
     float current_solution_quality;
     float gamma, epsilon;
     float limit_iteration;
+
+    std::random_device rd;
 
     public:
         //Improvement(solution, quality, gamma, epsilon, articles, topics, authors)
@@ -108,7 +111,7 @@ class Improvement
         Retorna los id de los articulos pertenecientes a la session con menor beneficio 
         a partir de la lista benefit_session
         */
-        std::vector<int> get_articles_worst_session(void);
+        int get_article_worst_session(void);
 
         /*
         select_article_in_diferent_block(id_article_1) = id_article_2
@@ -123,6 +126,19 @@ class Improvement
         del autor con mas conflictos de topes de horario
         */
         int select_article_most_authors_conflicts(Authors);
+
+        /*
+        select_article_from_most_authors_conflicts(authors, K) = id_article
+        Retorna un id articulo del conjunto de los autores con mas topes de horario
+        */
+        int select_article_from_most_authors_conflicts(Authors, int);
+
+        /*
+        select_article_same_day_diferent_block(id_article_1)
+        Retorna el id de un articulo que se encuentre dentro del mismo dia pero en
+        un bloque distinto que el id_article_1
+        */
+        int select_article_same_day_diferent_block(int);
 };
 
 #endif

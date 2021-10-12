@@ -3,6 +3,7 @@
 #include <string>
 #include <random>
 #include <chrono>
+#include <iomanip>
 
 #include "includes/ants.h"
 #include "includes/data.h"
@@ -18,25 +19,30 @@ using namespace std::chrono;
 int main() {
     
     /*Archivo input*/
-    std::string input_name = "lars/lars_original.txt";
+    //std::string input_name = "lars/lars_original.txt";
     //std::string input_name = "ebl/ebl_original.txt";
     
     //std::string input_name = "lars/lars_30_5.txt";
     //std::string input_name = "ebl/ebl_30_5.txt";
     
     //std::string input_name = "ebl_modified/ebl_modified_200_5.txt";
+
     //std::string input_name = "ebl/ebl_200_5.txt";
+    //std::string input_name = "lars/lars_200_5.txt";
 
     //std::string input_name = "ebl/ebl_40_3.txt";
     //std::string input_name = "lars/lars_70_1.txt";
 
+    std::string input_name = "ebl/ebl_30_2.txt";
+
     /*Parametros de las hormigas*/
-    int number_anthill = 200;
-    int number_ants = 50;
+    int number_anthill = 1000;
+    int number_ants = 200;
     int e = 10;
 
     /*Parametros de mejora de soluciones*/
-    float limit_iteration = 50;
+    float limit_iteration = 30;
+    int k = 10;
 
     /*Parametro de creacion de soluciones*/
     float alpha = 2.0;
@@ -44,8 +50,8 @@ int main() {
     bool random_first_article = true;
     
     /*Parametros de la actualizacion de feromona*/
-    float vapor = 0.30;
-    float c = 0.0001;
+    float vapor = 0.25;
+    float c = 0.0005;
     float gamma = 15.0;
     float epsilon = 10.0;
 
@@ -53,8 +59,8 @@ int main() {
     float min_pheromone = 0.1;
 
     bool set_author_penalty = true;
-    float base_penalty = 50.0;
-    float constant_for_penalty = 5.0;
+    float base_penalty = 100.0;
+    float constant_for_penalty = 4.0;
 
     /*Parametros de muestra de datos por pantalla*/
     bool show_solution_construction = false;
@@ -64,14 +70,14 @@ int main() {
     bool show_solution_improvement = true;
     bool show_very_best_solution = true;
     
-
     /*Registro de soluciones*/
+    bool write_result = false;
+    bool write_improvement = false;
+    bool write_convergence = false;
+
     std::string result_file_name = "experimet.csv"; 
     std::string result_improvement = "improvement.csv";
     std::string resutl_convergence = "convergence.csv";
-    bool write_result = true;
-    bool write_improvement = true;
-    bool write_convergence = true;
 
     std::string aux_path =  "input/"+ input_name;
     const char * input_file = aux_path.c_str();
@@ -153,6 +159,7 @@ int main() {
     
     std::vector<std::vector<std::vector<std::vector<int>>>> very_best_solution;
     float very_best_solution_quality = 0;
+    float best_time_execution;
 
     std::random_device rd; // obtain a random number from hardware
     std::mt19937 gen(rd()); // seed the generator
@@ -275,21 +282,26 @@ int main() {
                 if(improve_method->get_number_autor_conflicts() > 0)
                 {
                     //selecciono los articulo del autor con mas conflictos 
-                    std::vector<int> articles_author_max_conflicts = improve_method->get_articles_author_conflicts(authors);
-                    int number_articles_author = articles_author_max_conflicts.size();
-
-                    std::uniform_int_distribution<> distr_articles_author(0, number_articles_author - 1);
+                    //std::vector<int> articles_author_max_conflicts = improve_method->get_articles_author_conflicts(authors);
+                    //int number_articles_author = articles_author_max_conflicts.size();
+                    //std::uniform_int_distribution<> distr_articles_author(0, number_articles_author - 1);
                     //int random_article_1 = articles_author_max_conflicts[distr_articles_author(gen)];
-                    int random_article_1 = improve_method->select_article_most_authors_conflicts(authors);
-                    int random_article_2 = improve_method->select_article_in_diferent_block(random_article_1);
-                    improve_method->swap_articles_V2(random_article_1,random_article_2,articles,topics,authors);
+
+                    //selecciono los articulo de uno de los autores con mas conflictos
+                    int id_article_1 = improve_method->select_article_from_most_authors_conflicts(authors, k);
+                    int id_article_2 = improve_method->select_article_same_day_diferent_block(id_article_1);
+                    improve_method->swap_articles_V2(id_article_1,id_article_2,articles,topics,authors);
                 }
+                //if(number_topics_conflicts > 0){}
                 else
                 {   
-                    //selecciono un articulo de las sessiones con menos beneficio
-                    int random_article_1 = distr(gen);
-                    int random_article_2 = improve_method->select_article_in_diferent_session(random_article_1);
-                    improve_method->swap_articles_V2(random_article_1,random_article_2,articles,topics,authors);     
+                    //selecciono un articulo de la session con menos beneficio
+                    int id_article_1 = improve_method->get_article_worst_session();
+                    //int id_article_1 = distr(gen);
+                    int id_article_2 = improve_method->select_article_in_diferent_session(id_article_1);
+                    //std::cout<<"id_article_1: "<<id_article_1<<", id_article_2: "<<id_article_2<<std::endl;
+                    
+                    improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors);     
                 }    
             }
             
@@ -335,24 +347,28 @@ int main() {
         ants.pheromone_update_list();
         ants.reset_ants();
 
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(stop - start).count()/1000000.0;
+
         if(write_improvement)
         {
-            auto stop = high_resolution_clock::now();
-            auto duration = duration_cast<microseconds>(stop - start).count()/1000000.0;
+            //auto stop = high_resolution_clock::now();
+            //auto duration = duration_cast<microseconds>(stop - start).count()/1000000.0;
 
             improvementFile<<
             anthill<<","<<
-            duration<<","<<
+            std::setprecision(1) << std::fixed << duration<<","<<
             aux_benefit<<","<<
             aux_articles<<","<<
             aux_capacity<<","<<
-            best_solution_quality<<std::endl;
+            std::setprecision(1) << std::fixed <<best_solution_quality<<std::endl;
         }
 
         if(best_solution_quality>very_best_solution_quality)
         {
             very_best_solution_quality = best_solution_quality;
             very_best_solution = best_solution;
+            best_time_execution = duration;
 
             if(write_convergence)
             {
@@ -361,11 +377,11 @@ int main() {
 
                 convergenceFile<<
                 anthill<<","<<
-                duration<<","<<
+                std::setprecision(1) << std::fixed << duration<<","<<
                 aux_benefit<<","<<
                 aux_articles<<","<<
                 aux_capacity<<","<<
-                best_solution_quality<<std::endl;
+                std::setprecision(1) << std::fixed << best_solution_quality<<std::endl;
             }
 
             if(show_solution_improvement)
@@ -417,13 +433,14 @@ int main() {
         min_pheromone<<","<<
         vapor <<","<<
         c <<","<<
-        gamma <<","<<
-        epsilon <<","<<
-        delta_time <<","<<
+        //gamma <<","<<
+        //epsilon <<","<<
+        std::setprecision(1) << std::fixed << delta_time <<","<<
+        std::setprecision(1) << std::fixed <<best_time_execution <<","<<
         very_best_solution_benefit<<","<<
         n_articles_parelel_session<<","<<
         n_max_article_day<<","<<
-        very_best_solution_quality<<std::endl;
+        std::setprecision(1) << std::fixed << very_best_solution_quality<<std::endl;
 
         resultsFile.close();
     }

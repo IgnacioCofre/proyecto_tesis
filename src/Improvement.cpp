@@ -938,3 +938,81 @@ int Improvement::select_article_same_day_diferent_block(int id_article)
         return id_article_2;
     }
 }
+
+int Improvement::article_topics_problem(Topics topics)
+{
+    //int number_days = number_article_per_day_by_topic.size();
+    int number_topics = topics.get_number_topics();
+
+    bool topic_problem_not_found = true;
+    int id_topic = 0;
+    int day = 0;
+    
+    while(topic_problem_not_found)
+    {
+        if(number_article_per_day_by_topic[day][id_topic] > topics.get_max_per_day(id_topic))
+        {
+            topic_problem_not_found = false;
+        }
+        else
+        {
+            if(id_topic == number_topics - 1)
+            {
+                id_topic = 0;
+                day += 1;
+            }
+            else
+            {
+                id_topic += 1;
+            }
+        }
+    }
+    
+    std::vector<int> articles_with_topic = topics.get_articles_by_topic(id_topic);
+    for(auto id_article : articles_with_topic)
+    {
+        int day_article_asignation = article_ubication[id_article][0];
+        if(day == day_article_asignation)
+        {
+            return id_article;
+        }
+    }
+
+    return articles_with_topic[0];
+}
+
+int Improvement::select_article_diferent_day(int id_article_1)
+{
+    int day = article_ubication[id_article_1][0];
+    int number_days = solution_to_improve.size();
+    bool debug = false;
+    std::mt19937 gen(rd());
+
+    std::uniform_int_distribution<> distr_day(0, number_days - 1);
+    int new_day = distr_day(gen); 
+    
+    while(new_day == day)
+    {
+        new_day = distr_day(gen);
+    }
+
+    std::uniform_int_distribution<> distr_block(0, solution_to_improve[new_day].size() - 1);
+    int new_block = distr_block(gen);
+
+    int number_rooms = solution_to_improve[new_day][new_block].size();
+    std::uniform_int_distribution<> distr_rooms(0, number_rooms - 1);
+    int new_room = distr_rooms(gen);
+
+    int number_article_session = solution_to_improve[new_day][new_block][new_room].size();
+    std::uniform_int_distribution<> distr_article(0, number_article_session - 1);
+    int id_article_2 = solution_to_improve[new_day][new_block][new_room][distr_article(gen)];
+
+    if(debug)
+    {
+        std::cout << "Case 2:"<< std::endl;
+        std::cout << "id_article_2: "<< id_article_2<< std::endl;
+        std::cout << article_ubication[id_article_2][0]<<","<<article_ubication[id_article_2][1]<<std::endl;
+    }
+
+    return id_article_2;
+}

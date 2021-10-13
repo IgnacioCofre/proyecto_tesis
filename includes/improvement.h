@@ -139,6 +139,18 @@ class Improvement
         un bloque distinto que el id_article_1
         */
         int select_article_same_day_diferent_block(int);
+
+        /*
+        int article_topics_problem(topics) = id_article_1
+        Retorna un id del articulo que causa problemas con la restriccion de maximo de articulos por topico
+        */
+        int article_topics_problem(Topics);
+
+        /*
+        int select_article_diferent_day(id_article_1) = id_article_2
+        Retorna el id de un articulo que se encuentre en un dia distinto al de id_article_1
+        */
+        int select_article_diferent_day(int);
 };
 
 #endif

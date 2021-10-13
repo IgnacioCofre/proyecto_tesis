@@ -19,6 +19,9 @@ class Topics{
     //number_articles_by_topic[id_topic] = number of articles with the topic
     std::vector <int> number_articles_by_topic;
 
+    //article_by_topic[id_topic] = [ids articles with topic]
+    std::vector<std::vector<int>> article_by_topic;
+
     //max_article_topic[id_topic] = int number of max article that can be assing 
     //in a day by topic 
     std::vector<int> max_article_topic;
@@ -35,6 +38,12 @@ class Topics{
         Retorna el maximo de articulos que se pueden asignar por dia del topico id_topic
         */
         int get_max_per_day(int);
+
+        /*
+        std::vector<int> get_articles_by_topic(id_topico) = [ids articles]
+        Retorna los id de los articulos que contengan el topico id_topico 
+        */
+        std::vector<int> get_articles_by_topic(int);
 
 };
 

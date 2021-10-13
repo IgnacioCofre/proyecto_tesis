@@ -292,15 +292,20 @@ int main() {
                     int id_article_2 = improve_method->select_article_same_day_diferent_block(id_article_1);
                     improve_method->swap_articles_V2(id_article_1,id_article_2,articles,topics,authors);
                 }
-                //if(number_topics_conflicts > 0){}
+                if(improve_method->get_number_topics_conflicts() > 0.0)
+                {
+                    //selecciona el par de articulos para intercambiar que causan problemas de cantidad de topicos
+                    int id_article_1 = improve_method->article_topics_problem(topics);
+                    int id_article_2 = improve_method->select_article_diferent_day(id_article_1);
+                    improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors);
+                }
                 else
                 {   
                     //selecciono un articulo de la session con menos beneficio
-                    int id_article_1 = improve_method->get_article_worst_session();
-                    //int id_article_1 = distr(gen);
+                    //int id_article_1 = improve_method->get_article_worst_session();
+                    int id_article_1 = distr(gen);
                     int id_article_2 = improve_method->select_article_in_diferent_session(id_article_1);
                     //std::cout<<"id_article_1: "<<id_article_1<<", id_article_2: "<<id_article_2<<std::endl;
-                    
                     improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors);     
                 }    
             }

@@ -15,6 +15,7 @@ Topics::Topics(int n_topics, std::vector <int> n_topics_articles, std::vector <s
     number_days = n_days;
 
     std::vector<int> aux_number_articles_by_topic(number_topics,0);
+    std::vector<std::vector<int>> aux_article_by_topic(number_topics,std::vector<int>(0));
 
     int number_articles = articles_topics.size();
     for(int id_article=0; id_article<number_articles; id_article++)
@@ -23,12 +24,14 @@ Topics::Topics(int n_topics, std::vector <int> n_topics_articles, std::vector <s
         for(int topic=0; topic<n_topics; topic++)
         {
             int id_topic = articles_topics[id_article][topic];
+            aux_article_by_topic[id_topic].push_back(id_article);
             aux_number_articles_by_topic[id_topic] +=1;
             //std::cout<<id_topic<<",";
         }
         //std::cout<<std::endl;
     }
 
+    article_by_topic = aux_article_by_topic;
     number_articles_by_topic = aux_number_articles_by_topic;
 
     std::vector<int> aux_max_article_per_day(number_topics,0);
@@ -110,4 +113,9 @@ int Topics::get_max_per_day(int id_topic)
     }
 
     return max_article_topic[id_topic];
+}
+
+std::vector<int> Topics::get_articles_by_topic(int id_topic)
+{
+    return article_by_topic[id_topic];
 }

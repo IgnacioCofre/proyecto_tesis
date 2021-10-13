@@ -456,10 +456,11 @@ float Improvement::get_number_topics_conflicts()
     return number_topics_conflics;
 }
 
-void Improvement::swap_articles_V2(int id_article_1, int id_article_2, Articles articles, Topics topics, Authors authors)
+int Improvement::swap_articles_V2(int id_article_1, int id_article_2, Articles articles, Topics topics, Authors authors)
 {
     bool show_changes = false;
-    //bool save_if_better = true;
+    //no hay mejora de la solucion
+    int improvement_case = 1;
 
     std::vector<std::vector<int>> new_article_ubication = article_ubication;
     std::vector<int> new_author_conflics = authors_conflicts;
@@ -673,6 +674,9 @@ void Improvement::swap_articles_V2(int id_article_1, int id_article_2, Articles 
                     number_autor_conflicts = new_number_author_conflicts;
                     number_topics_conflics = new_number_topics_conflics;
 
+                    //se encontro mejora
+                    improvement_case = 0;
+
                     std::vector<std::vector<std::vector<std::vector<int>>>>().swap(new_solution);
                 }
                 std::vector<std::vector<std::vector<int>>>().swap(new_benefit_session);
@@ -688,6 +692,8 @@ void Improvement::swap_articles_V2(int id_article_1, int id_article_2, Articles 
 
     std::vector<std::vector<int>>().swap(new_article_ubication);
     std::vector<int>().swap(new_author_conflics);
+
+    return improvement_case;
 }
 
 std::vector<int> Improvement::get_articles_author_conflicts(Authors authors)

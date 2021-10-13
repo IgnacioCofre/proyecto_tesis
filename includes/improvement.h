@@ -39,12 +39,12 @@ class Improvement
         Improvement(std::vector<std::vector<std::vector<std::vector<int>>>>, float, float, float,Articles, Topics, Authors);
         
         /*
-        swap_articles(id_article_1, id_article_2)
+        swap_articles(id_article_1, id_article_2) = 1: no hay mejora, 0: si hay mejora
         Se realiza un intercambio de los articulos id_1 y id_2, donde se evalua si dicho 
         intercambio produce alguna mejora sobre la solucion solution_to_improve
         */
         void swap_articles(int, int,  Articles, Topics, Authors);
-        void swap_articles_V2(int, int, Articles, Topics, Authors);
+        int swap_articles_V2(int, int, Articles, Topics, Authors);
 
         /*
         show_data()

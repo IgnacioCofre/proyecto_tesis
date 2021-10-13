@@ -277,8 +277,13 @@ int main() {
             Improvement * improve_method = new Improvement(ants.get_best_solution(iter_solution),current_quality_solution, gamma, epsilon, articles, topics, authors);
 
             /*Implementacion de movimiento*/
-            for(int _ = 0; _<limit_iteration; _++)
+            //for(int _ = 0; _<limit_iteration; _++)
+            int count_with_out_improve = 0;
+            while(count_with_out_improve < limit_iteration)
             {   
+                int id_article_1;
+                int id_article_2;
+
                 if(improve_method->get_number_autor_conflicts() > 0)
                 {
                     //selecciono los articulo del autor con mas conflictos 
@@ -288,26 +293,35 @@ int main() {
                     //int random_article_1 = articles_author_max_conflicts[distr_articles_author(gen)];
 
                     //selecciono los articulo de uno de los autores con mas conflictos
-                    int id_article_1 = improve_method->select_article_from_most_authors_conflicts(authors, k);
-                    int id_article_2 = improve_method->select_article_same_day_diferent_block(id_article_1);
-                    improve_method->swap_articles_V2(id_article_1,id_article_2,articles,topics,authors);
+                    id_article_1 = improve_method->select_article_from_most_authors_conflicts(authors, k);
+                    id_article_2 = improve_method->select_article_same_day_diferent_block(id_article_1);
+                    //count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2,articles,topics,authors);
                 }
                 if(improve_method->get_number_topics_conflicts() > 0.0)
                 {
                     //selecciona el par de articulos para intercambiar que causan problemas de cantidad de topicos
-                    int id_article_1 = improve_method->article_topics_problem(topics);
-                    int id_article_2 = improve_method->select_article_diferent_day(id_article_1);
-                    improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors);
+                    id_article_1 = improve_method->article_topics_problem(topics);
+                    id_article_2 = improve_method->select_article_diferent_day(id_article_1);
+                    //count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors);
                 }
                 else
                 {   
                     //selecciono un articulo de la session con menos beneficio
-                    //int id_article_1 = improve_method->get_article_worst_session();
-                    int id_article_1 = distr(gen);
-                    int id_article_2 = improve_method->select_article_in_diferent_session(id_article_1);
-                    //std::cout<<"id_article_1: "<<id_article_1<<", id_article_2: "<<id_article_2<<std::endl;
-                    improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors);     
+                    //id_article_1 = improve_method->get_article_worst_session();
+                    id_article_1 = distr(gen);
+                    id_article_2 = improve_method->select_article_in_diferent_session(id_article_1);
+                    //std::cout<<"id_article_1: "<<id_article_1<<", id_article_2: "<<id_article_2<<std::endl;     
                 }    
+
+                int result_move = improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors);
+                
+                if(result_move == 0)
+                {
+                    count_with_out_improve = 0;
+                }
+
+                count_with_out_improve += result_move;
+
             }
             
             float n_articles_parelel_session = improve_method->get_number_autor_conflicts();

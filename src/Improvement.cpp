@@ -429,12 +429,6 @@ int Improvement::select_article_in_diferent_session(int id_article)
 
     return new_article;
 }
-/*
-std::vector<int> Improvement::get_quality_parameters()
-{
-    return {total_benefit,number_autor_conflicts,number_topics_conflics};
-}
-*/
 
 std::vector<std::vector<std::vector<std::vector<int>>>> Improvement::get_solution_improved()
 {
@@ -1019,6 +1013,100 @@ int Improvement::select_article_diferent_day(int id_article_1)
         std::cout << "id_article_2: "<< id_article_2<< std::endl;
         std::cout << article_ubication[id_article_2][0]<<","<<article_ubication[id_article_2][1]<<std::endl;
     }
+
+    return id_article_2;
+}
+
+std::vector<int> Improvement::article_topics_problem_and_topic(Topics topics)
+{
+    //int number_days = number_article_per_day_by_topic.size();
+    int number_topics = topics.get_number_topics();
+
+    bool topic_problem_not_found = true;
+    int id_topic = 0;
+    int day = 0;
+    
+    while(topic_problem_not_found)
+    {
+        if(number_article_per_day_by_topic[day][id_topic] > topics.get_max_per_day(id_topic))
+        {
+            topic_problem_not_found = false;
+        }
+        else
+        {
+            if(id_topic == number_topics - 1)
+            {
+                id_topic = 0;
+                day += 1;
+            }
+            else
+            {
+                id_topic += 1;
+            }
+        }
+
+        std::cout<<"while topic case"<<std::endl;
+    }
+    
+    std::vector<int> articles_with_topic = topics.get_articles_by_topic(id_topic);
+    for(auto id_article : articles_with_topic)
+    {
+        int day_article_asignation = article_ubication[id_article][0];
+        if(day == day_article_asignation)
+        {
+            return {id_article, id_topic};
+        }
+    }
+
+    return {articles_with_topic[0],id_topic};
+}
+
+int Improvement::select_article_diferent_dayV2(Topics topics,int id_article_1, int id_topic)
+{
+    int day_problem = article_ubication[id_article_1][0];
+    int number_articles = article_ubication.size();
+    bool debug = true;
+    std::mt19937 gen(rd());
+    std::vector<int> articles_with_topic = topics.get_articles_by_topic(id_topic);
+    
+    std::vector<int> articles_without_topic;
+
+    for(int article=0; article<number_articles; article++)
+    {
+        if(article != articles_with_topic[0])
+        {
+            articles_without_topic.push_back(article);
+            articles_with_topic.erase(articles_with_topic.begin());
+        }
+    }
+
+    std::uniform_int_distribution<> distr_articles(0, articles_with_topic.size() - 1);
+    int id_article_2 = articles_with_topic[distr_articles(gen)]; 
+
+    while(day_problem == article_ubication[id_article_2][0])
+    {
+        id_article_2 = articles_with_topic[distr_articles(gen)]; 
+    }
+    
+    if(debug)
+    {
+        std::cout << "id_article_1: "<< id_article_1<< std::endl;
+        std::cout << article_ubication[id_article_1][0]<<","<<article_ubication[id_article_1][1]<<std::endl;
+        std::cout << "id_article_2: "<< id_article_2<< std::endl;
+        std::cout << article_ubication[id_article_2][0]<<","<<article_ubication[id_article_2][1]<<std::endl;
+        std::cout << "id_topic problem: "<< id_topic<< std::endl;
+        std::vector<int> topics_article_2 = topics.get_article_topics(id_article_2);
+        
+        std::cout<<"Topicos articulo 2: ";
+        for(auto topic:topics_article_2)
+        {
+            std::cout<<topic<<",";
+        }
+        std::cout<<std::endl;
+        std::vector<int>().swap(topics_article_2);
+    }
+
+    std::vector<int>().swap(articles_without_topic);
 
     return id_article_2;
 }

@@ -147,10 +147,24 @@ class Improvement
         int article_topics_problem(Topics);
 
         /*
+        std::vector<int> article_topics_problem_and_topic(Topics) = [id_article, id_topic]
+        Retorna el id del articulo que causa problemas de maximo de articulos por topico, incuyendo el id 
+        del topico del cual genera problemas
+        */
+        std::vector<int> article_topics_problem_and_topic(Topics);
+
+        /*
         int select_article_diferent_day(id_article_1) = id_article_2
         Retorna el id de un articulo que se encuentre en un dia distinto al de id_article_1
         */
         int select_article_diferent_day(int);
+
+        /*
+        int select_article_diferent_dayV2(id_article, id_topic) = id_article
+        Retorna el id de un articulo que se encuentre en un dia distinto al de id_article_1
+        y que no tenga el topico id_topic
+        */
+        int select_article_diferent_dayV2(Topics, int, int);
 };
 
 #endif

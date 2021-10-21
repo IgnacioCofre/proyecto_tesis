@@ -1044,8 +1044,6 @@ std::vector<int> Improvement::article_topics_problem_and_topic(Topics topics)
                 id_topic += 1;
             }
         }
-
-        std::cout<<"while topic case"<<std::endl;
     }
     
     std::vector<int> articles_with_topic = topics.get_articles_by_topic(id_topic);
@@ -1065,7 +1063,8 @@ int Improvement::select_article_diferent_dayV2(Topics topics,int id_article_1, i
 {
     int day_problem = article_ubication[id_article_1][0];
     int number_articles = article_ubication.size();
-    bool debug = true;
+    bool debug = false;
+   
     std::mt19937 gen(rd());
     std::vector<int> articles_with_topic = topics.get_articles_by_topic(id_topic);
     
@@ -1073,19 +1072,29 @@ int Improvement::select_article_diferent_dayV2(Topics topics,int id_article_1, i
 
     for(int article=0; article<number_articles; article++)
     {
-        if(article != articles_with_topic[0])
+        if(articles_with_topic.size()>0)
+        {
+            if(article != articles_with_topic[0])
+            {
+                articles_without_topic.push_back(article);
+            }
+            else
+            {
+                articles_with_topic.erase(articles_with_topic.begin());
+            }
+        }
+        else
         {
             articles_without_topic.push_back(article);
-            articles_with_topic.erase(articles_with_topic.begin());
         }
     }
 
-    std::uniform_int_distribution<> distr_articles(0, articles_with_topic.size() - 1);
-    int id_article_2 = articles_with_topic[distr_articles(gen)]; 
+    std::uniform_int_distribution<> distr_articles(0, articles_without_topic.size() - 1);
+    int id_article_2 = articles_without_topic[distr_articles(gen)]; 
 
     while(day_problem == article_ubication[id_article_2][0])
     {
-        id_article_2 = articles_with_topic[distr_articles(gen)]; 
+        id_article_2 = articles_without_topic[distr_articles(gen)]; 
     }
     
     if(debug)

@@ -37,20 +37,20 @@ Topics::Topics(int n_topics, std::vector <int> n_topics_articles, std::vector <s
     std::vector<int> aux_max_article_per_day(number_topics,0);
     for(int id_topic=0; id_topic<number_topics; id_topic++)
     {
-        int article_by_topic = aux_number_articles_by_topic[id_topic];
+        int n_article_by_topic = aux_number_articles_by_topic[id_topic];
         if(number_days == 1)
         {
-            aux_max_article_per_day[id_topic] = article_by_topic;
+            aux_max_article_per_day[id_topic] = n_article_by_topic;
         }
         else
         {
-            if(article_by_topic>20)
+            if(n_article_by_topic>20)
             {
-                aux_max_article_per_day[id_topic] = ceil(article_by_topic/2.0);    
+                aux_max_article_per_day[id_topic] = ceil(n_article_by_topic/2.0);    
             }
             else
             {
-                aux_max_article_per_day[id_topic] = article_by_topic;
+                aux_max_article_per_day[id_topic] = n_article_by_topic;
             }
         }
     }

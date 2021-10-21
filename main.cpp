@@ -36,15 +36,15 @@ int main() {
     //std::string input_name = "ebl/ebl_30_2.txt";
     //std::string input_name = "lars/lars_30_2.txt";
 
-    std::string input_name = "lars/lars_150_1.txt";
+    std::string input_name = "ebl/ebl_original.txt";
 
     /*Parametros de las hormigas*/
-    int number_anthill = 1000;
+    int number_anthill = 500;
     int number_ants = 50;
-    int e = 30;
+    int e = 10;
 
     /*Parametros de mejora de soluciones*/
-    float limit_iteration = 10;
+    float limit_iteration = 50;
     int k = 10;
 
     /*Parametro de creacion de soluciones*/
@@ -298,10 +298,9 @@ int main() {
                 while((count_with_out_improve < limit_iteration) && (improve_method->get_number_topics_conflicts() > 0.0))
                 {
                     //selecciona el par de articulos para intercambiar que causan problemas de cantidad de topicos
-                    int id_topic_problem;
                     std::vector<int> article_topic = improve_method->article_topics_problem_and_topic(topics);
                     int id_article_1 = article_topic[0];
-                    id_topic_problem = article_topic[1];
+                    int id_topic_problem = article_topic[1];
                     //no tenga el topico de id_article_1_
                     int id_article_2 = improve_method->select_article_diferent_dayV2(topics, id_article_1, id_topic_problem);
                     count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors);

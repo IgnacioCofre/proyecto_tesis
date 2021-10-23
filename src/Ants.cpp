@@ -515,3 +515,35 @@ void Ants::update_best_solution_V2(std::vector<std::vector<std::vector<std::vect
     } 
 }
 
+std::vector<float> Ants::get_mean_and_des_std()
+{
+    int number_articles = pheromone_matrix.size();
+    float sum = 0;
+    int number_arcs = ((number_articles)*(number_articles-1))/2 ;
+
+    for(int i=0; i<number_articles; i++)
+    {
+        for(int j=i+1; j<number_articles; j++)
+        {
+            sum +=  pheromone_matrix[i][j];
+        }
+    }
+
+    float mean  = (float) (sum/number_arcs);
+
+    float des_std = 0.0;
+
+    for(int i=0; i<number_articles; i++)
+    {
+        for(int j=i+1; j<number_articles; j++)
+        {
+            des_std += pow(pheromone_matrix[i][j]-mean,2);
+        }
+    } 
+
+    des_std = (float) (des_std/number_arcs);
+    des_std = pow(des_std,0.5);
+
+    std::vector<float> params_matrix = {mean, des_std};
+    return params_matrix;  
+}

@@ -74,9 +74,9 @@ int main() {
     bool show_very_best_solution = true;
     
     /*Registro de soluciones*/
-    bool write_result = false;
-    bool write_improvement = false;
-    bool write_convergence = false;
+    bool write_result = true;
+    bool write_improvement = true;
+    bool write_convergence = true;
 
     std::string result_file_name = "experimet.csv"; 
     std::string result_improvement = "improvement.csv";
@@ -138,6 +138,8 @@ int main() {
     improvementFile<<
     "anthill"<<","<<
     "time [s]"<<","<<
+    "mean"<<","<<
+    "std"<<","<<
     "benefit"<<","<<
     "P articles"<<","<<
     "P topics"<<","<<
@@ -151,6 +153,8 @@ int main() {
     convergenceFile<<
     "anthill"<<","<<
     "time [s]"<<","<<
+    "mean"<<","<<
+    "std"<<","<<
     "benefit"<<","<<
     "P articles"<<","<<
     "P topics"<<","<<
@@ -245,7 +249,6 @@ int main() {
             float n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,scheduling); 
             float n_max_article_day = validator.capacity_topics_V2(topics,scheduling);
             
-
             if((n_articles_parelel_session>0) && set_author_penalty)
             {
                 base_penalty = n_articles_parelel_session * constant_for_penalty;
@@ -365,14 +368,19 @@ int main() {
         {
             //auto stop = high_resolution_clock::now();
             //auto duration = duration_cast<microseconds>(stop - start).count()/1000000.0;
+            std::vector<float> pheromone_matrix_indicator = ants.get_mean_and_des_std();
 
             improvementFile<<
             anthill<<","<<
             std::setprecision(1) << std::fixed << duration<<","<<
+            pheromone_matrix_indicator[0] <<","<<
+            pheromone_matrix_indicator[1] <<","<<
             aux_benefit<<","<<
             aux_articles<<","<<
             aux_capacity<<","<<
             std::setprecision(1) << std::fixed <<best_solution_quality<<std::endl;
+
+            std::vector<float>().swap(pheromone_matrix_indicator);
         }
 
         if(best_solution_quality>very_best_solution_quality)
@@ -383,16 +391,21 @@ int main() {
 
             if(write_convergence)
             {
-                auto stop = high_resolution_clock::now();
-                auto duration = duration_cast<microseconds>(stop - start).count()/1000000.0;
+                //auto stop = high_resolution_clock::now();
+                //auto duration = duration_cast<microseconds>(stop - start).count()/1000000.0;
+                std::vector<float> pheromone_matrix_indicator = ants.get_mean_and_des_std();
 
                 convergenceFile<<
                 anthill<<","<<
                 std::setprecision(1) << std::fixed << duration<<","<<
+                pheromone_matrix_indicator[0] <<","<<
+                pheromone_matrix_indicator[1] <<","<<
                 aux_benefit<<","<<
                 aux_articles<<","<<
                 aux_capacity<<","<<
                 std::setprecision(1) << std::fixed << best_solution_quality<<std::endl;
+
+                std::vector<float>().swap(pheromone_matrix_indicator);
             }
 
             if(show_solution_improvement)
@@ -431,7 +444,8 @@ int main() {
 
         auto stop = high_resolution_clock::now();
         auto delta_time = duration_cast<microseconds>(stop - start).count()/1000000.0;
-
+        std::vector<float> pheromone_matrix_indicator = ants.get_mean_and_des_std();
+        
         resultsFile << 
         input_name <<","<<
         number_anthill<<","<<
@@ -444,6 +458,8 @@ int main() {
         min_pheromone<<","<<
         vapor <<","<<
         c <<","<<
+        pheromone_matrix_indicator[0] <<","<<
+        pheromone_matrix_indicator[1] <<","<<
         //gamma <<","<<
         //epsilon <<","<<
         std::setprecision(1) << std::fixed << delta_time <<","<<
@@ -452,6 +468,7 @@ int main() {
         n_articles_parelel_session<<","<<
         n_max_article_day<<","<<
         std::setprecision(1) << std::fixed << very_best_solution_quality<<std::endl;
+
 
         resultsFile.close();
     }

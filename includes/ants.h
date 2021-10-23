@@ -132,6 +132,12 @@ class Ants
         guardada en id_ant
         */    
         void update_best_solution_V2(std::vector<std::vector<std::vector<std::vector<int>>>>,float,int);
+
+        /*
+        std::vector<float> get_mean_and_des_std() = [mean,std]
+        entrega la desviacion estandar de la matriz de feromonas actual
+        */
+        std::vector<float> get_mean_and_des_std(void);
         
 };
 

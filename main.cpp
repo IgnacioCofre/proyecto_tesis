@@ -39,7 +39,7 @@ int main() {
     std::string input_name = "ebl/ebl_original.txt";
 
     /*Parametros de las hormigas*/
-    int number_anthill = 500;
+    int number_anthill = 50;
     int number_ants = 50;
     int e = 10;
 
@@ -51,6 +51,7 @@ int main() {
     float alpha = 2.0;
     float beta = 5.0;
     bool random_first_article = true;
+    unsigned int seed = 100;
     
     /*Parametros de la actualizacion de feromona*/
     float vapor = 0.25;
@@ -162,17 +163,17 @@ int main() {
 
     /*Algoritmo de hormigas*/
     int number_articles = articles.get_number_articles();
-    Ants ants = Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,articles.get_similarity_matrix(),vapor,c,gamma,epsilon,e);
+    Ants ants = Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,articles.get_similarity_matrix(),vapor,c,e,seed);
     
     std::vector<std::vector<std::vector<std::vector<int>>>> very_best_solution;
     float very_best_solution_quality = 0;
     float best_time_execution;
 
-    std::random_device rd; // obtain a random number from hardware
-    std::mt19937 gen(rd()); // seed the generator
+    //std::random_device rd; // obtain a random number from hardware
+    std::mt19937 gen(seed); // seed the generator
     std::uniform_int_distribution<> distr(0, number_articles-1); // define the range
 
-    srand(time(0));
+    srand(seed);
 
     for(int anthill=0; anthill<number_anthill;anthill++)
     {   
@@ -280,7 +281,7 @@ int main() {
         {
             //solution_to_improve = ants.get_best_solution(iter_solution);
             float current_quality_solution = ants.get_best_quality_solution(iter_solution);
-            Improvement * improve_method = new Improvement(ants.get_best_solution(iter_solution),current_quality_solution, gamma, epsilon, articles, topics, authors);
+            Improvement * improve_method = new Improvement(ants.get_best_solution(iter_solution),current_quality_solution, gamma, epsilon, articles, topics, authors,seed);
 
             /*Implementacion de movimiento*/
             int count_with_out_improve;

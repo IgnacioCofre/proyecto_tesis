@@ -16,7 +16,9 @@ class Ants
     //alpha: importancia empírica
     //beta: importancia heuristica
     float alpha, beta;
-    float c_factor, vapor_factor, gamma_factor, epsilon_factor ;
+    float c_factor, vapor_factor;
+    //float  gamma_factor, epsilon_factor; 
+    unsigned int seed;
     int e;
     std::vector<std::vector<float>> pheromone_matrix;
     //ant_solution_scheduling[id_ant][day][block][room] = [id articles in session]
@@ -31,8 +33,8 @@ class Ants
     //std::vector<std::vector<int>> solution_ant;
 
     public:
-        //Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,articles.get_similarity_matrix(),vapor_factor, c_factor,gamma_factor,epsilon_factor)
-        Ants(int,float,float,int, float, float,std::vector<std::vector<int>>, float, float, float, float,int); 
+        //Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,articles.get_similarity_matrix(),vapor_factor, c_factor,e_max,seed)
+        Ants(int,float,float,int, float, float,std::vector<std::vector<int>>, float, float,int,unsigned int); 
         int get_number_ants(void);
 
         /*
@@ -73,7 +75,7 @@ class Ants
         Calucla la calidad final de la solucion
         solution_quality = c*(solution_benefit - gamma*autor_problems - epsilon*topics_problems)
         */
-        float calculate_quality_solution(int solution_benefit, int autor_problems, int topcis_problems);
+        //float calculate_quality_solution(int solution_benefit, int autor_problems, int topcis_problems);
 
         /*
         pheromone_update_list()

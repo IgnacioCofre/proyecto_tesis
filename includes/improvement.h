@@ -27,6 +27,7 @@ class Improvement
     
     int total_benefit= 0;
     int number_autor_conflicts = 0;
+    unsigned int seed;
     float number_topics_conflics = 0.0;
     float current_solution_quality;
     float gamma, epsilon;
@@ -36,7 +37,7 @@ class Improvement
 
     public:
         //Improvement(solution, quality, gamma, epsilon, articles, topics, authors)
-        Improvement(std::vector<std::vector<std::vector<std::vector<int>>>>, float, float, float,Articles, Topics, Authors);
+        Improvement(std::vector<std::vector<std::vector<std::vector<int>>>>, float, float, float,Articles, Topics, Authors, unsigned int);
         
         /*
         swap_articles(id_article_1, id_article_2) = 1: no hay mejora, 0: si hay mejora

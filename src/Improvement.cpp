@@ -1,17 +1,19 @@
 #include "../includes/improvement.h"
 
 //Improvement(solution, quality, limit_iteration, gamma, epsilon, articles, topics, authors)
-Improvement::Improvement(std::vector<std::vector<std::vector<std::vector<int>>>> current_solution, float s_q, float g, float ep, Articles articles, Topics topics, Authors authors)
+Improvement::Improvement(std::vector<std::vector<std::vector<std::vector<int>>>> current_solution, float s_q, float g, float ep, Articles articles, Topics topics, Authors authors, unsigned int seed_param)
 {
     solution_to_improve = current_solution;
     current_solution_quality = s_q;
     gamma = g;
     epsilon = ep;
+    seed = seed_param;
 
     int number_days = solution_to_improve.size();
     int number_articles = articles.get_number_articles();
     int number_topics = topics.get_number_topics();
     int number_authors = authors.get_number_authors();
+
 
     /*Ubicacion de los articulos y beneficio total de la solucion*/
     std::vector<std::vector<int>> article_ubication_aux(number_articles, {-1, -1, -1, -1});
@@ -412,8 +414,8 @@ int Improvement::select_article_in_diferent_session(int id_article)
 {
     std::vector<int> a_u_1 = article_ubication[id_article];
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    //std::random_device rd;
+    std::mt19937 gen(seed);
 
     int number_articles = article_ubication.size();
     std::uniform_int_distribution<> distr_articles(0, number_articles - 1);
@@ -733,7 +735,7 @@ int Improvement::get_article_worst_session()
     }
 
     int number_articles_worst_session = solution_to_improve[min_session[0]][min_session[1]][min_session[2]].size();
-    std::mt19937 gen(rd());
+    std::mt19937 gen(seed);
     std::uniform_int_distribution<> distr_articles(0, number_articles_worst_session - 1);
     int id_article_1 = solution_to_improve[min_session[0]][min_session[1]][min_session[2]][distr_articles(gen)];
 
@@ -744,8 +746,8 @@ int Improvement::select_article_in_diferent_block(int id_article)
 {
     std::vector<int> a_u_1 = article_ubication[id_article];
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    //std::random_device rd;
+    std::mt19937 gen(seed);
 
     int number_articles = article_ubication.size();
     std::uniform_int_distribution<> distr_articles(0, number_articles - 1);
@@ -846,7 +848,7 @@ int Improvement::select_article_from_most_authors_conflicts(Authors authors, int
     }
 
     //seleccion del author dentro de los k con mas topes de horario
-    std::mt19937 gen(rd());
+    std::mt19937 gen(seed);
     std::uniform_int_distribution<> distr_authors(0, max_k_authors - 1);
     int id_author = index_authors[distr_authors(gen)];
 
@@ -875,7 +877,7 @@ int Improvement::select_article_same_day_diferent_block(int id_article)
     int day = article_ubication[id_article][0];
     int number_blocks = solution_to_improve[day].size();
     bool debug = false;
-    std::mt19937 gen(rd());
+    std::mt19937 gen(seed);
 
     if(number_blocks>1){
         
@@ -986,7 +988,7 @@ int Improvement::select_article_diferent_day(int id_article_1)
     int day = article_ubication[id_article_1][0];
     int number_days = solution_to_improve.size();
     bool debug = false;
-    std::mt19937 gen(rd());
+    std::mt19937 gen(seed);
 
     std::uniform_int_distribution<> distr_day(0, number_days - 1);
     int new_day = distr_day(gen); 
@@ -1065,7 +1067,7 @@ int Improvement::select_article_diferent_dayV2(Topics topics,int id_article_1, i
     int number_articles = article_ubication.size();
     bool debug = false;
    
-    std::mt19937 gen(rd());
+    std::mt19937 gen(seed);
     std::vector<int> articles_with_topic = topics.get_articles_by_topic(id_topic);
     
     std::vector<int> articles_without_topic;

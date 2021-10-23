@@ -1,7 +1,7 @@
 #include "../includes/ants.h"
 
-//Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,articles.get_similarity_matrix(),vapor_factor, c_factor,gamma_fator,epsilon_fator)
-Ants::Ants(int n_ants,float mx_pheromone,float mn_pheromone,int n_articles, float alp, float b,std::vector<std::vector<int>> s_matrix, float vapor, float c, float gamma, float epsilon, int e_max)
+//Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,articles.get_similarity_matrix(),vapor_factor, c_factor,gamma_fator,epsilon_fator,e_max, seed)
+Ants::Ants(int n_ants,float mx_pheromone,float mn_pheromone,int n_articles, float alp, float b,std::vector<std::vector<int>> s_matrix, float vapor, float c,int e_max, unsigned int seed_param)
 {
     number_ants = n_ants;
     max_pheromone = mx_pheromone;
@@ -12,8 +12,9 @@ Ants::Ants(int n_ants,float mx_pheromone,float mn_pheromone,int n_articles, floa
     c_factor = c;
     similarity_matrix = s_matrix;
     vapor_factor = vapor;
-    gamma_factor = gamma;
-    epsilon_factor = epsilon;
+    seed = seed_param;
+    //gamma_factor = gamma;
+    //epsilon_factor = epsilon;
     e = e_max;
 
     /*Matriz de  feromonas se inicializa con el valor maximo de la feromona*/
@@ -63,6 +64,7 @@ int Ants::get_next_article(int id_article_1, std::vector<int> list_j)
         sum_p_ij += numerador;
     }
 
+    srand(seed);
     float new_random = (float) rand()/RAND_MAX;
 
     float acumulated = (p_ij[0]/sum_p_ij);
@@ -86,6 +88,7 @@ std::vector<std::vector<std::vector<std::vector<int>>>> Ants::create_solution(in
     std::vector<std::vector<std::vector<std::vector<int>>>> scheduling;
     std::vector<int> days;
     std::vector<std::vector<int>> block_days(number_days);
+    srand(seed);
 
     //creacion de la solucion
     for(int day=0; day<number_days; day++)
@@ -259,18 +262,6 @@ void Ants::pheromone_update(std::vector<std::vector<std::vector<std::vector<int>
             }       
         }
     } 
-}
-
-float Ants::calculate_quality_solution(int solution_benefit, int autor_problems, int topcis_problems)
-{
-    float solution_quality = (float)(solution_benefit - (gamma_factor*autor_problems) - (epsilon_factor*topcis_problems));
-    
-    if(solution_quality < 0)
-    {
-        return 0;
-    }
-
-    return solution_quality;
 }
 
 void Ants::save_solution(std::vector<std::vector<std::vector<std::vector<int>>>> scheduling, float solution_quality)

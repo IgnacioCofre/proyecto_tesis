@@ -1,12 +1,10 @@
 #include "../includes/improvement.h"
 
-//Improvement(solution, quality, limit_iteration, gamma, epsilon, articles, topics, authors)
-Improvement::Improvement(std::vector<std::vector<std::vector<std::vector<int>>>> current_solution, float s_q, float g, float ep, Articles articles, Topics topics, Authors authors, unsigned int seed_param)
+//Improvement(solution, quality, limit_iteration, articles, topics, authors)
+Improvement::Improvement(std::vector<std::vector<std::vector<std::vector<int>>>> current_solution, float s_q, Articles articles, Topics topics, Authors authors, unsigned int seed_param)
 {
     solution_to_improve = current_solution;
     current_solution_quality = s_q;
-    gamma = g;
-    epsilon = ep;
     seed = seed_param;
 
     int number_days = solution_to_improve.size();

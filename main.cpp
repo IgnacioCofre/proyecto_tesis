@@ -16,7 +16,7 @@
 
 using namespace std::chrono;
 
-int main() {
+int main(int argc,char* argv[]) {
     
     /*Archivo input*/
     //std::string input_name = "lars/lars_original.txt";
@@ -36,48 +36,76 @@ int main() {
     //std::string input_name = "ebl/ebl_30_2.txt";
     //std::string input_name = "lars/lars_30_2.txt";
 
-    std::string input_name = "ebl/ebl_original.txt";
+    std::string input_name = "lars/lars_30_5.txt";
+    unsigned int seed = 100;
 
     /*Parametros de las hormigas*/
-    int number_anthill = 50;
+    int number_anthill = 500;
     int number_ants = 50;
     int e = 10;
+    float base_penalty = 100.0;
+    float constant_for_penalty = 4.0;
+
+    /*Parametros de la actualizacion de feromona*/
+    float alpha = 2.0;
+    float beta = 5.0;
+    float vapor = 0.25;
+    float c = 0.0005;
+    float max_pheromone = 10.0;
+    float min_pheromone = 0.1;
 
     /*Parametros de mejora de soluciones*/
     float limit_iteration = 50;
     int k = 10;
+ 
+    /*
+    if(argc==2)
+    {
+        std::cout<<"Default parameters"<<std::endl;
 
-    /*Parametro de creacion de soluciones*/
-    float alpha = 2.0;
-    float beta = 5.0;
-    bool random_first_article = true;
-    unsigned int seed = 100;
+        number_anthill = 500;
+        number_ants = 50;
+        e = 10;
+        base_penalty = 100.0;
+        constant_for_penalty = 4.0;
+
+        alpha = 2.0;
+        beta = 5.0;
+        vapor = 0.25;
+        c = 0.0005;
+        max_pheromone = 10.0;
+        min_pheromone = 0.1;
+
+        limit_iteration = 50;
+        k = 10;
+
+        seed = 100;
+    }
+    */
     
-    /*Parametros de la actualizacion de feromona*/
-    float vapor = 0.25;
-    float c = 0.0005;
-    float gamma = 15.0;
-    float epsilon = 10.0;
-
-    float max_pheromone = 10.0;
-    float min_pheromone = 0.1;
-
+    /*Toma de paramatros por bash*/
+    if(argc>1)
+    {
+        input_name = argv[1];
+        seed = std::stoi(argv[2]);
+    }
+    
+    /*Parametros de creacion de soluciones*/
+    bool random_first_article = true;
     bool set_author_penalty = true;
-    float base_penalty = 100.0;
-    float constant_for_penalty = 4.0;
 
     /*Parametros de muestra de datos por pantalla*/
     bool show_solution_construction = false;
     bool show_solution_quality = false;
     bool show_ant_information = false;
     bool show_best_ant = false;
-    bool show_solution_improvement = true;
+    bool show_solution_improvement = false;
     bool show_very_best_solution = true;
     
     /*Registro de soluciones*/
     bool write_result = true;
-    bool write_improvement = true;
-    bool write_convergence = true;
+    bool write_improvement = false;
+    bool write_convergence = false;
 
     std::string result_file_name = "experimet.csv"; 
     std::string result_improvement = "improvement.csv";
@@ -177,7 +205,7 @@ int main() {
 
     for(int anthill=0; anthill<number_anthill;anthill++)
     {   
-        std::cout<<"Conjunto de hormigas: "<<anthill<<std::endl;
+        //std::cout<<"Conjunto de hormigas: "<<anthill<<std::endl;
         
         std::vector<std::vector<std::vector<std::vector<int>>>> best_solution;
         float best_solution_quality = -1;
@@ -281,7 +309,7 @@ int main() {
         {
             //solution_to_improve = ants.get_best_solution(iter_solution);
             float current_quality_solution = ants.get_best_quality_solution(iter_solution);
-            Improvement * improve_method = new Improvement(ants.get_best_solution(iter_solution),current_quality_solution, gamma, epsilon, articles, topics, authors,seed);
+            Improvement * improve_method = new Improvement(ants.get_best_solution(iter_solution),current_quality_solution, articles, topics, authors,seed);
 
             /*Implementacion de movimiento*/
             int count_with_out_improve;
@@ -452,6 +480,7 @@ int main() {
         number_anthill<<","<<
         number_ants<<","<<
         e <<","<<
+        seed <<","<<
         limit_iteration<<","<<
         alpha <<","<<
         beta <<","<<
@@ -461,8 +490,6 @@ int main() {
         c <<","<<
         pheromone_matrix_indicator[0] <<","<<
         pheromone_matrix_indicator[1] <<","<<
-        //gamma <<","<<
-        //epsilon <<","<<
         std::setprecision(1) << std::fixed << delta_time <<","<<
         std::setprecision(1) << std::fixed <<best_time_execution <<","<<
         very_best_solution_benefit<<","<<

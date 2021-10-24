@@ -30,14 +30,13 @@ class Improvement
     unsigned int seed;
     float number_topics_conflics = 0.0;
     float current_solution_quality;
-    float gamma, epsilon;
     float limit_iteration;
 
     std::random_device rd;
 
     public:
-        //Improvement(solution, quality, gamma, epsilon, articles, topics, authors)
-        Improvement(std::vector<std::vector<std::vector<std::vector<int>>>>, float, float, float,Articles, Topics, Authors, unsigned int);
+        //Improvement(solution, quality, articles, topics, authors,seed)
+        Improvement(std::vector<std::vector<std::vector<std::vector<int>>>>, float,Articles, Topics, Authors, unsigned int);
         
         /*
         swap_articles(id_article_1, id_article_2) = 1: no hay mejora, 0: si hay mejora

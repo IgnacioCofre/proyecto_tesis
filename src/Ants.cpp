@@ -27,7 +27,7 @@ Ants::Ants(int n_ants,float mx_pheromone,float mn_pheromone,int n_articles, floa
     //std::vector<std::vector<std::vector<std::vector<std::vector<int>>>>> aux_ant_solution_scheduling(number_ants);
     //ant_solution_scheduling = aux_ant_solution_scheduling;
 
-    std::cout<<"Ants created: "<<number_ants<<std::endl;
+    //std::cout<<"Ants created: "<<number_ants<<std::endl;
 }
          
 int Ants::get_number_ants(void)

@@ -40,7 +40,7 @@ int main(int argc,char* argv[]) {
     unsigned int seed = 100;
 
     /*Parametros de las hormigas*/
-    int number_anthill = 500;
+    int number_anthill = 1000;
     int number_ants = 50;
     int e = 10;
     float base_penalty = 100.0;
@@ -50,7 +50,7 @@ int main(int argc,char* argv[]) {
     float alpha = 2.0;
     float beta = 5.0;
     float vapor = 0.25;
-    float c = 0.0005;
+    float c = 0.0001;
     float max_pheromone = 10.0;
     float min_pheromone = 0.1;
 
@@ -58,36 +58,29 @@ int main(int argc,char* argv[]) {
     float limit_iteration = 50;
     int k = 10;
  
-    /*
-    if(argc==2)
-    {
-        std::cout<<"Default parameters"<<std::endl;
-
-        number_anthill = 500;
-        number_ants = 50;
-        e = 10;
-        base_penalty = 100.0;
-        constant_for_penalty = 4.0;
-
-        alpha = 2.0;
-        beta = 5.0;
-        vapor = 0.25;
-        c = 0.0005;
-        max_pheromone = 10.0;
-        min_pheromone = 0.1;
-
-        limit_iteration = 50;
-        k = 10;
-
-        seed = 100;
-    }
-    */
-    
     /*Toma de paramatros por bash*/
     if(argc>1)
     {
         input_name = argv[1];
         seed = std::stoi(argv[2]);
+
+        number_anthill = std::stoi(argv[3]);
+        number_ants = std::stoi(argv[4]);
+        e = std::stoi(argv[5]);
+        base_penalty = std::stof(argv[6]);
+        constant_for_penalty = std::stof(argv[7]);
+
+        /*Parametros de la actualizacion de feromona*/
+        alpha = std::stof(argv[8]);
+        beta = std::stof(argv[9]);
+        vapor = std::stof(argv[10]);
+        c = std::stof(argv[11]);
+        max_pheromone = std::stof(argv[12]);
+        min_pheromone = std::stof(argv[13]);
+
+        /*Parametros de mejora de soluciones*/
+        limit_iteration = std::stoi(argv[14]);
+        k = std::stoi(argv[15]);
     }
     
     /*Parametros de creacion de soluciones*/
@@ -99,7 +92,7 @@ int main(int argc,char* argv[]) {
     bool show_solution_quality = false;
     bool show_ant_information = false;
     bool show_best_ant = false;
-    bool show_solution_improvement = false;
+    bool show_solution_improvement = true;
     bool show_very_best_solution = true;
     
     /*Registro de soluciones*/
@@ -107,14 +100,13 @@ int main(int argc,char* argv[]) {
     bool write_improvement = false;
     bool write_convergence = false;
 
-    std::string result_file_name = "experimet.csv"; 
+    std::string result_file_name = "experimet.csv";
     std::string result_improvement = "improvement.csv";
     std::string resutl_convergence = "convergence.csv";
 
     std::string aux_path =  "input/"+ input_name;
     const char * input_file = aux_path.c_str();
-    const char * solution_test_file = "output/output_example.txt";
-
+    
     /*Inicio de timer*/
     auto start = high_resolution_clock::now();
 
@@ -148,6 +140,7 @@ int main(int argc,char* argv[]) {
         std::cout << "Validating solution" << std::endl;
 
         Solutions new_solution;
+        const char * solution_test_file = "output/output_example.txt";
         new_solution.read_solution(solution_test_file);
         
         validator.articles_in_diferent_sessions(data, authors, new_solution.get_scheduling());
@@ -161,33 +154,43 @@ int main(int argc,char* argv[]) {
 
     /*Archivo que guarda la mejor solucion encontrada en cada hormiguero*/
     std::ofstream improvementFile;
-    std::string aux_improvement_path = "results/" + result_improvement; 
-    const char * result_improvement_path = aux_improvement_path.c_str();
-    improvementFile.open(result_improvement_path,std::ios::out | std::ios::app);
-    improvementFile<<
-    "anthill"<<","<<
-    "time [s]"<<","<<
-    "mean"<<","<<
-    "std"<<","<<
-    "benefit"<<","<<
-    "P articles"<<","<<
-    "P topics"<<","<<
-    "quality"<<std::endl;
-
+    if (write_improvement)
+    {
+        std::string aux_improvement_path = "results/" + result_improvement; 
+        const char * result_improvement_path = aux_improvement_path.c_str();
+        improvementFile.open(result_improvement_path,std::ios::out | std::ios::app);
+        improvementFile<<
+        "anthill"<<","<<
+        "time [s]"<<","<<
+        "mean p"<<","<<
+        "std p"<<","<<
+        "benefit"<<","<<
+        "P articles"<<","<<
+        "P topics"<<","<<
+        "quality"<<std::endl;
+    }
+    
     /*Archivo que guarda la mejora que se produce a lo largo de las iteraciones*/
     std::ofstream convergenceFile;
-    std::string aux_convergence_path = "results/" + resutl_convergence; 
-    const char * result_convergence_path = aux_convergence_path.c_str();
-    convergenceFile.open(result_convergence_path,std::ios::out | std::ios::app);
-    convergenceFile<<
-    "anthill"<<","<<
-    "time [s]"<<","<<
-    "mean"<<","<<
-    "std"<<","<<
-    "benefit"<<","<<
-    "P articles"<<","<<
-    "P topics"<<","<<
-    "quality"<<std::endl;
+    if (write_convergence)
+    {
+
+        std::string aux_convergence_path = "results/" + resutl_convergence; 
+        const char * result_convergence_path = aux_convergence_path.c_str();
+        convergenceFile.open(result_convergence_path,std::ios::out | std::ios::app);
+        convergenceFile<<
+        "anthill"<<","<<
+        "time [s]"<<","<<
+        "mean p"<<","<<
+        "std p"<<","<<
+        "benefit"<<","<<
+        "P articles"<<","<<
+        "P topics"<<","<<
+        "quality"<<std::endl;
+    }
+    
+
+    
 
     /*Algoritmo de hormigas*/
     int number_articles = articles.get_number_articles();
@@ -384,6 +387,7 @@ int main(int argc,char* argv[]) {
             std::cout<<"Pair articles paralel session:  "<<aux_articles<<std::endl;
             std::cout<<"Average over max topic:         "<<aux_capacity<<std::endl;
             std::cout<<"Solution quality:               "<<best_solution_quality<<std::endl;
+            std::cout<<std::endl;
         }
 
         /*actualizacion de la feromona*/
@@ -432,14 +436,18 @@ int main(int argc,char* argv[]) {
                 aux_benefit<<","<<
                 aux_articles<<","<<
                 aux_capacity<<","<<
-                std::setprecision(1) << std::fixed << best_solution_quality<<std::endl;
+                std::setprecision(1) << std::fixed << very_best_solution_quality<<std::endl;
 
                 std::vector<float>().swap(pheromone_matrix_indicator);
             }
 
             if(show_solution_improvement)
             {
-                std::cout<<"New best solution: "<<very_best_solution_quality<<std::endl;
+                std::cout<<"Solution benefit:               "<<aux_benefit<<std::endl;
+                std::cout<<"Pair articles paralel session:  "<<aux_articles<<std::endl;
+                std::cout<<"Average over max topic:         "<<aux_capacity<<std::endl;
+                std::cout<<"Solution quality:               "<<very_best_solution_quality<<std::endl;
+                std::cout<<std::endl;
             }
 
         }
@@ -482,6 +490,7 @@ int main(int argc,char* argv[]) {
         e <<","<<
         seed <<","<<
         limit_iteration<<","<<
+        k<<","<<
         alpha <<","<<
         beta <<","<<
         max_pheromone<<","<<
@@ -497,11 +506,12 @@ int main(int argc,char* argv[]) {
         n_max_article_day<<","<<
         std::setprecision(1) << std::fixed << very_best_solution_quality<<std::endl;
 
-
         resultsFile.close();
     }
 
     convergenceFile.close();
 
-    return 0;
+    std::cout<<very_best_solution_quality<<std::endl;
+
+    return very_best_solution_quality;
 }

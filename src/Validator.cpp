@@ -548,7 +548,7 @@ float Validator::quality_solution(int benefit, int author_problems, float averag
     bool show_parameters = false;
 
     float average_authors_problems = (float) (author_problems/base_penalty);
-    float quality = benefit * (float)(1 - average_authors_problems - average_topics_problems);
+    float quality = benefit * (float)(1 - 0.5*average_authors_problems - 0.5*average_topics_problems);
 
     if(show_parameters)
     {

@@ -36,13 +36,13 @@ int main(int argc,char* argv[]) {
     //std::string input_name = "ebl/ebl_30_2.txt";
     //std::string input_name = "lars/lars_30_2.txt";
 
-    std::string input_name = "lars/lars_30_5.txt";
-    unsigned int seed = 100;
+    std::string input_name = "lars_modified/lars_modified_200_5.txt";
+    unsigned int seed = 96;
 
     /*Parametros de las hormigas*/
-    int number_anthill = 1000;
-    int number_ants = 50;
-    int e = 10;
+    int number_anthill = 2;
+    int number_ants = 2;
+    int e = 1;
     float base_penalty = 100.0;
     float constant_for_penalty = 4.0;
 
@@ -82,6 +82,8 @@ int main(int argc,char* argv[]) {
         limit_iteration = std::stoi(argv[14]);
         k = std::stoi(argv[15]);
     }
+
+    std::cout<<input_name<<std::endl;
     
     /*Parametros de creacion de soluciones*/
     bool random_first_article = true;
@@ -93,7 +95,7 @@ int main(int argc,char* argv[]) {
     bool show_ant_information = false;
     bool show_best_ant = false;
     bool show_solution_improvement = true;
-    bool show_very_best_solution = true;
+    bool show_very_best_solution = false;
     
     /*Registro de soluciones*/
     bool write_result = true;
@@ -189,9 +191,6 @@ int main(int argc,char* argv[]) {
         "quality"<<std::endl;
     }
     
-
-    
-
     /*Algoritmo de hormigas*/
     int number_articles = articles.get_number_articles();
     Ants ants = Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,articles.get_similarity_matrix(),vapor,c,e,seed);
@@ -380,22 +379,38 @@ int main(int argc,char* argv[]) {
         float aux_capacity = validator.capacity_topics_V2(topics,best_solution);
         float aux_articles = validator.articles_in_diferent_sessions(data,authors,best_solution);
         //int aux_capacity_validator = validator.capacity_topics(topics,best_solution);
+
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(stop - start).count()/1000000.0;
+
+        /*actualizacion de la feromona*/
+        ants.pheromone_update_list();
+        ants.reset_ants();
         
         if(show_best_ant){
+            /*
             std::cout<<"Best Ant"<<std::endl; 
             std::cout<<"Solution benefit:               "<<aux_benefit<<std::endl;
             std::cout<<"Pair articles paralel session:  "<<aux_articles<<std::endl;
             std::cout<<"Average over max topic:         "<<aux_capacity<<std::endl;
             std::cout<<"Solution quality:               "<<best_solution_quality<<std::endl;
             std::cout<<std::endl;
+            */
+
+            std::vector<float> pheromone_matrix_indicator = ants.get_mean_and_des_std();
+
+            std::cout<<
+            anthill<<","<<
+            std::setprecision(1) << std::fixed << duration<<","<<
+            pheromone_matrix_indicator[0] <<","<<
+            pheromone_matrix_indicator[1] <<","<<
+            aux_benefit<<","<<
+            aux_articles<<","<<
+            aux_capacity<<","<<
+            std::setprecision(1) << std::fixed <<best_solution_quality<<std::endl;
+
+            std::vector<float>().swap(pheromone_matrix_indicator);
         }
-
-        /*actualizacion de la feromona*/
-        ants.pheromone_update_list();
-        ants.reset_ants();
-
-        auto stop = high_resolution_clock::now();
-        auto duration = duration_cast<microseconds>(stop - start).count()/1000000.0;
 
         if(write_improvement)
         {
@@ -443,11 +458,27 @@ int main(int argc,char* argv[]) {
 
             if(show_solution_improvement)
             {
+                /*
                 std::cout<<"Solution benefit:               "<<aux_benefit<<std::endl;
                 std::cout<<"Pair articles paralel session:  "<<aux_articles<<std::endl;
                 std::cout<<"Average over max topic:         "<<aux_capacity<<std::endl;
                 std::cout<<"Solution quality:               "<<very_best_solution_quality<<std::endl;
                 std::cout<<std::endl;
+                */
+               
+                std::vector<float> pheromone_matrix_indicator = ants.get_mean_and_des_std();
+
+                std::cout<<
+                anthill<<","<<
+                std::setprecision(1) << std::fixed << duration<<","<<
+                pheromone_matrix_indicator[0] <<","<<
+                pheromone_matrix_indicator[1] <<","<<
+                aux_benefit<<","<<
+                aux_articles<<","<<
+                aux_capacity<<","<<
+                std::setprecision(1) << std::fixed << very_best_solution_quality<<std::endl;
+
+                std::vector<float>().swap(pheromone_matrix_indicator);
             }
 
         }

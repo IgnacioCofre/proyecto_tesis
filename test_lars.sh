@@ -1,15 +1,19 @@
 #/bin/bash 
 
 dir="lars"
+#dir="lars_modified"
+#dir="lars_one_author"
+#dir="lars_one_topic"
+
 instPercent="30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200"
 instanceType="1 2 3 4 5"
 
-seedList="96 235 512 815 921"
+seedList="10 96 235 384 496 555 643 729 855 921"
 
 #Parametros de las hormigas
-numberAnthill=500
+numberAnthill=1000
 numberAnts=100
-e=10
+e=20
 basePenalty=100.0
 constantForPenalty=4.0
 

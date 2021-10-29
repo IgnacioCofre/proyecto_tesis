@@ -140,6 +140,12 @@ class Ants
         entrega la desviacion estandar de la matriz de feromonas actual
         */
         std::vector<float> get_mean_and_des_std(void);
+
+        /*
+        void reset_pheromone(actua_iteration, number_iteration_to_reset);  
+        Resetea la matriz de feromona al max_pheromone. 
+        */       
+        void reset_pheromone(int, int);
         
 };
 

@@ -53,6 +53,7 @@ int main(int argc,char* argv[]) {
     float c = 0.0001;
     float max_pheromone = 10.0;
     float min_pheromone = 0.1;
+    int number_anthill_to_reset = 5; 
 
     /*Parametros de mejora de soluciones*/
     float limit_iteration = 50;
@@ -77,10 +78,11 @@ int main(int argc,char* argv[]) {
         c = std::stof(argv[11]);
         max_pheromone = std::stof(argv[12]);
         min_pheromone = std::stof(argv[13]);
+        number_anthill_to_reset = std::stoi(argv[14]);
 
         /*Parametros de mejora de soluciones*/
-        limit_iteration = std::stoi(argv[14]);
-        k = std::stoi(argv[15]);
+        limit_iteration = std::stoi(argv[15]);
+        k = std::stoi(argv[16]);
     }
 
     std::cout<<input_name<<std::endl;
@@ -484,6 +486,8 @@ int main(int argc,char* argv[]) {
         }
 
         std::vector<std::vector<std::vector<std::vector<int>>>>().swap(best_solution);
+
+        ants.reset_pheromone(anthill, number_anthill_to_reset);
     }
 
     /*Datos de la mejor solucion*/
@@ -522,6 +526,7 @@ int main(int argc,char* argv[]) {
         seed <<","<<
         limit_iteration<<","<<
         k<<","<<
+        number_anthill_to_reset<<","<<
         alpha <<","<<
         beta <<","<<
         max_pheromone<<","<<

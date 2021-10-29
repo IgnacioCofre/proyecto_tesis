@@ -26,8 +26,9 @@ vapor=0.25
 c=0.00005
 maxPheromone=10.0
 minPheromone=0.1
+n_anthill_to_reset=5
 
-SOLUTIONCREATION="${alpha} ${beta} ${vapor} ${c} ${maxPheromone} ${minPheromone}"
+SOLUTIONCREATION="${alpha} ${beta} ${vapor} ${c} ${maxPheromone} ${minPheromone} ${n_anthill_to_reset}"
 
 #Parametros de mejora de soluciones*/
 limitIteration=100
@@ -43,18 +44,17 @@ for percent in ${instPercent}; do
     for type in ${instanceType}; do
         sumarizedOut="Out_${dir}_${percent}_${type}"
         rm -rf ${sumarizedOut}
-        best=1000000.0 
+        best=0 
         for seed in ${seedList}; do
             detailedOut=out_${dir}_${percent}_${type}_${seed}_${numberAnthill}_${numberAnts}_${e}_${limitIteration}.csv
             rm -rf ${detailedOut}
             echo "./main ${dir}/${dir}_${percent}_${type}.txt ${seed} ${ACO} ${SOLUTIONCREATION} ${LOCALSEARCH} > ${detailedOut}"
             ./main ${dir}/${dir}_${percent}_${type}.txt ${seed} ${ACO} ${SOLUTIONCREATION} ${LOCALSEARCH} > ${detailedOut}
-            quality=`tail -1 ${detailedOut} |awk -F ' ' '{print $3}'`
-            if (( $(echo "${quality} < ${best}" |bc ) )); then 
-            best=${quality}
-            fi
             quality=`tail -1 ${detailedOut}`
             echo "${quality}" >> ${sumarizedOut}
+            if (( $(echo "$quality > $best" |bc) )); then 
+                best=${quality}
+            fi
             mv ${detailedOut} ${resultsDir}
         done
         echo "best: ${best}" >> ${sumarizedOut}

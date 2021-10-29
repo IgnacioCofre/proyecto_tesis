@@ -83,7 +83,7 @@ int Ants::get_next_article(int id_article_1, std::vector<int> list_j)
 std::vector<std::vector<std::vector<std::vector<int>>>> Ants::create_solution(int id_ant,std::vector<std::vector<std::vector<int>>> max_assign_per_session,std::vector<int> list_articles)
 {   
     bool show_solution = false;
-    bool random_days = true;
+    bool random_days = false;
     int number_days = max_assign_per_session.size();
     std::vector<std::vector<std::vector<std::vector<int>>>> scheduling;
     std::vector<int> days;
@@ -537,4 +537,13 @@ std::vector<float> Ants::get_mean_and_des_std()
 
     std::vector<float> params_matrix = {mean, des_std};
     return params_matrix;  
+}
+
+void Ants::reset_pheromone(int actual_iteration, int n_iteration_to_reset)
+{
+    if(((actual_iteration % n_iteration_to_reset) == 0) && (actual_iteration != 0))
+    {
+        pheromone_matrix = std::vector<std::vector<float>> (number_articles,std::vector<float>(number_articles,max_pheromone));    
+        //std::cout<<"Reset pheromone in iteration: "<<actual_iteration<<std::endl;
+    }
 }

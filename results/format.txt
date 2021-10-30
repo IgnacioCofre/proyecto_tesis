@@ -7,4 +7,13 @@ Formato Results_(ebl/lars)
 anthill, time [s], mean p, std p, benefit, P articles, P topics, quality
 
 test una sola ejecución
-./main ebl/ebl_original.txt 96 1000 50 2 100.0 4.0 2.0 5.0 0.15 0.0001 10.0 0.1 150 100 10
+la instancia de prueba debe estar dentro de una carpeta nombre_carpeta, dentro de la carpeta input
+./main nombre_carpeta/nombre_instancia.txt 96 1000 50 2 100.0 4.0 2.0 5.0 0.15 0.0001 10.0 0.1 150 100 10
+
+Ejemplos:
+
+lars_modified_190_2.txt
+./main lars_modified/lars_modified_190_2.txt 96 1000 50 2 100.0 4.0 2.0 5.0 0.15 0.0001 10.0 0.1 150 100 10
+
+ebl_modified_190_2.txt
+./main ebl_modified/ebl_modified_190_2.txt 96 1000 50 2 100.0 4.0 2.0 5.0 0.15 0.0001 10.0 0.1 150 100 10

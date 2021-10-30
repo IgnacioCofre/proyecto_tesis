@@ -541,7 +541,7 @@ std::vector<float> Ants::get_mean_and_des_std()
 
 void Ants::reset_pheromone(int actual_iteration, int n_iteration_to_reset)
 {
-    if(((actual_iteration % n_iteration_to_reset) == 0) && (actual_iteration != 0))
+    if(((actual_iteration + 1) % n_iteration_to_reset) == 0)
     {
         pheromone_matrix = std::vector<std::vector<float>> (number_articles,std::vector<float>(number_articles,max_pheromone));    
         //std::cout<<"Reset pheromone in iteration: "<<actual_iteration<<std::endl;

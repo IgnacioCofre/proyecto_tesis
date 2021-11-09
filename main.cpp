@@ -506,7 +506,12 @@ int main(int argc,char* argv[]) {
 
     improvementFile.close();
 
+
     /*Registro de resultdos*/
+    auto stop = high_resolution_clock::now();
+    auto delta_time = duration_cast<microseconds>(stop - start).count()/1000000.0;
+    std::vector<float> pheromone_matrix_indicator = ants.get_mean_and_des_std();
+    
     if(write_result)
     {
         std::ofstream resultsFile;
@@ -514,10 +519,12 @@ int main(int argc,char* argv[]) {
         const char * result_file_path = aux_result_path.c_str();
         resultsFile.open(result_file_path,std::ios::out | std::ios::app);
 
+        /*
         auto stop = high_resolution_clock::now();
         auto delta_time = duration_cast<microseconds>(stop - start).count()/1000000.0;
         std::vector<float> pheromone_matrix_indicator = ants.get_mean_and_des_std();
-        
+        */
+
         resultsFile << 
         input_name <<","<<
         number_anthill<<","<<
@@ -547,6 +554,31 @@ int main(int argc,char* argv[]) {
 
     convergenceFile.close();
 
+    std::cout<<
+        input_name <<","<<
+        number_anthill<<","<<
+        number_ants<<","<<
+        e <<","<<
+        seed <<","<<
+        limit_iteration<<","<<
+        k<<","<<
+        number_anthill_to_reset<<","<<
+        alpha <<","<<
+        beta <<","<<
+        max_pheromone<<","<<
+        min_pheromone<<","<<
+        vapor <<","<<
+        c <<","<<
+        pheromone_matrix_indicator[0] <<","<<
+        pheromone_matrix_indicator[1] <<","<<
+        std::setprecision(1) << std::fixed << delta_time <<","<<
+        std::setprecision(1) << std::fixed <<best_time_execution <<","<<
+        very_best_solution_benefit<<","<<
+        n_articles_parelel_session<<","<<
+        n_max_article_day<<","<<
+        std::setprecision(1) << std::fixed << very_best_solution_quality
+    <<std::endl;    
+    
     std::cout<<very_best_solution_quality<<std::endl;
 
     return very_best_solution_quality;

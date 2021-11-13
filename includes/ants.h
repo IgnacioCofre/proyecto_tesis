@@ -26,6 +26,10 @@ class Ants
 
     //solution_ant[id_ant] = float solution_quality
     std::vector<float> solution_ant;
+    std::vector<int> benefit_ant;
+    std::vector<int> number_authors_problems_ant;
+    std::vector<float> topics_problems_ant;
+    std::vector<int> id_ants_solutions;
     
     std::vector<std::vector<int>> similarity_matrix;
 
@@ -51,11 +55,10 @@ class Ants
         std::vector<std::vector<std::vector<std::vector<int>>>> create_solution(int,std::vector<std::vector<std::vector<int>>>, std::vector<int>);
 
         /*
-        save_solution(schedule, solution_quality)
+        save_solution(schedule, solution_benefit,n_articles_parelel_session,n_max_article_day,solution_quality,id_ant_to_save)
         Guarda las mejores e soluciones en la lista ant_solution_scheduling y solution_ant
         */
-        //std::vector<std::vector<std::vector<std::vector<int>>>> get_solution_ant(int);
-        void save_solution(std::vector<std::vector<std::vector<std::vector<int>>>>, float);
+        void save_solution(std::vector<std::vector<std::vector<std::vector<int>>>>, int, int, float, float,int);
 
         /*
         reset_ants()
@@ -129,11 +132,11 @@ class Ants
         int get_best_solution_found(void);
 
         /*
-        update_best_solution_v2(schedule,quality,id_ant)
+        update_best_solution_v2(schedule,benefit, n_problemas_autores, n_problemas_topicos,quality,id_ant)
         Actualiza la solucion de la hormiga id_ant con el schedule solo si la quality es mejor que la anteriormente 
         guardada en id_ant
         */    
-        void update_best_solution_V2(std::vector<std::vector<std::vector<std::vector<int>>>>,float,int);
+        void update_best_solution_V2(std::vector<std::vector<std::vector<std::vector<int>>>>,int,int,float,float,int);
 
         /*
         std::vector<float> get_mean_and_des_std() = [mean,std]
@@ -146,6 +149,12 @@ class Ants
         Resetea la matriz de feromona al max_pheromone. 
         */       
         void reset_pheromone(int, int);
+
+        /*
+        void show_best_ants(anthill)
+        Muestra por pantalla las mejores hormigas encontradas
+        */
+        void show_best_ants(int);
         
 };
 

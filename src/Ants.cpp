@@ -264,7 +264,7 @@ void Ants::pheromone_update(std::vector<std::vector<std::vector<std::vector<int>
     } 
 }
 
-void Ants::save_solution(std::vector<std::vector<std::vector<std::vector<int>>>> scheduling, float solution_quality)
+void Ants::save_solution(std::vector<std::vector<std::vector<std::vector<int>>>> scheduling, int solution_benefit, int n_articles_parelel_session, float n_max_article_day, float solution_quality, int id_ant_to_save)
 {
 
     bool show_top_e = false;
@@ -272,6 +272,11 @@ void Ants::save_solution(std::vector<std::vector<std::vector<std::vector<int>>>>
 
     if(size_solution_list==0){
         solution_ant.push_back(solution_quality);
+        benefit_ant.push_back(solution_benefit);
+        number_authors_problems_ant.push_back(n_articles_parelel_session);
+        topics_problems_ant.push_back(n_max_article_day);
+        id_ants_solutions.push_back(id_ant_to_save);
+
         ant_solution_scheduling.push_back(scheduling);
     }
     else
@@ -279,10 +284,20 @@ void Ants::save_solution(std::vector<std::vector<std::vector<std::vector<int>>>>
         if(solution_quality>solution_ant[0])
         {
             solution_ant.insert(solution_ant.begin(),solution_quality);
+            benefit_ant.insert(benefit_ant.begin(), solution_benefit);
+            number_authors_problems_ant.insert(number_authors_problems_ant.begin(),n_articles_parelel_session);
+            topics_problems_ant.insert(topics_problems_ant.begin(), n_max_article_day);
+            id_ants_solutions.insert(id_ants_solutions.begin(), id_ant_to_save);
+
             ant_solution_scheduling.insert(ant_solution_scheduling.begin(),scheduling);
         }
         else if(solution_quality<solution_ant[size_solution_list-1]){
             solution_ant.push_back(solution_quality);
+            benefit_ant.push_back(solution_benefit);
+            number_authors_problems_ant.push_back(n_articles_parelel_session);
+            topics_problems_ant.push_back(n_max_article_day);
+            id_ants_solutions.push_back(id_ant_to_save);
+
             ant_solution_scheduling.push_back(scheduling);
         }
         else{
@@ -307,6 +322,11 @@ void Ants::save_solution(std::vector<std::vector<std::vector<std::vector<int>>>>
             
             if(solution_ant[left+1] != solution_quality && solution_ant[left] != solution_quality){
                 solution_ant.insert(solution_ant.begin()+left,solution_quality);
+                benefit_ant.insert(benefit_ant.begin()+left,solution_benefit);
+                number_authors_problems_ant.insert(number_authors_problems_ant.begin()+left, n_articles_parelel_session);
+                topics_problems_ant.insert(topics_problems_ant.begin()+left,n_max_article_day);
+                id_ants_solutions.insert(id_ants_solutions.begin()+left, id_ant_to_save);
+
                 ant_solution_scheduling.insert(ant_solution_scheduling.begin()+left,scheduling);
             }
         }
@@ -316,6 +336,11 @@ void Ants::save_solution(std::vector<std::vector<std::vector<std::vector<int>>>>
         {
             //eliminar las peores soluciones
             solution_ant.pop_back();
+            benefit_ant.pop_back();
+            number_authors_problems_ant.pop_back();
+            topics_problems_ant.pop_back();
+            id_ants_solutions.pop_back();
+
             ant_solution_scheduling.pop_back();
         }
     }
@@ -334,7 +359,11 @@ void Ants::save_solution(std::vector<std::vector<std::vector<std::vector<int>>>>
 void Ants::reset_ants()
 {
     std::vector<std::vector<std::vector<std::vector<std::vector<int>>>>>().swap(ant_solution_scheduling);
-    std::vector<float>().swap(solution_ant);    
+    std::vector<float>().swap(solution_ant); 
+    std::vector<int>().swap(benefit_ant);
+    std::vector<int>().swap(number_authors_problems_ant);
+    std::vector<float>().swap(topics_problems_ant);  
+    std::vector<int>().swap(id_ants_solutions); 
 }
 
 void Ants::pheromone_update_list()
@@ -487,23 +516,63 @@ int Ants::get_best_solution_found()
     return position_best_solution;
 }
 
-void Ants::update_best_solution_V2(std::vector<std::vector<std::vector<std::vector<int>>>> schedule,float new_quality, int id_ant)
+void Ants::update_best_solution_V2(std::vector<std::vector<std::vector<std::vector<int>>>> schedule,int benefit, int n_problems_autors, float number_problems_topics, float new_quality, int id_ant)
 {
-    bool show_improvement = false;
+    bool show_decision = true;
+    bool save_only_improve_quality = true;
     
-    if(solution_ant[id_ant] < new_quality)
-    {   
-        if(show_improvement)
-        {
-            std::cout<<std::endl;
-            std::cout<<"new solution improvement"<<std::endl;
-            std::cout<<"Old quality: "<<solution_ant[id_ant]<<std::endl; 
-            std::cout<<"New quality: "<<new_quality<<std::endl; 
+    if(save_only_improve_quality)
+    {
+        if(solution_ant[id_ant] < new_quality)
+        {   
+            if(show_decision)
+            {   
+                /*
+                std::cout<<std::endl;
+                std::cout<<"new solution improvement"<<std::endl;
+                std::cout<<"Old quality: "<<solution_ant[id_ant]<<std::endl; 
+                std::cout<<"New quality: "<<new_quality<<std::endl; 
+                */
+
+                printf("Se cambio la solucion %d\n",id_ant);
+                printf("%d\t%d\t%f\t%f\t\n",benefit_ant[id_ant],number_authors_problems_ant[id_ant],topics_problems_ant[id_ant],solution_ant[id_ant]);
+                printf("%d\t%d\t%f\t%f\t\n",benefit,n_problems_autors,number_problems_topics,new_quality);
+
+                benefit_ant[id_ant] = benefit;
+                number_authors_problems_ant[id_ant] = n_problems_autors;
+                topics_problems_ant[id_ant] = number_problems_topics;
+                solution_ant[id_ant] = new_quality;
+                
+                ant_solution_scheduling[id_ant] = schedule;
+            }
         }
+        else
+        {
+            if(show_decision)
+            {
+                printf("No se cambio la solucion %d\n",id_ant);
+                printf("%d\t%d\t%f\t%f\t\n",benefit_ant[id_ant],number_authors_problems_ant[id_ant],topics_problems_ant[id_ant],solution_ant[id_ant]);
+                printf("%d\t%d\t%f\t%f\t\n",benefit,n_problems_autors,number_problems_topics,new_quality);
+            }
+        } 
+    }
+
+    else
+    {
+        if(show_decision)
+        {
+            printf("Se cambio la solucion %d\n",id_ant);
+            printf("%d\t%d\t%f\t%f\t\n",benefit_ant[id_ant],number_authors_problems_ant[id_ant],topics_problems_ant[id_ant],solution_ant[id_ant]);
+            printf("%d\t%d\t%f\t%f\t\n",benefit,n_problems_autors,number_problems_topics,new_quality);
+        }
+    
+        benefit_ant[id_ant] = benefit;
+        number_authors_problems_ant[id_ant] = n_problems_autors;
+        topics_problems_ant[id_ant] = number_problems_topics;
+        solution_ant[id_ant] = new_quality;
         
         ant_solution_scheduling[id_ant] = schedule;
-        solution_ant[id_ant] = new_quality;
-    } 
+    }
 }
 
 std::vector<float> Ants::get_mean_and_des_std()
@@ -545,5 +614,21 @@ void Ants::reset_pheromone(int actual_iteration, int n_iteration_to_reset)
     {
         pheromone_matrix = std::vector<std::vector<float>> (number_articles,std::vector<float>(number_articles,max_pheromone));    
         //std::cout<<"Reset pheromone in iteration: "<<actual_iteration<<std::endl;
+    }
+}
+
+void Ants::show_best_ants(int anthill)
+{
+    int number_of_best_ants = solution_ant.size();
+
+    for(int iter =0; iter<number_of_best_ants; iter+=1)
+    {
+        int benefit = benefit_ant[iter];
+        int number_authors_problems = number_authors_problems_ant[iter];
+        float number_topics_problems = topics_problems_ant[iter];
+        float quality = solution_ant[iter];
+        int id_ant = id_ants_solutions[iter];
+
+        printf("%d\t%d\t%d\t%d\t%f\t%f\n",anthill,id_ant,benefit, number_authors_problems, number_topics_problems, quality);
     }
 }

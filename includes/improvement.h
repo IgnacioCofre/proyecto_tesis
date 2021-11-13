@@ -32,7 +32,7 @@ class Improvement
     float current_solution_quality;
     float limit_iteration;
 
-    std::random_device rd;
+    //std::random_device rd;
 
     public:
         //Improvement(solution, quality, articles, topics, authors,seed)

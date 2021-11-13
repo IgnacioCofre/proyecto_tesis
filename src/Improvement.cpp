@@ -453,7 +453,7 @@ float Improvement::get_number_topics_conflicts()
 int Improvement::swap_articles_V2(int id_article_1, int id_article_2, Articles articles, Topics topics, Authors authors)
 {
     bool show_changes = false;
-    //no hay mejora de la solucion
+    // Caso en que no hay mejora de la solucion
     int improvement_case = 1;
 
     std::vector<std::vector<int>> new_article_ubication = article_ubication;
@@ -642,13 +642,19 @@ int Improvement::swap_articles_V2(int id_article_1, int id_article_2, Articles a
                 {
                     if (show_changes)
                     {
+                        /*
                         std::cout << std::endl;
                         std::cout << "Beneficio antes del cambio: " << total_benefit << std::endl;
                         std::cout << "N° conflictos tope horario: " << number_autor_conflicts << std::endl;
                         std::cout << "N° conflictos topicos:      " << number_topics_conflics << std::endl;
+
                         std::cout << "Beneficio despues:          " << new_total_benefit << std::endl;
                         std::cout << "N° conflictos tope horario: " << new_number_author_conflicts << std::endl;
                         std::cout << "N° conflictos topicos:      " << new_number_topics_conflics << std::endl;
+                        */
+                        printf("Movimiento produjo mejora [benefit, p autores, p topicos]\n");
+                        printf("%d\t%d\t%f\n",total_benefit,number_autor_conflicts,number_topics_conflics);
+                        printf("%d\t%d\t%f\n",new_total_benefit,new_number_author_conflicts,new_number_topics_conflics);
                     }
 
                     //Se realiza el intercambio

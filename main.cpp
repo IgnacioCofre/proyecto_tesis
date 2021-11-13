@@ -56,7 +56,7 @@ int main(int argc,char* argv[]) {
     int number_anthill_to_reset = 5; 
 
     /*Parametros de mejora de soluciones*/
-    float limit_iteration = 50;
+    int limit_iteration = 50;
     int k = 10;
  
     /*Toma de paramatros por bash*/
@@ -86,6 +86,7 @@ int main(int argc,char* argv[]) {
     }
 
     std::cout<<input_name<<std::endl;
+    //printf("limit iteration: %d\n",limit_iteration);
     
     /*Parametros de creacion de soluciones*/
     bool random_first_article = true;
@@ -93,11 +94,11 @@ int main(int argc,char* argv[]) {
 
     /*Parametros de muestra de datos por pantalla*/
     bool show_solution_construction = false;
-    bool show_solution_quality = false;
+    bool show_solution_quality = true;
     bool show_ant_information = false;
     bool show_best_ant = false;
-    bool show_solution_improvement = true;
-    bool show_very_best_solution = false;
+    bool show_solution_improvement = false;
+    bool show_very_best_solution = true;
     
     /*Registro de soluciones*/
     bool write_result = true;
@@ -215,7 +216,12 @@ int main(int argc,char* argv[]) {
         float best_solution_quality = -1;
 
         std::vector<int> available_articles; 
-        std::vector<int> solution_articles;    
+        std::vector<int> solution_articles;  
+
+        if(show_solution_quality)
+        {
+            printf("Soluciones de la iteracion: %d\n",anthill);
+        }  
 
         for(int id_ant=0; id_ant<number_ants;id_ant++)
         {
@@ -279,7 +285,7 @@ int main(int argc,char* argv[]) {
             float solution_quality = ants.calculate_quality_solution(solution_benefit,n_articles_parelel_session,n_max_article_day);
             */
 
-            float n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,scheduling); 
+            int n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,scheduling); 
             float n_max_article_day = validator.capacity_topics_V2(topics,scheduling);
             
             if((n_articles_parelel_session>0) && set_author_penalty)
@@ -291,14 +297,18 @@ int main(int argc,char* argv[]) {
             
             float solution_quality = validator.quality_solution(solution_benefit,n_articles_parelel_session,n_max_article_day,base_penalty);
 
-            ants.save_solution(scheduling,solution_quality);
+            ants.save_solution(scheduling,solution_benefit,n_articles_parelel_session,n_max_article_day,solution_quality,id_ant);
 
             if(show_solution_quality)
-            {
+            {   
+                /*
                 std::cout<<"Solution benefit:               "<<solution_benefit<<std::endl;
                 std::cout<<"Pair articles paralel session:  "<<n_articles_parelel_session<<std::endl;
                 std::cout<<"Average over max topic:         "<<n_max_article_day<<std::endl;
                 std::cout<<"Solution quality:               "<<solution_quality<<std::endl;
+                */
+
+                printf("%d\t%d\t%d\t%d\t%f\t%f\n",anthill,id_ant,solution_benefit,n_articles_parelel_session,n_max_article_day,solution_quality);
             }
 
             std::vector<std::vector<std::vector<std::vector<int>>>>().swap(scheduling);
@@ -307,6 +317,8 @@ int main(int argc,char* argv[]) {
         /*Mejoramiento de la solucion*/
         int number_best_solutions = ants.get_number_best_solutions();
         //std::cout<<"total solutions: "<<number_best_solutions<<std::endl;
+        printf("Mejores Soluciones antes de la busqueda local\n");
+        ants.show_best_ants(anthill);
         std::vector<std::vector<std::vector<std::vector<int>>>> solution_to_improve;
     
         for(int iter_solution = 0; iter_solution<number_best_solutions; iter_solution++)
@@ -319,6 +331,7 @@ int main(int argc,char* argv[]) {
             int count_with_out_improve;
             if(improve_method->get_number_autor_conflicts() > 0)
             { 
+                //printf("movimiento de topes de horario, solucion %d\n", iter_solution);
                 count_with_out_improve = 0;
                 while((count_with_out_improve < limit_iteration) && (improve_method->get_number_autor_conflicts() > 0))
                 {
@@ -343,6 +356,7 @@ int main(int argc,char* argv[]) {
                 }
             }
 
+            //printf("movimiento de mejora de beneficio, solucion %d\n", iter_solution);
             count_with_out_improve = 0;
             while(count_with_out_improve < limit_iteration)
             {  
@@ -351,11 +365,14 @@ int main(int argc,char* argv[]) {
                 int id_article_2 = improve_method->select_article_in_diferent_session(id_article_1);
                 count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors); 
             }    
-         
-            float n_articles_parelel_session = improve_method->get_number_autor_conflicts();
+
+            int benefit_improved = improve_method->get_benefit_solution_improved();
+            int n_articles_parelel_session = improve_method->get_number_autor_conflicts();
             float n_average_max_article_day = improve_method->get_number_topics_conflicts();
-            float solution_quality = validator.quality_solution(improve_method->get_benefit_solution_improved(),n_articles_parelel_session,n_average_max_article_day,base_penalty);
-            ants.update_best_solution_V2(improve_method->get_solution_improved(),solution_quality, iter_solution);
+            float solution_quality = validator.quality_solution(benefit_improved,n_articles_parelel_session,n_average_max_article_day,base_penalty);
+            
+            /* Creo que este es el problema */
+            ants.update_best_solution_V2(improve_method->get_solution_improved(),benefit_improved, n_articles_parelel_session,n_average_max_article_day,solution_quality, iter_solution);
             
             delete improve_method;
         }
@@ -386,6 +403,8 @@ int main(int argc,char* argv[]) {
         auto duration = duration_cast<microseconds>(stop - start).count()/1000000.0;
 
         /*actualizacion de la feromona*/
+        printf("Mejores Soluciones despues de la busqueda local\n");
+        ants.show_best_ants(anthill);
         ants.pheromone_update_list();
         ants.reset_ants();
         
@@ -553,6 +572,17 @@ int main(int argc,char* argv[]) {
     }
 
     convergenceFile.close();
+
+    std::cout<<
+        number_anthill<<","<<
+        std::setprecision(1) << std::fixed << delta_time <<","<<
+        pheromone_matrix_indicator[0] <<","<<
+        pheromone_matrix_indicator[1] <<","<<
+        very_best_solution_benefit<<","<<
+        n_articles_parelel_session<<","<<
+        n_max_article_day<<","<<
+        std::setprecision(1) << std::fixed << very_best_solution_quality
+    <<std::endl;
 
     std::cout<<
         input_name <<","<<

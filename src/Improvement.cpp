@@ -452,7 +452,7 @@ float Improvement::get_number_topics_conflicts()
 
 int Improvement::swap_articles_V2(int id_article_1, int id_article_2, Articles articles, Topics topics, Authors authors)
 {
-    bool show_changes = false;
+    bool show_changes = true;
     // Caso en que no hay mejora de la solucion
     int improvement_case = 1;
 
@@ -828,7 +828,7 @@ int Improvement::select_article_most_authors_conflicts(Authors authors)
     return author_articles[index_article_max_conflicts];
 }
 
-int Improvement::select_article_from_most_authors_conflicts(Authors authors, int k)
+int Improvement::select_article_from_most_authors_conflicts(Authors authors, int k, int internal_seed)
 {
     //se ordenan los autores por cantidad de conflictos
     bool debug = false;
@@ -852,9 +852,13 @@ int Improvement::select_article_from_most_authors_conflicts(Authors authors, int
     }
 
     //seleccion del author dentro de los k con mas topes de horario
-    std::mt19937 gen(seed);
+    // random check
+    std::mt19937 gen(internal_seed);
     std::uniform_int_distribution<> distr_authors(0, max_k_authors - 1);
-    int id_author = index_authors[distr_authors(gen)];
+    int index_iter = distr_authors(gen);
+    //printf("max_k_authors %d\n", max_k_authors);
+    //printf("numero aleatorio %d\n", index_iter);
+    int id_author = index_authors[index_iter];
 
     //seleccion del articulo del autor seleccionado
     int number_articles_author = authors.get_author_articles(id_author).size();
@@ -876,12 +880,13 @@ int Improvement::select_article_from_most_authors_conflicts(Authors authors, int
     return article_id;
 }
 
-int Improvement::select_article_same_day_diferent_block(int id_article)
+int Improvement::select_article_same_day_diferent_block(int id_article,int internal_seed)
 {
     int day = article_ubication[id_article][0];
     int number_blocks = solution_to_improve[day].size();
     bool debug = false;
-    std::mt19937 gen(seed);
+    //random check
+    std::mt19937 gen(internal_seed);
 
     if(number_blocks>1){
         

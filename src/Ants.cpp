@@ -40,7 +40,7 @@ float Ants::get_test(int id_article_1, int id_article_2)
     return pheromone_matrix[id_article_1][id_article_2];
 }
 
-int Ants::get_next_article(int id_article_1, std::vector<int> list_j)
+int Ants::get_next_article(int id_article_1, std::vector<int> list_j, int internal_seed)
 {   
     int size_list_j = list_j.size();
     std::vector<float> p_ij(size_list_j,0);
@@ -63,9 +63,11 @@ int Ants::get_next_article(int id_article_1, std::vector<int> list_j)
         p_ij[j] = numerador;
         sum_p_ij += numerador;
     }
-
-    srand(seed);
+    
+    // random check
+    srand(internal_seed);
     float new_random = (float) rand()/RAND_MAX;
+    //printf("probabilidad random %f\n",new_random);
 
     float acumulated = (p_ij[0]/sum_p_ij);
     int next_i = 0;
@@ -518,61 +520,22 @@ int Ants::get_best_solution_found()
 
 void Ants::update_best_solution_V2(std::vector<std::vector<std::vector<std::vector<int>>>> schedule,int benefit, int n_problems_autors, float number_problems_topics, float new_quality, int id_ant)
 {
-    bool show_decision = true;
-    bool save_only_improve_quality = true;
+    bool show_change = true;
     
-    if(save_only_improve_quality)
+    if(show_change)
     {
-        if(solution_ant[id_ant] < new_quality)
-        {   
-            if(show_decision)
-            {   
-                /*
-                std::cout<<std::endl;
-                std::cout<<"new solution improvement"<<std::endl;
-                std::cout<<"Old quality: "<<solution_ant[id_ant]<<std::endl; 
-                std::cout<<"New quality: "<<new_quality<<std::endl; 
-                */
-
-                printf("Se cambio la solucion %d\n",id_ant);
-                printf("%d\t%d\t%f\t%f\t\n",benefit_ant[id_ant],number_authors_problems_ant[id_ant],topics_problems_ant[id_ant],solution_ant[id_ant]);
-                printf("%d\t%d\t%f\t%f\t\n",benefit,n_problems_autors,number_problems_topics,new_quality);
-
-                benefit_ant[id_ant] = benefit;
-                number_authors_problems_ant[id_ant] = n_problems_autors;
-                topics_problems_ant[id_ant] = number_problems_topics;
-                solution_ant[id_ant] = new_quality;
-                
-                ant_solution_scheduling[id_ant] = schedule;
-            }
-        }
-        else
-        {
-            if(show_decision)
-            {
-                printf("No se cambio la solucion %d\n",id_ant);
-                printf("%d\t%d\t%f\t%f\t\n",benefit_ant[id_ant],number_authors_problems_ant[id_ant],topics_problems_ant[id_ant],solution_ant[id_ant]);
-                printf("%d\t%d\t%f\t%f\t\n",benefit,n_problems_autors,number_problems_topics,new_quality);
-            }
-        } 
+        printf("Se cambio la solucion %d\n",id_ant);
+        printf("%d\t%d\t%f\t%f\t\n",benefit_ant[id_ant],number_authors_problems_ant[id_ant],topics_problems_ant[id_ant],solution_ant[id_ant]);
+        printf("%d\t%d\t%f\t%f\t\n",benefit,n_problems_autors,number_problems_topics,new_quality);
     }
 
-    else
-    {
-        if(show_decision)
-        {
-            printf("Se cambio la solucion %d\n",id_ant);
-            printf("%d\t%d\t%f\t%f\t\n",benefit_ant[id_ant],number_authors_problems_ant[id_ant],topics_problems_ant[id_ant],solution_ant[id_ant]);
-            printf("%d\t%d\t%f\t%f\t\n",benefit,n_problems_autors,number_problems_topics,new_quality);
-        }
+    benefit_ant[id_ant] = benefit;
+    number_authors_problems_ant[id_ant] = n_problems_autors;
+    topics_problems_ant[id_ant] = number_problems_topics;
+    solution_ant[id_ant] = new_quality;
     
-        benefit_ant[id_ant] = benefit;
-        number_authors_problems_ant[id_ant] = n_problems_autors;
-        topics_problems_ant[id_ant] = number_problems_topics;
-        solution_ant[id_ant] = new_quality;
-        
-        ant_solution_scheduling[id_ant] = schedule;
-    }
+    ant_solution_scheduling[id_ant] = schedule;
+    
 }
 
 std::vector<float> Ants::get_mean_and_des_std()

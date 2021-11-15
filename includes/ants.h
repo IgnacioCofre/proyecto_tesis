@@ -42,10 +42,10 @@ class Ants
         int get_number_ants(void);
 
         /*
-        get_next_article(id_article,list_id_articles)
+        get_next_article(id_article,list_id_articles, internal_seed)
         Retorna el id del siguiente articulo seleccionado para ser parte de la solucion
         */
-        int get_next_article(int, std::vector<int>); 
+        int get_next_article(int, std::vector<int>, int); 
 
         /*
         create_solution(id_ant,max_assign_per_session,[id_articles])

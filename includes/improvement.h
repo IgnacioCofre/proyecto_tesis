@@ -128,17 +128,18 @@ class Improvement
         int select_article_most_authors_conflicts(Authors);
 
         /*
-        select_article_from_most_authors_conflicts(authors, K) = id_article
+        select_article_from_most_authors_conflicts(authors, K,internal_seed) = id_article
         Retorna un id articulo del conjunto de los autores con mas topes de horario
         */
-        int select_article_from_most_authors_conflicts(Authors, int);
+        //int select_article_from_most_authors_conflicts(Authors, int, std::mt19937);
+        int select_article_from_most_authors_conflicts(Authors, int,int);
 
         /*
-        select_article_same_day_diferent_block(id_article_1)
+        select_article_same_day_diferent_block(id_article_1,internal_seed)
         Retorna el id de un articulo que se encuentre dentro del mismo dia pero en
         un bloque distinto que el id_article_1
         */
-        int select_article_same_day_diferent_block(int);
+        int select_article_same_day_diferent_block(int, int);
 
         /*
         int article_topics_problem(topics) = id_article_1

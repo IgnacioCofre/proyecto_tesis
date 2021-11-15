@@ -205,7 +205,6 @@ int main(int argc,char* argv[]) {
     //std::random_device rd; // obtain a random number from hardware
     std::mt19937 gen(seed); // seed the generator
     std::uniform_int_distribution<> distr(0, number_articles-1); // define the range
-
     srand(seed);
 
     for(int anthill=0; anthill<number_anthill;anthill++)
@@ -237,7 +236,8 @@ int main(int argc,char* argv[]) {
 
             if(random_first_article)
             {
-                initial_article = distr(gen);  
+                initial_article = distr(gen);
+                //printf("articlulo incial %d\n",initial_article);  
             }
             
             int id_inital_article = available_articles[initial_article];
@@ -247,7 +247,7 @@ int main(int argc,char* argv[]) {
 
             while(available_articles.size()>0)
             {
-                int next_article = ants.get_next_article(id_inital_article,available_articles);
+                int next_article = ants.get_next_article(id_inital_article,available_articles,rand());
                 int id_next_article = available_articles[next_article];
                 
                 //ants.save_solution(id_ant,id_next_article);
@@ -331,18 +331,21 @@ int main(int argc,char* argv[]) {
             int count_with_out_improve;
             if(improve_method->get_number_autor_conflicts() > 0)
             { 
-                //printf("movimiento de topes de horario, solucion %d\n", iter_solution);
+                printf("movimiento de topes de horario, solucion %d\n", iter_solution);
                 count_with_out_improve = 0;
                 while((count_with_out_improve < limit_iteration) && (improve_method->get_number_autor_conflicts() > 0))
                 {
                     //selecciono los articulo de uno de los autores con mas conflictos
-                    int id_article_1 = improve_method->select_article_from_most_authors_conflicts(authors, k);
-                    int id_article_2 = improve_method->select_article_same_day_diferent_block(id_article_1);
+                    int id_article_1 = improve_method->select_article_from_most_authors_conflicts(authors, k, rand());
+                    //printf("id_article_1 %d\n",id_article_1);
+                    int id_article_2 = improve_method->select_article_same_day_diferent_block(id_article_1,rand());
+                    //printf("id_article_2 %d\n",id_article_2);
                     count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2,articles,topics,authors);
                 }
             }
             if(improve_method->get_number_topics_conflicts() > 0.0)
             {   
+                printf("movimiento de topicos, solucion %d\n", iter_solution);
                 count_with_out_improve = 0;
                 while((count_with_out_improve < limit_iteration) && (improve_method->get_number_topics_conflicts() > 0.0))
                 {
@@ -356,7 +359,7 @@ int main(int argc,char* argv[]) {
                 }
             }
 
-            //printf("movimiento de mejora de beneficio, solucion %d\n", iter_solution);
+            printf("movimiento de mejora de beneficio, solucion %d\n", iter_solution);
             count_with_out_improve = 0;
             while(count_with_out_improve < limit_iteration)
             {  
@@ -369,6 +372,17 @@ int main(int argc,char* argv[]) {
             int benefit_improved = improve_method->get_benefit_solution_improved();
             int n_articles_parelel_session = improve_method->get_number_autor_conflicts();
             float n_average_max_article_day = improve_method->get_number_topics_conflicts();
+
+            /*
+            int benefit_check = validator.solution_benefit(articles,improve_method->get_solution_improved());
+            int n_articles_parelel_session_check = validator.articles_in_diferent_sessions(data,authors,improve_method->get_solution_improved()); 
+            float n_max_article_day_check = validator.capacity_topics_V2(topics,improve_method->get_solution_improved());
+        
+            printf("resultado mejora\n");
+            printf("%d\t%d\t%f\n", benefit_improved, n_articles_parelel_session, n_average_max_article_day);
+            printf("%d\t%d\t%f\n",  benefit_check, n_articles_parelel_session_check, n_max_article_day_check);
+            */
+
             float solution_quality = validator.quality_solution(benefit_improved,n_articles_parelel_session,n_average_max_article_day,base_penalty);
             
             /* Creo que este es el problema */

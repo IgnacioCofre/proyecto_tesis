@@ -39,12 +39,12 @@ class Improvement
         Improvement(std::vector<std::vector<std::vector<std::vector<int>>>>, float,Articles, Topics, Authors, unsigned int);
         
         /*
-        swap_articles(id_article_1, id_article_2) = 1: no hay mejora, 0: si hay mejora
+        swap_articles(id_article_1, id_article_2, articles, topics, authors, show_improvement) = 1: no hay mejora, 0: si hay mejora
         Se realiza un intercambio de los articulos id_1 y id_2, donde se evalua si dicho 
         intercambio produce alguna mejora sobre la solucion solution_to_improve
         */
         void swap_articles(int, int,  Articles, Topics, Authors);
-        int swap_articles_V2(int, int, Articles, Topics, Authors);
+        int swap_articles_V2(int, int, Articles, Topics, Authors, bool);
 
         /*
         show_data()
@@ -64,10 +64,10 @@ class Improvement
         bool in_diferent_session(int,int);
 
         /*
-        select_aricle_in_diferent_session(id_article) = int del proximo id_article a cambiar
+        select_aricle_in_diferent_session(id_article,internal_seed) = int del proximo id_article a cambiar
         Retorna el id de un article que no se encuentre en la misma sesion que id_article
         */
-        int select_article_in_diferent_session(int);
+        int select_article_in_diferent_session(int,int);
 
         /*
         get_quality_parameters() = {total_benefit,number_autor_conflicts,number_topics_conflics} 
@@ -107,11 +107,11 @@ class Improvement
         std::vector<int> get_articles_author_conflicts(Authors);
 
         /*
-        get_articles_worst_session() = [id_articles]
+        get_articles_worst_session(internal_seed) = [id_articles]
         Retorna los id de los articulos pertenecientes a la session con menor beneficio 
         a partir de la lista benefit_session
         */
-        int get_article_worst_session(void);
+        int get_article_worst_session(int);
 
         /*
         select_article_in_diferent_block(id_article_1) = id_article_2
@@ -161,11 +161,11 @@ class Improvement
         int select_article_diferent_day(int);
 
         /*
-        int select_article_diferent_dayV2(id_article, id_topic) = id_article
+        int select_article_diferent_dayV2(id_article, id_topic,internal_seed) = id_article
         Retorna el id de un articulo que se encuentre en un dia distinto al de id_article_1
         y que no tenga el topico id_topic
         */
-        int select_article_diferent_dayV2(Topics, int, int);
+        int select_article_diferent_dayV2(Topics, int, int,int);
 };
 
 #endif

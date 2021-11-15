@@ -408,12 +408,12 @@ bool Improvement::in_diferent_session(int id_article_1, int id_article_2)
     return true;
 }
 
-int Improvement::select_article_in_diferent_session(int id_article)
+int Improvement::select_article_in_diferent_session(int id_article,int internal_seed)
 {
     std::vector<int> a_u_1 = article_ubication[id_article];
 
     //std::random_device rd;
-    std::mt19937 gen(seed);
+    std::mt19937 gen(internal_seed);
 
     int number_articles = article_ubication.size();
     std::uniform_int_distribution<> distr_articles(0, number_articles - 1);
@@ -450,9 +450,9 @@ float Improvement::get_number_topics_conflicts()
     return number_topics_conflics;
 }
 
-int Improvement::swap_articles_V2(int id_article_1, int id_article_2, Articles articles, Topics topics, Authors authors)
+int Improvement::swap_articles_V2(int id_article_1, int id_article_2, Articles articles, Topics topics, Authors authors, bool show_changes)
 {
-    bool show_changes = true;
+    //bool show_changes = true;
     // Caso en que no hay mejora de la solucion
     int improvement_case = 1;
 
@@ -714,7 +714,7 @@ std::vector<int> Improvement::get_articles_author_conflicts(Authors authors)
     return authors.get_author_articles(author_max_conflicts);
 }
 
-int Improvement::get_article_worst_session()
+int Improvement::get_article_worst_session(int internal_seed)
 {
     std::vector<int> min_session = {0,0,0};
     int min_session_benefit = 1000000;
@@ -739,7 +739,7 @@ int Improvement::get_article_worst_session()
     }
 
     int number_articles_worst_session = solution_to_improve[min_session[0]][min_session[1]][min_session[2]].size();
-    std::mt19937 gen(seed);
+    std::mt19937 gen(internal_seed);
     std::uniform_int_distribution<> distr_articles(0, number_articles_worst_session - 1);
     int id_article_1 = solution_to_improve[min_session[0]][min_session[1]][min_session[2]][distr_articles(gen)];
 
@@ -1070,13 +1070,13 @@ std::vector<int> Improvement::article_topics_problem_and_topic(Topics topics)
     return {articles_with_topic[0],id_topic};
 }
 
-int Improvement::select_article_diferent_dayV2(Topics topics,int id_article_1, int id_topic)
+int Improvement::select_article_diferent_dayV2(Topics topics,int id_article_1, int id_topic, int internal_seed)
 {
     int day_problem = article_ubication[id_article_1][0];
     int number_articles = article_ubication.size();
     bool debug = false;
    
-    std::mt19937 gen(seed);
+    std::mt19937 gen(internal_seed);
     std::vector<int> articles_with_topic = topics.get_articles_by_topic(id_topic);
     
     std::vector<int> articles_without_topic;

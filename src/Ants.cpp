@@ -595,3 +595,42 @@ void Ants::show_best_ants(int anthill)
         printf("%d\t%d\t%d\t%d\t%f\t%f\n",anthill,id_ant,benefit, number_authors_problems, number_topics_problems, quality);
     }
 }
+
+int Ants::get_best_benefit_solution(int position_solution)
+{
+    int number_solutions = solution_ant.size();
+    if(position_solution < number_solutions)
+    {
+        return benefit_ant[position_solution];
+    }
+
+    int empty = 0;
+    std::cout<<"Erorr best solution position: "<<position_solution<<std::endl;
+    return empty;
+}
+
+int Ants::get_best_authors_problems_solution(int position_solution)
+{
+    int number_solutions = solution_ant.size();
+    if(position_solution < number_solutions)
+    {
+        return number_authors_problems_ant[position_solution];
+    }
+
+    int empty = 0;
+    std::cout<<"Erorr best solution position: "<<position_solution<<std::endl;
+    return empty;
+}
+
+float Ants::get_best_topics_problems_solution(int position_solution)
+{
+    int number_solutions = solution_ant.size();
+    if(position_solution < number_solutions)
+    {
+        return topics_problems_ant[position_solution];
+    }
+
+    float empty = 0.0;
+    std::cout<<"Erorr best solution position: "<<position_solution<<std::endl;
+    return empty;
+}

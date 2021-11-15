@@ -98,6 +98,7 @@ int main(int argc,char* argv[]) {
     bool show_ant_information = false;
     bool show_best_ant = false;
     bool show_solution_improvement = false;
+    bool show_improvement_local_search = false;
     bool show_very_best_solution = true;
     
     /*Registro de soluciones*/
@@ -279,12 +280,6 @@ int main(int argc,char* argv[]) {
             int solution_benefit = validator.solution_benefit(articles,scheduling);
 
             /*Numero de restricciones no cumplidas de la solucion*/
-            /*
-            int n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,scheduling); 
-            int n_max_article_day = validator.capacity_topics(topics,scheduling);
-            float solution_quality = ants.calculate_quality_solution(solution_benefit,n_articles_parelel_session,n_max_article_day);
-            */
-
             int n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,scheduling); 
             float n_max_article_day = validator.capacity_topics_V2(topics,scheduling);
             
@@ -316,19 +311,18 @@ int main(int argc,char* argv[]) {
 
         /*Mejoramiento de la solucion*/
         int number_best_solutions = ants.get_number_best_solutions();
-        //std::cout<<"total solutions: "<<number_best_solutions<<std::endl;
         printf("Mejores Soluciones antes de la busqueda local\n");
         ants.show_best_ants(anthill);
         std::vector<std::vector<std::vector<std::vector<int>>>> solution_to_improve;
     
+        /*Implementacion de movimiento*/
         for(int iter_solution = 0; iter_solution<number_best_solutions; iter_solution++)
         {
-            //solution_to_improve = ants.get_best_solution(iter_solution);
             float current_quality_solution = ants.get_best_quality_solution(iter_solution);
             Improvement * improve_method = new Improvement(ants.get_best_solution(iter_solution),current_quality_solution, articles, topics, authors,seed);
 
-            /*Implementacion de movimiento*/
             int count_with_out_improve;
+
             if(improve_method->get_number_autor_conflicts() > 0)
             { 
                 printf("movimiento de topes de horario, solucion %d\n", iter_solution);
@@ -340,7 +334,7 @@ int main(int argc,char* argv[]) {
                     //printf("id_article_1 %d\n",id_article_1);
                     int id_article_2 = improve_method->select_article_same_day_diferent_block(id_article_1,rand());
                     //printf("id_article_2 %d\n",id_article_2);
-                    count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2,articles,topics,authors);
+                    count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2,articles,topics,authors,show_improvement_local_search);
                 }
             }
             if(improve_method->get_number_topics_conflicts() > 0.0)
@@ -354,8 +348,9 @@ int main(int argc,char* argv[]) {
                     int id_article_1 = article_topic[0];
                     int id_topic_problem = article_topic[1];
                     //no tenga el topico de id_article_1_
-                    int id_article_2 = improve_method->select_article_diferent_dayV2(topics, id_article_1, id_topic_problem);
-                    count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors);
+                    int id_article_2 = improve_method->select_article_diferent_dayV2(topics, id_article_1, id_topic_problem,rand());
+                    //printf("%d\t%d\n",id_article_1,id_article_2);
+                    count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors,show_improvement_local_search);
                 }
             }
 
@@ -364,9 +359,10 @@ int main(int argc,char* argv[]) {
             while(count_with_out_improve < limit_iteration)
             {  
                 //selecciono un articulo de la session con menos beneficio
-                int id_article_1 = improve_method->get_article_worst_session();
-                int id_article_2 = improve_method->select_article_in_diferent_session(id_article_1);
-                count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors); 
+                int id_article_1 = improve_method->get_article_worst_session(rand());
+                int id_article_2 = improve_method->select_article_in_diferent_session(id_article_1,rand());
+                //printf("%d\t%d\n",id_article_1,id_article_2);
+                count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors,show_improvement_local_search); 
             }    
 
             int benefit_improved = improve_method->get_benefit_solution_improved();
@@ -401,24 +397,24 @@ int main(int argc,char* argv[]) {
         best_solution = ants.get_best_solution(pos_best_solution_in_anthill); 
         best_solution_quality = ants.get_best_quality_solution(pos_best_solution_in_anthill);
        
+        int aux_benefit = ants.get_best_benefit_solution(pos_best_solution_in_anthill);
+        float aux_articles = ants.get_best_authors_problems_solution(pos_best_solution_in_anthill);
+        float aux_capacity = ants.get_best_topics_problems_solution(pos_best_solution_in_anthill);
+
         //hay que optimizar esto
         /*
-        float aux_benefit = validator.solution_benefit(articles,best_solution);
+        int aux_benefit = validator.solution_benefit(articles,best_solution);
         float aux_articles = validator.articles_in_diferent_sessions(data,authors,best_solution);
-        float aux_capacity = validator.capacity_topics(topics,best_solution);
-        */
-
-        float aux_benefit = validator.solution_benefit(articles,best_solution);
         float aux_capacity = validator.capacity_topics_V2(topics,best_solution);
-        float aux_articles = validator.articles_in_diferent_sessions(data,authors,best_solution);
-        //int aux_capacity_validator = validator.capacity_topics(topics,best_solution);
+        */
 
         auto stop = high_resolution_clock::now();
         auto duration = duration_cast<microseconds>(stop - start).count()/1000000.0;
 
-        /*actualizacion de la feromona*/
         printf("Mejores Soluciones despues de la busqueda local\n");
         ants.show_best_ants(anthill);
+
+        /*actualizacion de la feromona*/
         ants.pheromone_update_list();
         ants.reset_ants();
         

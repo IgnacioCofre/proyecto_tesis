@@ -103,6 +103,12 @@ class Ants
         */
         float get_best_quality_solution(int);
 
+        int get_best_benefit_solution(int);
+
+        int get_best_authors_problems_solution(int);
+
+        float get_best_topics_problems_solution(int);
+        
         /*
         solution_quality(id_ant,max_assign_per_session)
         calcula el beneficio total de la solucion creada por la hormiga id_ant

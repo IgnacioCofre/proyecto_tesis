@@ -98,7 +98,11 @@ int main(int argc,char* argv[]) {
     bool show_ant_information = false;
     bool show_best_ant = false;
     bool show_solution_improvement = false;
-    bool show_improvement_local_search = false;
+
+    bool show_local_search_authors = false;
+    bool show_local_search_topics = false;
+    bool show_local_search_benefit = true;
+    
     bool show_very_best_solution = true;
     
     /*Registro de soluciones*/
@@ -334,7 +338,7 @@ int main(int argc,char* argv[]) {
                     //printf("id_article_1 %d\n",id_article_1);
                     int id_article_2 = improve_method->select_article_same_day_diferent_block(id_article_1,rand());
                     //printf("id_article_2 %d\n",id_article_2);
-                    count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2,articles,topics,authors,show_improvement_local_search);
+                    count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2,articles,topics,authors,show_local_search_authors);
                 }
             }
             if(improve_method->get_number_topics_conflicts() > 0.0)
@@ -350,7 +354,7 @@ int main(int argc,char* argv[]) {
                     //no tenga el topico de id_article_1_
                     int id_article_2 = improve_method->select_article_diferent_dayV2(topics, id_article_1, id_topic_problem,rand());
                     //printf("%d\t%d\n",id_article_1,id_article_2);
-                    count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors,show_improvement_local_search);
+                    count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors,show_local_search_topics);
                 }
             }
 
@@ -362,7 +366,7 @@ int main(int argc,char* argv[]) {
                 int id_article_1 = improve_method->get_article_worst_session(rand());
                 int id_article_2 = improve_method->select_article_in_diferent_session(id_article_1,rand());
                 //printf("%d\t%d\n",id_article_1,id_article_2);
-                count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors,show_improvement_local_search); 
+                count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors,show_local_search_benefit); 
             }    
 
             int benefit_improved = improve_method->get_benefit_solution_improved();

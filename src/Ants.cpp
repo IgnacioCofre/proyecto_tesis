@@ -394,6 +394,9 @@ void Ants::pheromone_update_list()
         scheduling = ant_solution_scheduling[id_solution];
         
         float solution_pheromona = (float)(c_factor*solution_ant[id_solution]);
+        
+        //printf("c value %f\n",c_factor);
+        //printf("quality in pheromone %f\n",solution_pheromona);
 
         if(sum_e_factor)
         {

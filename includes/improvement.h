@@ -148,11 +148,11 @@ class Improvement
         int article_topics_problem(Topics);
 
         /*
-        std::vector<int> article_topics_problem_and_topic(Topics) = [id_article, id_topic]
+        std::vector<int> article_topics_problem_and_topic(Topics, internal_seed) = [id_article, id_topic]
         Retorna el id del articulo que causa problemas de maximo de articulos por topico, incuyendo el id 
         del topico del cual genera problemas
         */
-        std::vector<int> article_topics_problem_and_topic(Topics);
+        std::vector<int> article_topics_problem_and_topic(Topics, int);
 
         /*
         int select_article_diferent_day(id_article_1) = id_article_2
@@ -166,6 +166,13 @@ class Improvement
         y que no tenga el topico id_topic
         */
         int select_article_diferent_dayV2(Topics, int, int,int);
+
+        /*
+        get_articles_from_random_sessions(internal_seed) = [[int articles session 1], [int articles session 2]]
+        Retorna los id de los articulos de las sesiones 1 y sesiones 2 para realizar los movimientos de swap
+        donde la sesion 1 es distinta a la sesion 2
+        */
+        std::vector<std::vector<int>> get_articles_from_random_sessions(int);
 };
 
 #endif

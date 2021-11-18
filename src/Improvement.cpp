@@ -456,6 +456,11 @@ int Improvement::swap_articles_V2(int id_article_1, int id_article_2, Articles a
     // Caso en que no hay mejora de la solucion
     int improvement_case = 1;
 
+    if(id_article_1 == id_article_2)
+    {
+        printf("\nFatal error\n");
+    }
+
     std::vector<std::vector<int>> new_article_ubication = article_ubication;
     std::vector<int> new_author_conflics = authors_conflicts;
 
@@ -1028,7 +1033,7 @@ int Improvement::select_article_diferent_day(int id_article_1)
     return id_article_2;
 }
 
-std::vector<int> Improvement::article_topics_problem_and_topic(Topics topics)
+std::vector<int> Improvement::article_topics_problem_and_topic(Topics topics, int internal_seed)
 {
     //int number_days = number_article_per_day_by_topic.size();
     int number_topics = topics.get_number_topics();
@@ -1058,6 +1063,17 @@ std::vector<int> Improvement::article_topics_problem_and_topic(Topics topics)
     }
     
     std::vector<int> articles_with_topic = topics.get_articles_by_topic(id_topic);
+
+    /* Swap random de los id de los articulos */
+    srand(internal_seed);
+
+    int number_articles_with_topic = articles_with_topic.size();
+    for(int i=0; i<number_articles_with_topic-1; i++)
+    {  
+        int j = i + (rand()%(number_articles_with_topic-i));
+        std::swap(articles_with_topic[i],articles_with_topic[j]);
+    }
+
     for(auto id_article : articles_with_topic)
     {
         int day_article_asignation = article_ubication[id_article][0];
@@ -1129,4 +1145,36 @@ int Improvement::select_article_diferent_dayV2(Topics topics,int id_article_1, i
     std::vector<int>().swap(articles_without_topic);
 
     return id_article_2;
+}
+
+std::vector<std::vector<int>> Improvement::get_articles_from_random_sessions(int internal_seed)
+{
+    //bool alow_session_from_same_time_block = true;
+    srand(internal_seed);
+
+    int number_days = solution_to_improve.size();
+
+    int day_session_1 = (rand()%(number_days));
+    int block_session_1 = (rand()%(solution_to_improve[day_session_1].size()));
+    int room_session_1 = (rand()%(solution_to_improve[day_session_1][block_session_1].size()));
+    
+    int day_session_2 = (rand()%(number_days));
+    int block_session_2 = (rand()%(solution_to_improve[day_session_2].size()));
+    int room_session_2 = (rand()%(solution_to_improve[day_session_2][block_session_2].size()));
+
+    //while( (day_session_1 == day_session_2) && (block_session_1 == block_session_2) && (room_session_1 == room_session_2) )
+    while( (day_session_1 == day_session_2) && (block_session_1 == block_session_2))
+    {
+        day_session_2 = (rand()%(number_days));
+        block_session_2 = (rand()%(solution_to_improve[day_session_2].size()));
+        room_session_2 = (rand()%(solution_to_improve[day_session_2][block_session_2].size())); 
+    }
+
+    std::vector<int> articles_session_1 = solution_to_improve[day_session_1][block_session_1][room_session_1];
+    std::vector<int> articles_session_2 = solution_to_improve[day_session_2][block_session_2][room_session_2];   
+
+    //printf("%d\t%d\t%d\n",day_session_1,block_session_1,room_session_1);
+    //printf("%d\t%d\t%d\n",day_session_2,block_session_2,room_session_2);
+
+    return {articles_session_1,articles_session_2};
 }

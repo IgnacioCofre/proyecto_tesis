@@ -86,6 +86,7 @@ int main(int argc,char* argv[]) {
     }
 
     std::cout<<input_name<<std::endl;
+    printf("valor c %f\n",c);
     //printf("limit iteration: %d\n",limit_iteration);
     
     /*Parametros de creacion de soluciones*/
@@ -97,16 +98,17 @@ int main(int argc,char* argv[]) {
     bool show_solution_quality = true;
     bool show_ant_information = false;
     bool show_best_ant = false;
+    bool show_before_after_local_search = true;
     bool show_solution_improvement = false;
 
     bool show_local_search_authors = false;
     bool show_local_search_topics = false;
-    bool show_local_search_benefit = true;
+    bool show_local_search_benefit = false;
     
     bool show_very_best_solution = true;
     
     /*Registro de soluciones*/
-    bool write_result = true;
+    bool write_result = false;
     bool write_improvement = false;
     bool write_convergence = false;
 
@@ -224,7 +226,7 @@ int main(int argc,char* argv[]) {
 
         if(show_solution_quality)
         {
-            printf("Soluciones de la iteracion: %d\n",anthill);
+            printf("\nSoluciones de la iteracion: %d\n",anthill);
         }  
 
         for(int id_ant=0; id_ant<number_ants;id_ant++)
@@ -314,9 +316,13 @@ int main(int argc,char* argv[]) {
         }
 
         /*Mejoramiento de la solucion*/
+        if(show_before_after_local_search)
+        {
+            printf("Mejores Soluciones antes de la busqueda local\n");
+            ants.show_best_ants(anthill);
+        }
+
         int number_best_solutions = ants.get_number_best_solutions();
-        printf("Mejores Soluciones antes de la busqueda local\n");
-        ants.show_best_ants(anthill);
         std::vector<std::vector<std::vector<std::vector<int>>>> solution_to_improve;
     
         /*Implementacion de movimiento*/
@@ -341,6 +347,7 @@ int main(int argc,char* argv[]) {
                     count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2,articles,topics,authors,show_local_search_authors);
                 }
             }
+
             if(improve_method->get_number_topics_conflicts() > 0.0)
             {   
                 printf("movimiento de topicos, solucion %d\n", iter_solution);
@@ -348,7 +355,7 @@ int main(int argc,char* argv[]) {
                 while((count_with_out_improve < limit_iteration) && (improve_method->get_number_topics_conflicts() > 0.0))
                 {
                     //selecciona el par de articulos para intercambiar que causan problemas de cantidad de topicos
-                    std::vector<int> article_topic = improve_method->article_topics_problem_and_topic(topics);
+                    std::vector<int> article_topic = improve_method->article_topics_problem_and_topic(topics, rand());
                     int id_article_1 = article_topic[0];
                     int id_topic_problem = article_topic[1];
                     //no tenga el topico de id_article_1_
@@ -362,31 +369,65 @@ int main(int argc,char* argv[]) {
             count_with_out_improve = 0;
             while(count_with_out_improve < limit_iteration)
             {  
-                //selecciono un articulo de la session con menos beneficio
-                int id_article_1 = improve_method->get_article_worst_session(rand());
-                int id_article_2 = improve_method->select_article_in_diferent_session(id_article_1,rand());
-                //printf("%d\t%d\n",id_article_1,id_article_2);
-                count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors,show_local_search_benefit); 
+                bool defect_move = false;
+
+                if(defect_move)
+                {
+                    //selecciono un articulo de la session con menos beneficio
+                    int id_article_1 = improve_method->get_article_worst_session(rand());
+                    int id_article_2 = improve_method->select_article_in_diferent_session(id_article_1,rand());
+                    printf("%d\t%d\n",id_article_1,id_article_2);
+                    count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors,show_local_search_benefit);
+                }
+                else
+                {
+                    std::vector<std::vector<int>>list_articles_session_1_and_2 = improve_method->get_articles_from_random_sessions(rand());
+                    std::vector<int> list_articles_session_1 = list_articles_session_1_and_2[0];
+                    std::vector<int> list_articles_session_2 = list_articles_session_1_and_2[1];
+
+                    int case_improvement = 1;
+                    int iter_article_1 = 0;
+                    int number_articles_in_session_1 = list_articles_session_1.size();
+                    int number_articles_in_session_2 = list_articles_session_2.size();
+
+                    while((case_improvement == 1) && (iter_article_1 < number_articles_in_session_1))
+                    {
+                        int id_article_1 = list_articles_session_1[iter_article_1];
+                        int iter_article_2 = 0;
+                        
+                        while((case_improvement == 1) && (iter_article_2 <number_articles_in_session_2))
+                        {
+                            int id_article_2 = list_articles_session_2[iter_article_2];
+                            //printf("%d\t%d\n",id_article_1,id_article_2);
+                            case_improvement = improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors,show_local_search_benefit);
+                            count_with_out_improve += case_improvement;
+                            iter_article_2 += 1;
+                        }    
+                        iter_article_1 += 1;
+                    }
+
+                    std::vector<std::vector<int>>().swap(list_articles_session_1_and_2);
+                    std::vector<int>().swap(list_articles_session_1);
+                    std::vector<int>().swap(list_articles_session_2);
+                }
             }    
 
             int benefit_improved = improve_method->get_benefit_solution_improved();
-            int n_articles_parelel_session = improve_method->get_number_autor_conflicts();
-            float n_average_max_article_day = improve_method->get_number_topics_conflicts();
+            int n_articles_parelel_session_improved = improve_method->get_number_autor_conflicts();
+            float n_average_max_article_day_improved = improve_method->get_number_topics_conflicts();
 
             /*
             int benefit_check = validator.solution_benefit(articles,improve_method->get_solution_improved());
             int n_articles_parelel_session_check = validator.articles_in_diferent_sessions(data,authors,improve_method->get_solution_improved()); 
             float n_max_article_day_check = validator.capacity_topics_V2(topics,improve_method->get_solution_improved());
         
-            printf("resultado mejora\n");
-            printf("%d\t%d\t%f\n", benefit_improved, n_articles_parelel_session, n_average_max_article_day);
-            printf("%d\t%d\t%f\n",  benefit_check, n_articles_parelel_session_check, n_max_article_day_check);
+            printf("\nresultado mejora\n");
+            printf("%d\t%d\t%f\n", benefit_improved, n_articles_parelel_session_improved, n_average_max_article_day_improved);
+            printf("%d\t%d\t%f\n\n",  benefit_check, n_articles_parelel_session_check, n_max_article_day_check);
             */
-
-            float solution_quality = validator.quality_solution(benefit_improved,n_articles_parelel_session,n_average_max_article_day,base_penalty);
-            
-            /* Creo que este es el problema */
-            ants.update_best_solution_V2(improve_method->get_solution_improved(),benefit_improved, n_articles_parelel_session,n_average_max_article_day,solution_quality, iter_solution);
+           
+            float solution_quality_improved = validator.quality_solution(benefit_improved,n_articles_parelel_session_improved,n_average_max_article_day_improved,base_penalty);
+            ants.update_best_solution_V2(improve_method->get_solution_improved(),benefit_improved, n_articles_parelel_session_improved,n_average_max_article_day_improved,solution_quality_improved, iter_solution);
             
             delete improve_method;
         }
@@ -415,8 +456,11 @@ int main(int argc,char* argv[]) {
         auto stop = high_resolution_clock::now();
         auto duration = duration_cast<microseconds>(stop - start).count()/1000000.0;
 
-        printf("Mejores Soluciones despues de la busqueda local\n");
-        ants.show_best_ants(anthill);
+        if(show_before_after_local_search)
+        {
+            printf("Mejores Soluciones despues de la busqueda local\n");
+            ants.show_best_ants(anthill);
+        }
 
         /*actualizacion de la feromona*/
         ants.pheromone_update_list();
@@ -589,12 +633,12 @@ int main(int argc,char* argv[]) {
 
     std::cout<<
         number_anthill<<","<<
-        std::setprecision(1) << std::fixed << delta_time <<","<<
-        pheromone_matrix_indicator[0] <<","<<
-        pheromone_matrix_indicator[1] <<","<<
+        std::setprecision(1) << std::fixed <<  delta_time <<","<<
+        std::setprecision(1) << std::fixed <<  pheromone_matrix_indicator[0] <<","<<
+        std::setprecision(1) << std::fixed <<  pheromone_matrix_indicator[1] <<","<<
         very_best_solution_benefit<<","<<
         n_articles_parelel_session<<","<<
-        n_max_article_day<<","<<
+        std::setprecision(4) << std::fixed <<  n_max_article_day<<","<<
         std::setprecision(1) << std::fixed << very_best_solution_quality
     <<std::endl;
 
@@ -612,18 +656,18 @@ int main(int argc,char* argv[]) {
         max_pheromone<<","<<
         min_pheromone<<","<<
         vapor <<","<<
-        c <<","<<
-        pheromone_matrix_indicator[0] <<","<<
-        pheromone_matrix_indicator[1] <<","<<
+        std::setprecision(6) << c <<","<<
+        std::setprecision(1) << std::fixed << pheromone_matrix_indicator[0] <<","<<
+        std::setprecision(1) << std::fixed << pheromone_matrix_indicator[1] <<","<<
         std::setprecision(1) << std::fixed << delta_time <<","<<
-        std::setprecision(1) << std::fixed <<best_time_execution <<","<<
+        std::setprecision(1) << std::fixed << best_time_execution <<","<<
         very_best_solution_benefit<<","<<
         n_articles_parelel_session<<","<<
-        n_max_article_day<<","<<
+        std::setprecision(4) << std::fixed << n_max_article_day<<","<<
         std::setprecision(1) << std::fixed << very_best_solution_quality
-    <<std::endl;    
-    
-    std::cout<<very_best_solution_quality<<std::endl;
+    <<std::endl;   
+
+    printf("%f\n",very_best_solution_quality);
 
     return very_best_solution_quality;
 }

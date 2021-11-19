@@ -109,7 +109,7 @@ int main(int argc,char* argv[]) {
     
     /*Registro de soluciones*/
     bool write_result = false;
-    bool write_improvement = false;
+    bool write_improvement = true;
     bool write_convergence = false;
 
     std::string result_file_name = "experimet.csv";
@@ -223,6 +223,8 @@ int main(int argc,char* argv[]) {
 
         std::vector<int> available_articles; 
         std::vector<int> solution_articles;  
+
+        ants.reset_pheromone(anthill, number_anthill_to_reset);
 
         if(show_solution_quality)
         {
@@ -463,7 +465,7 @@ int main(int argc,char* argv[]) {
         }
 
         /*actualizacion de la feromona*/
-        ants.pheromone_update_list();
+        ants.pheromone_update_list(very_best_solution,very_best_solution_quality,anthill,number_anthill_to_reset);
         ants.reset_ants();
         
         if(show_best_ant){
@@ -563,13 +565,11 @@ int main(int argc,char* argv[]) {
         }
 
         std::vector<std::vector<std::vector<std::vector<int>>>>().swap(best_solution);
-
-        ants.reset_pheromone(anthill, number_anthill_to_reset);
     }
 
     /*Datos de la mejor solucion*/
-    float very_best_solution_benefit = validator.solution_benefit(articles,very_best_solution);
-    float n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,very_best_solution); 
+    int very_best_solution_benefit = validator.solution_benefit(articles,very_best_solution);
+    int n_articles_parelel_session = validator.articles_in_diferent_sessions(data,authors,very_best_solution); 
     float n_max_article_day = validator.capacity_topics_V2(topics,very_best_solution);
 
     if(show_very_best_solution)

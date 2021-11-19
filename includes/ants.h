@@ -13,11 +13,8 @@ class Ants
 {
     int number_ants, number_articles;
     float max_pheromone, min_pheromone;
-    //alpha: importancia empírica
-    //beta: importancia heuristica
     float alpha, beta;
     float c_factor, vapor_factor;
-    //float  gamma_factor, epsilon_factor; 
     unsigned int seed;
     int e;
     std::vector<std::vector<float>> pheromone_matrix;
@@ -81,11 +78,11 @@ class Ants
         //float calculate_quality_solution(int solution_benefit, int autor_problems, int topcis_problems);
 
         /*
-        pheromone_update_list()
+        pheromone_update_list(very_best_solution,very_best_solution_quality,actual_iteration,number_iterarion_to_reset)
         Actualiza el valor de los arcos de la matriz de feromona 
         a partir de los valores de solution_ant y las calendarizaciones de ant_solution_scheduling
         */
-        void pheromone_update_list(void); 
+        void pheromone_update_list(std::vector<std::vector<std::vector<std::vector<int>>>>,float,int,int); 
 
         /*
         Retorna la cantidad de soluciones que se han guardado en la lista de mejores 

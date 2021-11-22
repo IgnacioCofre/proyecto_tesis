@@ -56,6 +56,12 @@ class Validator{
         Retorna la calidad de la solucion basado en los parametros
         */
         float quality_solution(int,int,float,float);
+
+        /*
+        void show_schedule_information(scheduling,topics,authors,articles);
+        Muestra por pantalla la informacion de la calendarizacion pasada por parametro
+        */
+        void show_schedule_information(std::vector<std::vector<std::vector<std::vector<int>>>>,Topics,Authors,Articles);
 };
 
 #endif

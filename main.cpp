@@ -95,11 +95,12 @@ int main(int argc,char* argv[]) {
 
     /*Parametros de muestra de datos por pantalla*/
     bool show_solution_construction = false;
-    bool show_solution_quality = true;
+    bool show_solution_quality = false;
     bool show_ant_information = false;
     bool show_best_ant = false;
     bool show_before_after_local_search = true;
     bool show_solution_improvement = false;
+    bool show_schedule_detail = true;
 
     bool show_local_search_authors = false;
     bool show_local_search_topics = false;
@@ -109,7 +110,7 @@ int main(int argc,char* argv[]) {
     
     /*Registro de soluciones*/
     bool write_result = false;
-    bool write_improvement = true;
+    bool write_improvement = false;
     bool write_convergence = false;
 
     std::string result_file_name = "experimet.csv";
@@ -325,7 +326,7 @@ int main(int argc,char* argv[]) {
         }
 
         int number_best_solutions = ants.get_number_best_solutions();
-        std::vector<std::vector<std::vector<std::vector<int>>>> solution_to_improve;
+        //std::vector<std::vector<std::vector<std::vector<int>>>> solution_to_improve;
     
         /*Implementacion de movimiento*/
         for(int iter_solution = 0; iter_solution<number_best_solutions; iter_solution++)
@@ -427,13 +428,19 @@ int main(int argc,char* argv[]) {
             printf("%d\t%d\t%f\n", benefit_improved, n_articles_parelel_session_improved, n_average_max_article_day_improved);
             printf("%d\t%d\t%f\n\n",  benefit_check, n_articles_parelel_session_check, n_max_article_day_check);
             */
-           
+            
             float solution_quality_improved = validator.quality_solution(benefit_improved,n_articles_parelel_session_improved,n_average_max_article_day_improved,base_penalty);
             ants.update_best_solution_V2(improve_method->get_solution_improved(),benefit_improved, n_articles_parelel_session_improved,n_average_max_article_day_improved,solution_quality_improved, iter_solution);
             
+            if(show_schedule_detail)
+            {
+                validator.show_schedule_information(improve_method->get_solution_improved(),topics,authors,articles);
+            }
+            
+
             delete improve_method;
         }
-        std::vector<std::vector<std::vector<std::vector<int>>>>().swap(solution_to_improve); 
+        //std::vector<std::vector<std::vector<std::vector<int>>>>().swap(solution_to_improve); 
 
         int pos_best_solution_in_anthill = 0;
         if(limit_iteration>0 && number_best_solutions>1)

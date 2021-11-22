@@ -561,3 +561,71 @@ float Validator::quality_solution(int benefit, int author_problems, float averag
     }
     return quality; 
 }
+
+void Validator::show_schedule_information(std::vector<std::vector<std::vector<std::vector<int>>>> scheduling,Topics topics,Authors authors,Articles articles)
+{
+    int number_days = scheduling.size();
+    //std::cout<<number_days<<std::endl;
+    for(int day=0; day<number_days; day++)
+    {
+        int number_blocks = scheduling[day].size();
+        //std::vector<std::vector<int>> articles_in_session_of_day;
+
+        for(int block=0; block<number_blocks; block++)
+        {
+            int number_rooms = scheduling[day][block].size();
+            for(int room=0; room<number_rooms; room++)
+            {   
+                std::vector<int> articles_in_session = scheduling[day][block][room];
+                //articles_in_session_of_day.push_back(articles_in_session);
+                int number_articles_in_session = scheduling[day][block][room].size();
+                int benefit_session = 0;
+
+                for(int iter_article_1 = 0; iter_article_1 < number_articles_in_session; iter_article_1++)
+                {
+                    int id_aricle_1 = articles_in_session[iter_article_1];
+                    for(int iter_article_2 = iter_article_1 + 1; iter_article_2 < number_articles_in_session; iter_article_2++)
+                    {
+                        int id_aricle_2 = articles_in_session[iter_article_2];
+                        benefit_session += articles.get_similarity(id_aricle_1,id_aricle_2);
+                    }
+                }
+
+                printf("Dia %d Bloque %d Sala %d Bene %d | ",day,block,room,benefit_session);
+
+                for(auto article:articles_in_session)
+                {
+                    printf("%d\t",article);
+                }
+                printf("\n");
+
+                for(auto article:articles_in_session)
+                {
+                    printf("%d:\t",article);
+                    std::vector<int> topics_of_article = topics.get_article_topics(article);
+                    for(auto topic:topics_of_article)
+                    {
+                        printf("%d\t",topic);
+                    }
+                    printf("\n");
+                }
+            }
+        }
+    }
+    
+    /*
+    int number_articles = articles.get_number_articles();
+    printf("id_article : topics\n");
+
+    for(int id_article=0; id_article<number_articles; id_article++)
+    {
+        printf("%d:\t",id_article);
+        std::vector<int> topics_of_article = topics.get_article_topics(id_article);
+        for(int topic:topics_of_article)
+        {
+            printf("%d\t",topic);
+        }
+        printf("\n");
+    }
+    */
+}

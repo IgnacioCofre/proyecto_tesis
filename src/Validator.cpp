@@ -591,7 +591,7 @@ void Validator::show_schedule_information(std::vector<std::vector<std::vector<st
                     }
                 }
 
-                printf("Dia %d Bloque %d Sala %d Bene %d | ",day,block,room,benefit_session);
+                printf("Dia %d Bloque %d Sala %d Bene %d\t|\t",day,block,room,benefit_session);
 
                 for(auto article:articles_in_session)
                 {

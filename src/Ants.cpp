@@ -462,7 +462,7 @@ void Ants::pheromone_update_list(std::vector<std::vector<std::vector<std::vector
                 }
             }
         }
-        printf("Reforzamiento de feromona en iteracion: %d\n",actual_iteration);
+        //printf("Reforzamiento de feromona en iteracion: %d\n",actual_iteration);
     }    
 
     for(int i=0; i<number_articles; i++)
@@ -556,7 +556,7 @@ int Ants::get_best_solution_found()
 
 void Ants::update_best_solution_V2(std::vector<std::vector<std::vector<std::vector<int>>>> schedule,int benefit, int n_problems_autors, float number_problems_topics, float new_quality, int id_ant)
 {
-    bool show_change = true;
+    bool show_change = false;
     
     if(show_change)
     {
@@ -612,7 +612,7 @@ void Ants::reset_pheromone(int actual_iteration, int n_iteration_to_reset)
     if(((actual_iteration + 1) % n_iteration_to_reset) == 0)
     {
         pheromone_matrix = std::vector<std::vector<float>> (number_articles,std::vector<float>(number_articles,max_pheromone));    
-        printf("Reset pheromone in iteration: %d\n",actual_iteration);
+        //printf("Reset pheromone in iteration: %d\n",actual_iteration);
     }
 }
 

@@ -658,6 +658,7 @@ int Improvement::swap_articles_V2(int id_article_1, int id_article_2, Articles a
                         std::cout << "N° conflictos topicos:      " << new_number_topics_conflics << std::endl;
                         */
                         printf("Movimiento produjo mejora [benefit, p autores, p topicos]\n");
+                        printf("%d\t%d\n",id_article_1,id_article_2);
                         printf("%d\t%d\t%f\n",total_benefit,number_autor_conflicts,number_topics_conflics);
                         printf("%d\t%d\t%f\n",new_total_benefit,new_number_author_conflicts,new_number_topics_conflics);
                     }
@@ -1150,14 +1151,102 @@ int Improvement::select_article_diferent_dayV2(Topics topics,int id_article_1, i
 std::vector<std::vector<int>> Improvement::get_articles_from_random_sessions(int internal_seed)
 {
     //bool alow_session_from_same_time_block = true;
+
+    float percent_sessions_worst_benefit = 0.5;
+    int number_days = benefit_session.size();
+
     srand(internal_seed);
 
-    int number_days = solution_to_improve.size();
+    bool default_metod = false;
 
+    int day_session_1;
+    int block_session_1;
+    int room_session_1;
+
+    if(default_metod)
+    {
+        day_session_1 = (rand()%(number_days));
+        block_session_1 = (rand()%(solution_to_improve[day_session_1].size()));
+        room_session_1 = (rand()%(solution_to_improve[day_session_1][block_session_1].size()));
+    }
+
+    else
+    {
+        //printf("entra al else\n");
+
+        std::vector<std::vector<int>> day_block_room;
+        //std::vector<int> orden_benefit_sessions;
+        std::vector<float> orden_ponderation_sessions;
+
+        for(int day = 0; day < number_days; day++)
+        {
+            int number_blocks = benefit_session[day].size();
+            for(int block = 0; block < number_blocks; block++)
+            {
+                int number_rooms = benefit_session[day][block].size();
+                for(int room = 0; room < number_rooms; room++)
+                {
+                    day_block_room.push_back({day,block,room});
+                    //float benefit_capacity_ponderation = (float) (benefit_session[day][block][room]/pow(benefit_session[day][block][room].size(),2.0));
+                    float benefit_capacity_ponderation = (float) (benefit_session[day][block][room]/pow(2.0,solution_to_improve[day][block][room].size()));
+                    //orden_benefit_sessions.push_back(benefit_session[day][block][room]);
+                    orden_ponderation_sessions.push_back(benefit_capacity_ponderation);
+                }
+            } 
+        }
+        
+        int number_sessions = day_block_room.size();
+        //printf("numero de sessiones: %d\n",number_sessions);
+        
+        std::vector<int> index_sessions(number_sessions,0);
+        for(int session_iter = 0; session_iter < number_sessions; session_iter++)
+        {
+            index_sessions[session_iter] = session_iter;
+        }
+        
+        //se ordenan las sesiones segun la cantidad de beneficio de menor a mayor
+        std::sort(index_sessions.begin(), index_sessions.end(),
+            [&](const int& c, const int& d) {
+                return (orden_ponderation_sessions[c] < orden_ponderation_sessions[d]);
+            }
+        );
+        
+        /*
+        for(int session_iter = 0; session_iter < number_sessions; session_iter++)
+        {
+            int id_session = index_sessions[session_iter];
+            float ponderation_session = orden_ponderation_sessions[id_session];
+
+            printf("%f\t",ponderation_session);
+        }
+        printf("\n");
+        */
+
+        std::mt19937 gen(internal_seed);
+        std::uniform_int_distribution<> distr_sessions(0, (int) (number_sessions*percent_sessions_worst_benefit) - 1);
+        int id_session = index_sessions[distr_sessions(gen)];
+
+        day_session_1 = day_block_room[id_session][0];
+        block_session_1 = day_block_room[id_session][1];
+        room_session_1 = day_block_room[id_session][2];
+
+        //printf("Sesion 1: %d\t%d\t%d\t:\t%d\n",day_session_1,block_session_1,room_session_1, orden_benefit_sessions[id_session]);    
+        
+        /*
+        day_session_1 = (rand()%(number_days));
+        block_session_1 = (rand()%(solution_to_improve[day_session_1].size()));
+        room_session_1 = (rand()%(solution_to_improve[day_session_1][block_session_1].size()));
+        */
+    }
+
+    //int number_days = solution_to_improve.size();
+
+    /*
     int day_session_1 = (rand()%(number_days));
     int block_session_1 = (rand()%(solution_to_improve[day_session_1].size()));
     int room_session_1 = (rand()%(solution_to_improve[day_session_1][block_session_1].size()));
-    
+    */
+
     int day_session_2 = (rand()%(number_days));
     int block_session_2 = (rand()%(solution_to_improve[day_session_2].size()));
     int room_session_2 = (rand()%(solution_to_improve[day_session_2][block_session_2].size()));
@@ -1174,7 +1263,7 @@ std::vector<std::vector<int>> Improvement::get_articles_from_random_sessions(int
     std::vector<int> articles_session_2 = solution_to_improve[day_session_2][block_session_2][room_session_2];   
 
     //printf("%d\t%d\t%d\n",day_session_1,block_session_1,room_session_1);
-    //printf("%d\t%d\t%d\n",day_session_2,block_session_2,room_session_2);
+    //printf("Sesion 2: %d\t%d\t%d\n",day_session_2,block_session_2,room_session_2);
 
     return {articles_session_1,articles_session_2};
 }

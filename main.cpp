@@ -458,7 +458,8 @@ int main(int argc,char* argv[]) {
             
             float solution_quality_improved = validator.quality_solution(benefit_improved,n_articles_parelel_session_improved,n_average_max_article_day_improved,base_penalty);
             ants.update_best_solution_V2(improve_method->get_solution_improved(),benefit_improved, n_articles_parelel_session_improved,n_average_max_article_day_improved,solution_quality_improved, iter_solution);
-            
+            ants.save_solution_authors_problems(improve_method->get_article_ubication(),iter_solution, authors);
+
             if(show_schedule_detail)
             {
                 validator.show_schedule_information(improve_method->get_solution_improved(),topics,authors,articles);
@@ -654,7 +655,7 @@ int main(int argc,char* argv[]) {
         pheromone_matrix_indicator[0] <<","<<
         pheromone_matrix_indicator[1] <<","<<
         std::setprecision(1) << std::fixed << delta_time <<","<<
-        std::setprecision(1) << std::fixed <<best_time_execution <<","<<
+        std::setprecision(1) << std::fixed << best_time_execution <<","<<
         very_best_solution_benefit<<","<<
         n_articles_parelel_session<<","<<
         n_max_article_day<<","<<
@@ -673,7 +674,7 @@ int main(int argc,char* argv[]) {
         very_best_solution_benefit<<"\t"<<
         n_articles_parelel_session<<"\t"<<
         std::setprecision(4) << std::fixed <<  n_max_article_day<<"\t"<<
-        std::setprecision(1) << std::fixed << very_best_solution_quality
+        std::setprecision(1) << std::fixed <<  very_best_solution_quality
     <<std::endl;
 
     std::cout<<

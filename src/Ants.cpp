@@ -366,12 +366,13 @@ void Ants::reset_ants()
     std::vector<int>().swap(number_authors_problems_ant);
     std::vector<float>().swap(topics_problems_ant);  
     std::vector<int>().swap(id_ants_solutions); 
+    std::vector<std::vector<int>>().swap(articles_whith_author_problems);
 }
 
 void Ants::pheromone_update_list(std::vector<std::vector<std::vector<std::vector<int>>>> vey_best_solution, float very_best_solution_quality, int actual_iteration, int number_iteration_to_reset)
 {
     bool sum_e_factor = false;
-
+    
     /*Evaporizacion general de la matriz de feromonas*/
     for(int i=0; i<number_articles; i++)
     {
@@ -386,6 +387,7 @@ void Ants::pheromone_update_list(std::vector<std::vector<std::vector<std::vector
     
     /*Aumento de feromona para articulos de una misma sesion*/
     int size_solutions_total = ant_solution_scheduling.size();
+    //printf("number_solutions: %d\n",size_solutions_total);
 
     std::vector<std::vector<std::vector<std::vector<int>>>> scheduling;
 
@@ -409,21 +411,29 @@ void Ants::pheromone_update_list(std::vector<std::vector<std::vector<std::vector
             int number_blocks = scheduling[day].size();
             for(int block=0; block<number_blocks; block++)
             {
-                int number_sessions = scheduling[day][block].size();
-                for(int session=0; session<number_sessions; session++)
+                int number_rooms = scheduling[day][block].size();
+                for(int room=0; room<number_rooms; room++)
                 {
-                    int articles_in_session = scheduling[day][block][session].size();
-                    //std::cout<<day<<","<<block<<","<<session<<","<<articles_in_session<<std::endl;
+                    int articles_in_session = scheduling[day][block][room].size();
+
                     for(int i=0; i<articles_in_session; i++)
                     {
-                        int art_1 = scheduling[day][block][session][i];
-                        for(int j=i+1; j<articles_in_session; j++)
+                        int art_1 = scheduling[day][block][room][i];
+                        if(articles_whith_author_problems[id_solution][art_1] != 1)
                         {
-                            int art_2 = scheduling[day][block][session][j];
-                            pheromone_matrix[art_1][art_2] += solution_pheromona;
-                            pheromone_matrix[art_2][art_1] += solution_pheromona;
-                            //std::cout<<art_1<<","<<art_2<<","<<solution_pheromona<<std::endl;
-                        }
+                            for(int j=i+1; j<articles_in_session; j++)
+                            {
+                                int art_2 = scheduling[day][block][room][j];
+                                
+                                if(articles_whith_author_problems[id_solution][art_2] != 1)
+                                {
+                                    pheromone_matrix[art_1][art_2] += solution_pheromona;
+                                    pheromone_matrix[art_2][art_1] += solution_pheromona;
+
+                                    //printf("article_1: %d\tarticle_2: %d\n",art_1,art_2);
+                                }
+                            }
+                        }    
                     }
                 }
             }
@@ -669,4 +679,59 @@ float Ants::get_best_topics_problems_solution(int position_solution)
     float empty = 0.0;
     std::cout<<"Erorr best solution position: "<<position_solution<<std::endl;
     return empty;
+}
+
+void Ants::save_solution_authors_problems(std::vector<std::vector<int>> article_ubication,int id_ant, Authors authors)
+{
+    bool show_conflict = false;
+
+    int number_authors = authors.get_number_authors();
+    int number_articles = article_ubication.size();
+
+    std::vector<int> articles_conflict_in_solution(number_articles,0);
+
+    for(int author= 0; author< number_authors; author++)
+    {
+        std::vector<int> list_articles = authors.get_author_articles(author);
+        int n_articles = list_articles.size();
+
+        if(n_articles>1)
+        {
+            for(int i=0; i<n_articles; i++)
+            {   
+                int id_article_1 = list_articles[i];
+                int day_article_1 = article_ubication[id_article_1][0];
+                int block_article_1 = article_ubication[id_article_1][1];
+                int room_article_1 = article_ubication[id_article_1][2];    
+
+                for(int j=i+1; j<n_articles; j++)
+                {
+                    int id_article_2 = list_articles[j];
+                    int day_article_2 = article_ubication[id_article_2][0];
+                    int block_article_2 = article_ubication[id_article_2][1];
+                    int room_article_2 = article_ubication[id_article_2][2];   
+
+                    //se verifica primero que los dias y el bloque de dos articulos de un mismo autor sean iguales
+                    if((day_article_1 == day_article_2) & (block_article_1 == block_article_2))
+                    {   
+                        //si las salas son diferentes no se cumplen con las restricciones
+                        if(room_article_1 != room_article_2)
+                        {
+                            articles_conflict_in_solution[id_article_1] = 1;
+                            articles_conflict_in_solution[id_article_2] = 1;
+
+                            if(show_conflict)
+                            {
+                                //comments.push_back("Problem articles: "+std::to_string(id_article_1)+" "+std::to_string(id_article_2)); 
+                                printf("Author conflic: %d\t%d\n",id_article_1,id_article_2);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    articles_whith_author_problems.push_back(articles_conflict_in_solution);
+
 }

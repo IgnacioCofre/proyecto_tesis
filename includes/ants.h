@@ -27,6 +27,9 @@ class Ants
     std::vector<int> number_authors_problems_ant;
     std::vector<float> topics_problems_ant;
     std::vector<int> id_ants_solutions;
+
+    //articles_whith_author_problems[id_ant][id_article] = <int> {0:article with no problems, 1:article with problems} 
+    std::vector<std::vector<int>> articles_whith_author_problems; 
     
     std::vector<std::vector<int>> similarity_matrix;
 
@@ -158,6 +161,13 @@ class Ants
         Muestra por pantalla las mejores hormigas encontradas
         */
         void show_best_ants(int);
+
+        /*
+        save_solution_authors_problems(article_ubication,id_ant, Authors)
+        Guarda los problemas de los articulos que causan topes de horario en
+        la lista articles_whith_author_problems[id_ant]
+        */
+        void save_solution_authors_problems(std::vector<std::vector<int>> ,int, Authors);
         
 };
 

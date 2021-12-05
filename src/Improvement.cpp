@@ -1267,3 +1267,8 @@ std::vector<std::vector<int>> Improvement::get_articles_from_random_sessions(int
 
     return {articles_session_1,articles_session_2};
 }
+
+std::vector<std::vector<int>> Improvement::get_article_ubication()
+{
+    return article_ubication;
+}

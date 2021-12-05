@@ -173,6 +173,12 @@ class Improvement
         donde la sesion 1 es distinta a la sesion 2
         */
         std::vector<std::vector<int>> get_articles_from_random_sessions(int);
+
+        /*
+        get_article_ubication() = article_ubication[id_article] = {day,block,room,index_in_session}
+        Retorna la ubicacion de los articulos de la solucion actual
+        */
+        std::vector<std::vector<int>> get_article_ubication(void);
 };
 
 #endif

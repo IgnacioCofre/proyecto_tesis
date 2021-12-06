@@ -487,6 +487,13 @@ int Improvement::swap_articles_V2(int id_article_1, int id_article_2, Articles a
         //Evaluacion del intercambio de articulos
         new_article_ubication[id_article_1] = {day_2, block_2, room_2, pos_2};
         new_article_ubication[id_article_2] = {day_1, block_1, room_1, pos_1};
+        
+        if(show_changes)
+        {
+            printf("Artículos por intercambiar: dia, bloque, sala, id_articulo\n");
+            printf("%d\t%d\t%d\t%d\n",day_1, block_1, room_1 ,id_article_1);
+            printf("%d\t%d\t%d\t%d\n",day_2, block_2, room_2 ,id_article_2);
+        }
 
         //Calculo de nuevos conflictos de topes de horario despues del intercambio
         for (auto id_article : {id_article_1, id_article_2})
@@ -658,7 +665,6 @@ int Improvement::swap_articles_V2(int id_article_1, int id_article_2, Articles a
                         std::cout << "N° conflictos topicos:      " << new_number_topics_conflics << std::endl;
                         */
                         printf("Movimiento produjo mejora [benefit, p autores, p topicos]\n");
-                        printf("%d\t%d\n",id_article_1,id_article_2);
                         printf("%d\t%d\t%f\n",total_benefit,number_autor_conflicts,number_topics_conflics);
                         printf("%d\t%d\t%f\n",new_total_benefit,new_number_author_conflicts,new_number_topics_conflics);
                     }
@@ -1251,6 +1257,7 @@ std::vector<std::vector<int>> Improvement::get_articles_from_random_sessions(int
     int block_session_2 = (rand()%(solution_to_improve[day_session_2].size()));
     int room_session_2 = (rand()%(solution_to_improve[day_session_2][block_session_2].size()));
 
+    //while(day_session_1 == day_session_2 )
     //while( (day_session_1 == day_session_2) && (block_session_1 == block_session_2) && (room_session_1 == room_session_2) )
     while( (day_session_1 == day_session_2) && (block_session_1 == block_session_2))
     {

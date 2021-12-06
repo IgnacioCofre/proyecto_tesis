@@ -98,18 +98,18 @@ int main(int argc,char* argv[]) {
     bool show_solution_quality = false;
     bool show_ant_information = false;
     bool show_best_ant = false;
-    bool show_before_after_local_search = false;
+    bool show_before_after_local_search = true;
     bool show_solution_improvement = true;
     bool show_schedule_detail = false;
 
     bool show_local_search_authors = false;
     bool show_local_search_topics = false;
-    bool show_local_search_benefit = false;
+    bool show_local_search_benefit = true;
     
     bool show_very_best_solution = false;
     
     /*Registro de soluciones*/
-    bool write_result = false;
+    bool write_result = true;
     bool write_improvement = false;
     bool write_convergence = false;
 

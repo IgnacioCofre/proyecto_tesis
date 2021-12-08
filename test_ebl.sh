@@ -32,11 +32,12 @@ SOLUTIONCREATION="${alpha} ${beta} ${vapor} ${c} ${maxPheromone} ${minPheromone}
 
 #Parametros de mejora de soluciones*/
 limitIteration=10
+limitBenefitSearch=10
 k=10
 
-LOCALSEARCH="${limitIteration} ${k}"
+LOCALSEARCH="${limitIteration} ${limitBenefitSearch} ${k}"
 
-resultsDir=Results_${dir}_${numberAnthill}_${numberAnts}_${e}_${vapor}_${c}_${limitIteration}_${k}
+resultsDir=Results_${dir}_${numberAnthill}_${numberAnts}_${e}_${vapor}_${c}_${limitIteration}_${limitBenefitSearch}_${k}
 rm -rf ${resultsDir}
 mkdir ${resultsDir}
 
@@ -46,7 +47,7 @@ for percent in ${instPercent}; do
         rm -rf ${sumarizedOut}
         best=0 
         for seed in ${seedList}; do
-            detailedOut=out_${dir}_${percent}_${type}_${seed}_${numberAnthill}_${numberAnts}_${e}_${limitIteration}_${n_anthill_to_reset}.csv
+            detailedOut=out_${dir}_${percent}_${type}_${seed}_${numberAnthill}_${numberAnts}_${e}_${limitIteration}_${limitIteration}_${n_anthill_to_reset}.csv
             rm -rf ${detailedOut}
             echo "./main ${dir}/${dir}_${percent}_${type}.txt ${seed} ${ACO} ${SOLUTIONCREATION} ${LOCALSEARCH} > ${detailedOut}"
             ./main ${dir}/${dir}_${percent}_${type}.txt ${seed} ${ACO} ${SOLUTIONCREATION} ${LOCALSEARCH} > ${detailedOut}

@@ -179,6 +179,19 @@ class Improvement
         Retorna la ubicacion de los articulos de la solucion actual
         */
         std::vector<std::vector<int>> get_article_ubication(void);
+
+        /*
+        get_list_session_sorted_by_ponderation(void) = [{day,block,room}] order by ponderation
+        Retorna una lista con los datos de las sesiones ordenadas por la ponderacion
+        de crecimiento de beneficio, de menor a mayor
+        */
+        std::vector<std::vector<int>> get_list_session_sorted_by_ponderation(void);
+
+        /*
+        get_articles_session({day,block,room}) = [id_article_1, ....]
+        Retorna los articulos de la sesion a partir de sus datos 
+        */
+        std::vector<int> get_articles_session(std::vector<int>);
 };
 
 #endif

@@ -1279,3 +1279,77 @@ std::vector<std::vector<int>> Improvement::get_article_ubication()
 {
     return article_ubication;
 }
+
+std::vector<std::vector<int>> Improvement::get_list_session_sorted_by_ponderation(void)
+{
+    int number_days = benefit_session.size();
+    bool debug = false;
+
+    std::vector<std::vector<int>> day_block_room;
+    //std::vector<int> orden_benefit_sessions;
+    std::vector<float> orden_ponderation_sessions;
+    std::vector<int> aux_benefit_session;
+    std::vector<int> capacity_session;
+
+    for(int day = 0; day < number_days; day++)
+    {
+        int number_blocks = benefit_session[day].size();
+        for(int block = 0; block < number_blocks; block++)
+        {
+            int number_rooms = benefit_session[day][block].size();
+            for(int room = 0; room < number_rooms; room++)
+            {
+                day_block_room.push_back({day,block,room});
+                //float benefit_capacity_ponderation = (float) (benefit_session[day][block][room]/pow(benefit_session[day][block][room].size(),2.0));
+                float benefit_capacity_ponderation = (float) (benefit_session[day][block][room]/pow(2.0,solution_to_improve[day][block][room].size()));
+                //orden_benefit_sessions.push_back(benefit_session[day][block][room]);
+                aux_benefit_session.push_back(benefit_session[day][block][room]);
+                capacity_session.push_back(solution_to_improve[day][block][room].size());
+                orden_ponderation_sessions.push_back(benefit_capacity_ponderation);
+            }
+        } 
+    }
+    
+    int number_sessions = day_block_room.size();
+    //printf("numero de sessiones: %d\n",number_sessions);
+    std::vector<int> index_sessions(number_sessions,0);
+    for(int session_iter = 0; session_iter < number_sessions; session_iter++)
+    {
+        index_sessions[session_iter] = session_iter;
+    }
+    
+    std::sort(index_sessions.begin(), index_sessions.end(),
+        [&](const int& c, const int& d) {
+            return (orden_ponderation_sessions[c] < orden_ponderation_sessions[d]);
+        }
+    );
+    
+    std::vector<std::vector<int>> day_block_room_by_ponderation_order;
+
+    for(int session_iter = 0; session_iter < number_sessions; session_iter++)
+    {   
+        int id_session_order = index_sessions[session_iter];
+
+        if(debug)
+        {    
+            printf("%d\t%d\t%d\t%f\t%d\t%d\n",
+            day_block_room[id_session_order][0],
+            day_block_room[id_session_order][1],
+            day_block_room[id_session_order][2],
+            orden_ponderation_sessions[id_session_order],
+            aux_benefit_session[id_session_order],
+            capacity_session[id_session_order]);
+        }
+        
+        day_block_room_by_ponderation_order.push_back(day_block_room[id_session_order]);
+    }
+
+    return day_block_room_by_ponderation_order;
+}
+
+std::vector<int> Improvement::get_articles_session(std::vector<int> day_block_room)
+{
+    //printf("Acceding:\t%d\t%d\t%d\n",day_block_room[0],day_block_room[1],day_block_room[2]);
+
+    return solution_to_improve[day_block_room[0]][day_block_room[1]][day_block_room[2]];
+}

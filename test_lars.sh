@@ -31,12 +31,13 @@ n_anthill_to_reset=5
 SOLUTIONCREATION="${alpha} ${beta} ${vapor} ${c} ${maxPheromone} ${minPheromone} ${n_anthill_to_reset}"
 
 #Parametros de mejora de soluciones*/
-limitIteration=100
+limitIteration=10
+limitBenefitSearch=10
 k=10
 
-LOCALSEARCH="${limitIteration} ${k}"
+LOCALSEARCH="${limitIteration} ${limitBenefitSearch} ${k}"
 
-resultsDir=Results_${dir}_${numberAnthill}_${numberAnts}_${e}_${vapor}_${c}_${limitIteration}_${k}
+resultsDir=Results_${dir}_${numberAnthill}_${numberAnts}_${e}_${vapor}_${c}_${limitIteration}_${limitBenefitSearch}_${k}
 rm -rf ${resultsDir}
 mkdir ${resultsDir}
 

@@ -369,7 +369,7 @@ void Ants::reset_ants()
     std::vector<std::vector<int>>().swap(articles_whith_author_problems);
 }
 
-void Ants::pheromone_update_list(std::vector<std::vector<std::vector<std::vector<int>>>> vey_best_solution, float very_best_solution_quality, int actual_iteration, int number_iteration_to_reset)
+void Ants::pheromone_update_list(std::vector<std::vector<std::vector<std::vector<int>>>> vey_best_solution, float very_best_solution_quality, int actual_iteration, int number_iteration_to_reset, int initial_quality)
 {
     bool sum_e_factor = false;
     
@@ -395,7 +395,8 @@ void Ants::pheromone_update_list(std::vector<std::vector<std::vector<std::vector
     {
         scheduling = ant_solution_scheduling[id_solution];
         
-        float solution_pheromona = (float)(c_factor*solution_ant[id_solution]);
+        float solution_pheromona = (float)(c_factor*(solution_ant[id_solution]/initial_quality));
+        //float solution_pheromona = (float)(c_factor*pow((float) (solution_ant[id_solution]/initial_quality), 2.0));
         
         //printf("c value %f\n",c_factor);
         //printf("quality in pheromone %f\n",solution_pheromona);

@@ -44,6 +44,7 @@ int main(int argc,char* argv[]) {
     int number_ants = 2;
     int e = 1;
     float base_penalty = 100.0;
+    float initial_quality = 200.0;
     float constant_for_penalty = 4.0;
 
     /*Parametros de la actualizacion de feromona*/
@@ -70,6 +71,8 @@ int main(int argc,char* argv[]) {
         number_ants = std::stoi(argv[4]);
         e = std::stoi(argv[5]);
         base_penalty = std::stof(argv[6]);
+        initial_quality = std::stof(argv[6]);
+        
         constant_for_penalty = std::stof(argv[7]);
 
         /*Parametros de la actualizacion de feromona*/
@@ -96,6 +99,7 @@ int main(int argc,char* argv[]) {
     /*Parametros de creacion de soluciones*/
     bool random_first_article = true;
     bool set_author_penalty = true;
+    bool set_initial_quality = true;
 
     /*Parametros de muestra de datos por pantalla*/
     bool show_solution_construction = false;
@@ -113,7 +117,7 @@ int main(int argc,char* argv[]) {
     bool show_very_best_solution = false;
     
     /*Registro de soluciones*/
-    bool write_result = false;
+    bool write_result = true;
     bool write_improvement = false;
     bool write_convergence = false;
 
@@ -468,6 +472,14 @@ int main(int argc,char* argv[]) {
             */
 
             float solution_quality_improved = validator.quality_solution(benefit_improved,n_articles_parelel_session_improved,n_average_max_article_day_improved,base_penalty);
+            
+            if((solution_quality_improved > 0) && set_initial_quality)
+            {
+                initial_quality = solution_quality_improved;
+                set_initial_quality = false;
+                //printf("initial quality:\t%f",initial_quality);
+            }
+            
             ants.update_best_solution_V2(improve_method->get_solution_improved(),benefit_improved, n_articles_parelel_session_improved,n_average_max_article_day_improved,solution_quality_improved, iter_solution);
             ants.save_solution_authors_problems(improve_method->get_article_ubication(),iter_solution, authors);
 
@@ -510,7 +522,7 @@ int main(int argc,char* argv[]) {
         }
 
         /*actualizacion de la feromona*/
-        ants.pheromone_update_list(very_best_solution,very_best_solution_quality,anthill,number_anthill_to_reset);
+        ants.pheromone_update_list(very_best_solution,very_best_solution_quality,anthill,number_anthill_to_reset,initial_quality);
         ants.reset_ants();
         
         if(show_best_ant){
@@ -718,55 +730,3 @@ int main(int argc,char* argv[]) {
 
     return very_best_solution_quality;
 }
-
-            /*
-            count_with_out_improve = 0;
-            while(count_with_out_improve < limit_iteration)
-            {  
-                bool defect_move = false;
-
-                if(defect_move)
-                {
-                    //selecciono un articulo de la session con menos beneficio
-                    int id_article_1 = improve_method->get_article_worst_session(rand());
-                    int id_article_2 = improve_method->select_article_in_diferent_session(id_article_1,rand());
-                    printf("%d\t%d\n",id_article_1,id_article_2);
-                    count_with_out_improve += improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors,show_local_search_benefit);
-                }
-                else
-                {
-                    std::vector<std::vector<int>>list_articles_session_1_and_2 = improve_method->get_articles_from_random_sessions(rand());
-                    std::vector<int> list_articles_session_1 = list_articles_session_1_and_2[0];
-                    std::vector<int> list_articles_session_2 = list_articles_session_1_and_2[1];
-
-                    int case_improvement = 1;
-                    int iter_article_1 = 0;
-                    int number_articles_in_session_1 = list_articles_session_1.size();
-                    int number_articles_in_session_2 = list_articles_session_2.size();
-
-                    while((case_improvement == 1) && (iter_article_1 < number_articles_in_session_1))
-                    {
-                        int id_article_1 = list_articles_session_1[iter_article_1];
-                        int iter_article_2 = 0;
-                        
-                        while((case_improvement == 1) && (iter_article_2 <number_articles_in_session_2))
-                        {
-                            int id_article_2 = list_articles_session_2[iter_article_2];
-                            //printf("%d\t%d\n",id_article_1,id_article_2);
-                            case_improvement = improve_method->swap_articles_V2(id_article_1,id_article_2 ,articles,topics,authors,show_local_search_benefit);
-                            count_with_out_improve += case_improvement;
-                            if((case_improvement == 0) && (show_schedule_detail))
-                            {
-                                validator.show_schedule_information(improve_method->get_solution_improved(),topics,authors,articles);
-                            }
-                            iter_article_2 += 1;
-                        }    
-                        iter_article_1 += 1;
-                    }
-
-                    std::vector<std::vector<int>>().swap(list_articles_session_1_and_2);
-                    std::vector<int>().swap(list_articles_session_1);
-                    std::vector<int>().swap(list_articles_session_2);
-                }
-            }
-            */ 

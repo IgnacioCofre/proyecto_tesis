@@ -81,11 +81,11 @@ class Ants
         //float calculate_quality_solution(int solution_benefit, int autor_problems, int topcis_problems);
 
         /*
-        pheromone_update_list(very_best_solution,very_best_solution_quality,actual_iteration,number_iterarion_to_reset)
+        pheromone_update_list(very_best_solution,very_best_solution_quality,actual_iteration,number_iterarion_to_reset,initial_quaility)
         Actualiza el valor de los arcos de la matriz de feromona 
         a partir de los valores de solution_ant y las calendarizaciones de ant_solution_scheduling
         */
-        void pheromone_update_list(std::vector<std::vector<std::vector<std::vector<int>>>>,float,int,int); 
+        void pheromone_update_list(std::vector<std::vector<std::vector<std::vector<int>>>>,float,int,int,int); 
 
         /*
         Retorna la cantidad de soluciones que se han guardado en la lista de mejores 

@@ -60,7 +60,7 @@ int main(int argc,char* argv[]) {
     int limit_iteration = 50;
     int limit_benefit_search = 10;
     int k = 10;
- 
+
     /*Toma de paramatros por bash*/
     if(argc>1)
     {
@@ -214,6 +214,7 @@ int main(int argc,char* argv[]) {
     int number_articles = articles.get_number_articles();
     Ants ants = Ants(number_ants,max_pheromone,min_pheromone,number_articles, alpha, beta,articles.get_similarity_matrix(),vapor,c,e,seed);
     
+    
     std::vector<std::vector<std::vector<std::vector<int>>>> very_best_solution;
     float very_best_solution_quality = 0;
     long double best_time_execution;
@@ -228,7 +229,13 @@ int main(int argc,char* argv[]) {
         printf("Anthill\tTime\tMean p\tStd p\tBene\tAuthors\tTopics\tQuality\n");
     }
 
-    for(int anthill=0; anthill<number_anthill;anthill++)
+    int anthill=0;
+    int limit_iterations_without_improvement  = 1000;
+    int current_iterarion_without_improvement = 0;
+
+    while((anthill<number_anthill) && (current_iterarion_without_improvement < limit_iterations_without_improvement))
+
+    //for(int int anthill=0; anthill<number_anthill;anthill++)
     {   
         //std::cout<<"Conjunto de hormigas: "<<anthill<<std::endl;
         
@@ -575,6 +582,8 @@ int main(int argc,char* argv[]) {
             very_best_solution = best_solution;
             best_time_execution = duration;
 
+            current_iterarion_without_improvement = 0;
+
             if(write_convergence)
             {
                 //auto stop = high_resolution_clock::now();
@@ -621,7 +630,15 @@ int main(int argc,char* argv[]) {
 
         }
 
+        else
+        {
+            current_iterarion_without_improvement ++;
+            //printf("Iteration without improvemnt:\t%d\n",current_iterarion_without_improvement);
+        }
+
         std::vector<std::vector<std::vector<std::vector<int>>>>().swap(best_solution);
+
+        anthill ++;
     }
 
     /*Datos de la mejor solucion*/
@@ -690,7 +707,7 @@ int main(int argc,char* argv[]) {
     convergenceFile.close();
 
     std::cout<<
-        number_anthill<<"\t\t"<<
+        anthill<<"\t\t"<<
         std::setprecision(1) << std::fixed <<  delta_time <<"\t\t"<<
         std::setprecision(1) << std::fixed <<  pheromone_matrix_indicator[0] <<"\t\t"<<
         std::setprecision(1) << std::fixed <<  pheromone_matrix_indicator[1] <<"\t\t"<<
